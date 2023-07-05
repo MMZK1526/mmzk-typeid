@@ -11,6 +11,3 @@ main :: IO ()
 main = do
     timestamp <- getEpochMilli
     print timestamp
-    let bs = runPut $ fillTime timestamp
-    let value = runGet getInt64be bs
-    print value
