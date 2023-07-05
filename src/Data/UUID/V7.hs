@@ -9,11 +9,23 @@ import qualified Data.ByteString.Lazy as BSL
 import           Data.IORef
 import           Data.Time.Clock.POSIX
 import           Data.Word
+import           Numeric
 import           System.Entropy
 import           System.IO.Unsafe (unsafePerformIO)
 
 newtype UUID = UUID { unUUID :: ByteString }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+
+instance Show UUID where
+  show (UUID bs)
+    | BSL.length bs /= 16 = "<INVALID-UUID>"
+    | otherwise           = showHex b0 . showHex b1
+                          . (('-' :) . showHex b2)
+                          . (('-' :) . showHex b3)
+                          . (('-' :) . showHex b4)
+                          . (('-' :) . showHex b5) . showHex b6 $ showHex b7 ""
+    where
+      [b0, b1, b2, b3, b4, b5, b6, b7] = runGet (replicateM 8 getWord16be) bs
 
 -- | Generate @n@ UUID V7s.
 --
@@ -38,11 +50,11 @@ genUUIDs n = do
   -- If the current timestamp decreased, it means another thread got ahead of
   -- us, so we return "Nothing".
   (n', seqNo)  <- atomicModifyIORef __state__ $ \(ts, seqNo) -> if
-    | ts < timestamp    -> let (n', entropy16') = getMaxSlots n seqNo
-                           in  ((timestamp, entropy16'), (n', seqNo + 1))
-    | ts > timestamp    -> ((ts, seqNo), (0, 0))
-    | otherwise         -> let (n', entropy16') = getMaxSlots n entropy16
+    | ts < timestamp    -> let (n', entropy16') = getMaxSlots n entropy16
                            in  ((timestamp, entropy16'), (n', entropy16 + 1))
+    | ts > timestamp    -> ((ts, seqNo), (0, 0))
+    | otherwise         -> let (n', entropy16') = getMaxSlots n seqNo
+                           in  ((timestamp, entropy16'), (n', seqNo + 1))
   -- When we get "Nothing", we try again, hopefully with a new timestamp.
   if n' == 0
     then genUUIDs n
@@ -51,8 +63,8 @@ genUUIDs n = do
         entropy64 <- getEntropyWord64
         pure . UUID . runPut $ do
           fillTime timestamp
-          fillVerAndRandA curN
-          fillVarAndRandB curN entropy64
+          fillVerAndRandA (seqNo + curN)
+          fillVarAndRandB (seqNo + curN) entropy64
       if n' == n
         then pure uuids
         else (uuids ++) <$> genUUIDs (n - n')
@@ -66,8 +78,8 @@ __state__ = unsafePerformIO (newIORef (0, 0))
 -- time.
 fillTime :: Word64 -> Put
 fillTime timestamp = do
-  let (_, p1, p2, p3) = splitWord64 timestamp
-  mapM_ putWord8 [p1, p2, p3]
+  let (_, p2, p1, p0) = splitWord64ToWord16s timestamp
+  mapM_ putWord16be [p2, p1, p0]
 {-# INLINE fillTime #-}
 
 -- | Fill in the version and rand_a part of a UUID V7 with the given sequence
@@ -93,9 +105,9 @@ fillVerAndRandA seqNo = do
 -- sequence number.
 fillVarAndRandB :: Word16 -> Word64 -> Put
 fillVarAndRandB seqNo entropy = do
-  let seqNoRandB  = seqNo .&. 0xF
+  let seqNoRandB   = seqNo .&. 0xF
   let randBWithVar = fromIntegral (seqNoRandB .|. (0x2 `shiftL` 4))
-  putWord64be $ entropy .|. (randBWithVar `shiftL` 58)
+  putWord64be $ (entropy .&. 0x3FFFFFFFFFFFFFF) .|. (randBWithVar `shiftL` 58)
 
 -- | Get the current time in milliseconds since the Unix epoch.
 getEpochMilli :: IO Word64
@@ -104,14 +116,14 @@ getEpochMilli = do
   return $ round $ t * 1000
 {-# INLINE getEpochMilli #-}
 
-splitWord64 :: Word64 -> (Word8, Word8, Word8, Word8)
-splitWord64 n =
-  let b1 = fromIntegral (n .&. 0xFF)
-      b2 = fromIntegral ((n `shiftR` 8) .&. 0xFF)
-      b3 = fromIntegral ((n `shiftR` 16) .&. 0xFF)
-      b4 = fromIntegral ((n `shiftR` 24) .&. 0xFF)
-  in (b1, b2, b3, b4)
-{-# INLINE splitWord64 #-}
+splitWord64ToWord16s :: Word64 -> (Word16, Word16, Word16, Word16)
+splitWord64ToWord16s n =
+  let b0 = fromIntegral (n .&. 0xFFFF)
+      b1 = fromIntegral ((n `shiftR` 16) .&. 0xFFFF)
+      b2 = fromIntegral ((n `shiftR` 32) .&. 0xFFFF)
+      b3 = fromIntegral ((n `shiftR` 48) .&. 0xFFFF)
+  in (b3, b2, b1, b0)
+{-# INLINE splitWord64ToWord16s #-}
 
 getEntropyWord16 :: IO Word16
 getEntropyWord16 = do
