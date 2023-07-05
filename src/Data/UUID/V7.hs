@@ -1,6 +1,7 @@
 module Data.UUID.V7 where
 
 import           Control.Monad
+import           Data.Array
 import           Data.Binary.Get
 import           Data.Binary.Put
 import           Data.Bits
@@ -9,7 +10,6 @@ import qualified Data.ByteString.Lazy as BSL
 import           Data.IORef
 import           Data.Time.Clock.POSIX
 import           Data.Word
-import           Numeric
 import           System.Entropy
 import           System.IO.Unsafe (unsafePerformIO)
 
@@ -19,13 +19,25 @@ newtype UUID = UUID { unUUID :: ByteString }
 instance Show UUID where
   show (UUID bs)
     | BSL.length bs /= 16 = "<INVALID-UUID>"
-    | otherwise           = showHex b0 . showHex b1
-                          . (('-' :) . showHex b2)
-                          . (('-' :) . showHex b3)
-                          . (('-' :) . showHex b4)
-                          . (('-' :) . showHex b5) . showHex b6 $ showHex b7 ""
+    | otherwise           = word16ToHex b0
+                          . word16ToHex b1
+                          . (('-' :) . word16ToHex b2)
+                          . (('-' :) . word16ToHex b3)
+                          . (('-' :) . word16ToHex b4)
+                          . (('-' :) . word16ToHex b5)
+                          . word16ToHex b6
+                          $ word16ToHex b7 ""
     where
-      [b0, b1, b2, b3, b4, b5, b6, b7] = runGet (replicateM 8 getWord16be) bs
+      [b0, b1, b2, b3, b4, b5, b6, b7]
+        = runGet (replicateM 8 getWord16be) bs
+      hexTable
+        = listArray (0, 15) "0123456789abcdef"
+      word16ToHex w rem
+       = let (q0, r0) = w `divMod` 16
+             (q1, r1) = q0 `divMod` 16
+             (q2, r2) = q1 `divMod` 16
+             (q3, r3) = q2 `divMod` 16
+         in  hexTable ! r3 : hexTable ! r2 : hexTable ! r1 : hexTable ! r0 : rem
 
 -- | Generate @n@ UUID V7s.
 --
