@@ -1,5 +1,6 @@
 module Data.UUID.V7 where
-import Debug.Trace
+
+import           Data.Binary.Get
 import           Data.Binary.Put
 import           Data.Bits
 import           Data.ByteString.Lazy (ByteString)
@@ -7,7 +8,11 @@ import qualified Data.ByteString.Lazy as BSL
 import           Data.IORef
 import           Data.Int
 import           Data.Time.Clock.POSIX
+import           System.Entropy
 import           System.IO.Unsafe (unsafePerformIO)
+
+newtype UUID = UUID { unUUID :: ByteString }
+  deriving (Eq, Ord)
 
 -- | The global mutable state of (timestamp, sequence number).
 __state__ :: IORef (Int64, Int16)
@@ -64,3 +69,9 @@ splitInt64 n =
       b4 = fromIntegral ((n `shiftR` 24) .&. 0xFF)
   in (b1, b2, b3, b4)
 {-# INLINE splitInt64 #-}
+
+getEntropyInt64 :: IO Int64
+getEntropyInt64 = do
+  bs <- BSL.fromStrict <$> getEntropy 8
+  return $ runGet getInt64be bs
+{-# INLINE getEntropyInt64 #-}
