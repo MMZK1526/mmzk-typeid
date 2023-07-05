@@ -1,5 +1,6 @@
 module Data.UUID.V7 where
 
+import           Control.Monad
 import           Data.Binary.Get
 import           Data.Binary.Put
 import           Data.Bits
@@ -18,30 +19,43 @@ newtype UUID = UUID { unUUID :: ByteString }
 --
 -- It tries its best to generate UUIDs at the same timestamp, but it may not be
 -- possible if we are asking too many UUIDs at the same time.
---
--- If @n@ is less than or equal to 0, an empty list is returned.
--- genUUIDs :: Int -> IO [UUID]
--- genUUIDs n | n <= 0 = pure []
--- genUUIDs n = do
---   timestamp <- getEpochMilli
---   -- Get the sequence number corresponding to the current timestamp.
---   -- If the current timestamp has not changed, we need to increment the
---   -- sequence number, unless it's already at the maximum value, in which case
---   -- we return "Nothing".
---   -- If the current timestamp increased, we reset the sequence number to the
---   -- pre-calculated entropy.
---   -- If the current timestamp decreased, it means another thread got ahead of
---   -- us, so we return "Nothing".
---   (n', seqNo)  <- atomicModifyIORef __state__ $ \(ts, seqNo) -> if
---     | ts < timestamp    -> ((timestamp, 0), (0, 0))
---     | ts > timestamp    -> ((ts, seqNo), (0, -1))
---     | seqNo == maxBound -> ((ts, seqNo), Nothing)
---     | otherwise         -> ((ts, seqNo + 1), Just (seqNo + 1))
---   -- When we get "Nothing", we try again, hopefully with a new timestamp.
---   case mSeqNo of
---     Nothing    -> genUUIDs n
---     Just seqNo -> do
---       undefined
+genUUIDs :: Word16 -> IO [UUID]
+genUUIDs 0 = pure []
+genUUIDs n = do
+  timestamp <- getEpochMilli
+  -- We set the first bit of the entropy to 0 to ensure that there's enough
+  -- room for incrementing the sequence number.
+  entropy16 <- (.&. 0x7FFF) <$> getEntropyWord16
+  let getMaxSlots num seqNo = if 0xFFFF - seqNo < num
+        then (0xFFFF - seqNo, 0xFFFF)
+        else (num, seqNo + num)
+  -- Get the sequence number corresponding to the current timestamp.
+  -- If the current timestamp has not changed, we need to increment the
+  -- sequence number, unless it's already at the maximum value, in which case
+  -- we return "Nothing".
+  -- If the current timestamp increased, we reset the sequence number to the
+  -- pre-calculated entropy.
+  -- If the current timestamp decreased, it means another thread got ahead of
+  -- us, so we return "Nothing".
+  (n', seqNo)  <- atomicModifyIORef __state__ $ \(ts, seqNo) -> if
+    | ts < timestamp    -> let (n', entropy16') = getMaxSlots n seqNo
+                           in  ((timestamp, entropy16'), (n', seqNo + 1))
+    | ts > timestamp    -> ((ts, seqNo), (0, 0))
+    | otherwise         -> let (n', entropy16') = getMaxSlots n entropy16
+                           in  ((timestamp, entropy16'), (n', entropy16 + 1))
+  -- When we get "Nothing", we try again, hopefully with a new timestamp.
+  if n' == 0
+    then genUUIDs n
+    else do
+      uuids <- forM [0..(n' - 1)] $ \curN -> do
+        entropy64 <- getEntropyWord64
+        pure . UUID . runPut $ do
+          fillTime timestamp
+          fillVerAndRandA curN
+          fillVarAndRandB curN entropy64
+      if n' == n
+        then pure uuids
+        else (uuids ++) <$> genUUIDs (n - n')
 
 -- | The global mutable state of (timestamp, sequence number).
 __state__ :: IORef (Word64, Word16)
