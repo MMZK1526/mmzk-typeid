@@ -25,7 +25,8 @@ executable playground
     main-is:          Main.hs
     other-modules:
         Data.UUID.V7
-    -- default-extensions:
+    default-extensions:
+        MultiWayIf
     build-depends:
         base ^>=4.16.4.0,
         binary ^>=0.8.9,
@@ -40,7 +41,8 @@ library
     exposed-modules:
         Data.UUID.V7
     -- other-modules:
-    -- default-extensions:
+    default-extensions:
+        MultiWayIf
     build-depends:
         base ^>=4.16.4.0,
         binary ^>=0.8.9,
