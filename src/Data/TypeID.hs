@@ -77,14 +77,9 @@ parseString str = case span (/= '_') str of
   (prefix, _ : suffix) -> do
     let prefix' = T.pack prefix
     let bs      = fromString suffix
-    unless (BSL.length bs == 26) $ Left TypeIDErrorUUIDError
-    unless (bs `BSL.index` 0 <= 55) $ Left TypeIDErrorUUIDError
-    when (any ((== 0xFF) . (table !)) $ BSL.unpack bs)
-      $ Left TypeIDErrorUUIDError
     case checkPrefix prefix' of
       Nothing  -> TypeID prefix' <$> decodeUUID bs
       Just err -> Left err
-    TypeID "" <$> decodeUUID bs
   where
     bs = fromString str
 
@@ -94,10 +89,6 @@ parseText text = case second T.uncons $ T.span (/= '_') text of
   (_, Nothing)               -> TypeID "" <$> decodeUUID bs
   (prefix, Just (_, suffix)) -> do
     let bs = BSL.fromStrict $ encodeUtf8 suffix
-    unless (BSL.length bs == 26) $ Left TypeIDErrorUUIDError
-    unless (bs `BSL.index` 0 <= 55) $ Left TypeIDErrorUUIDError
-    when (any ((== 0xFF) . (table !)) $ BSL.unpack bs)
-      $ Left TypeIDErrorUUIDError
     case checkPrefix prefix of
       Nothing  -> TypeID prefix <$> decodeUUID bs
       Just err -> Left err
@@ -110,10 +101,6 @@ parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
   (_, Nothing)               -> TypeID "" <$> decodeUUID bs
   (prefix, Just (_, suffix)) -> do
     let prefix' = decodeUtf8 $ BSL.toStrict prefix
-    unless (BSL.length suffix == 26) $ Left TypeIDErrorUUIDError
-    unless (suffix `BSL.index` 0 <= 55) $ Left TypeIDErrorUUIDError
-    when (any ((== 0xFF) . (table !)) $ BSL.unpack suffix)
-      $ Left TypeIDErrorUUIDError
     case checkPrefix prefix' of
       Nothing  -> TypeID prefix' <$> decodeUUID suffix
       Just err -> Left err
@@ -210,8 +197,7 @@ decodeUUID :: ByteString -> Either TypeIDError UUID
 decodeUUID bs = do
   unless (BSL.length bs == 26) $ Left TypeIDErrorUUIDError
   unless (bs `BSL.index` 0 <= 55) $ Left TypeIDErrorUUIDError
-  when (any ((== 0xFF) . (table !)) $ BSL.unpack bs)
-    $ Left TypeIDErrorUUIDError
+  when (any ((== 0xFF) . (table !)) $ BSL.unpack bs) $ Left TypeIDErrorUUIDError
   pure . UUID $ suffixDecode bs
 
 table :: Array Word8 Word8
