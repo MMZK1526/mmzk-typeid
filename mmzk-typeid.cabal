@@ -26,6 +26,7 @@ executable playground
     other-modules:
         Data.UUID.V7
     default-extensions:
+        InstanceSigs
         MultiWayIf
     build-depends:
         base ^>=4.16.4.0,
@@ -43,6 +44,7 @@ library
         Data.UUID.V7
     -- other-modules:
     default-extensions:
+        InstanceSigs
         MultiWayIf
     build-depends:
         base ^>=4.16.4.0,

@@ -1,4 +1,9 @@
-module Data.UUID.V7 where
+module Data.UUID.V7
+  ( UUID(..)
+  , genUUID
+  , genUUIDs
+  , getEpochMilli
+  ) where
 
 import           Control.Monad
 import           Data.Array
@@ -17,6 +22,7 @@ newtype UUID = UUID { unUUID :: ByteString }
   deriving (Eq, Ord)
 
 instance Show UUID where
+  show :: UUID -> String
   show (UUID bs)
     | BSL.length bs /= 16 = "<INVALID-UUID>"
     | otherwise           = word16ToHex b0
@@ -39,6 +45,10 @@ instance Show UUID where
              (q3, r3) = q2 `divMod` 16
          in  hexTable ! r3 : hexTable ! r2 : hexTable ! r1 : hexTable ! r0 : rem
 
+-- | Generate a UUID V7.
+genUUID :: IO UUID
+genUUID = head <$> genUUIDs 1
+
 -- | Generate @n@ UUID V7s.
 --
 -- It tries its best to generate UUIDs at the same timestamp, but it may not be
@@ -50,24 +60,21 @@ genUUIDs n = do
   -- We set the first bit of the entropy to 0 to ensure that there's enough
   -- room for incrementing the sequence number.
   entropy16 <- (.&. 0x7FFF) <$> getEntropyWord16
+  -- Calculate the maximum number of slots we can use for the current timestamp
+  -- before the sequence number overflows.
   let getMaxSlots num seqNo = if 0xFFFF - seqNo < num
         then (0xFFFF - seqNo, 0xFFFF)
         else (num, seqNo + num)
-  -- Get the sequence number corresponding to the current timestamp.
-  -- If the current timestamp has not changed, we need to increment the
-  -- sequence number, unless it's already at the maximum value, in which case
-  -- we return "Nothing".
-  -- If the current timestamp increased, we reset the sequence number to the
-  -- pre-calculated entropy.
-  -- If the current timestamp decreased, it means another thread got ahead of
-  -- us, so we return "Nothing".
+  -- Get the sequence number corresponding to the current timestamp and the
+  -- number of UUIDs we can generate.
   (n', seqNo)  <- atomicModifyIORef __state__ $ \(ts, seqNo) -> if
-    | ts < timestamp    -> let (n', entropy16') = getMaxSlots n entropy16
-                           in  ((timestamp, entropy16'), (n', entropy16 + 1))
-    | ts > timestamp    -> ((ts, seqNo), (0, 0))
-    | otherwise         -> let (n', entropy16') = getMaxSlots n seqNo
-                           in  ((timestamp, entropy16'), (n', seqNo + 1))
-  -- When we get "Nothing", we try again, hopefully with a new timestamp.
+    | ts < timestamp -> let (n', entropy16') = getMaxSlots n entropy16
+                        in  ((timestamp, entropy16'), (n', entropy16 + 1))
+    | ts > timestamp -> ((ts, seqNo), (0, 0))
+    | otherwise      -> let (n', entropy16') = getMaxSlots n seqNo
+                        in  ((timestamp, entropy16'), (n', seqNo + 1))
+  -- If we can't generate any UUIDs, we try again, hoping that the timestamp
+  -- has changed.
   if n' == 0
     then genUUIDs n
     else do

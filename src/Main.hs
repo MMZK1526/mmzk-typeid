@@ -9,5 +9,5 @@ import           Data.Int
 
 main :: IO ()
 main = do
-    timestamp <- getEpochMilli
-    print timestamp
+  timestamp <- getEpochMilli
+  print timestamp
