@@ -21,11 +21,14 @@ maintainer:         yc4120@ic.ac.uk
 -- category:
 extra-source-files: CHANGELOG.md
 
+
 executable playground
     main-is:          Main.hs
     other-modules:
+        Data.TypeID,
         Data.UUID.V7
     default-extensions:
+        BlockArguments
         InstanceSigs
         MultiWayIf
     build-depends:
@@ -34,6 +37,7 @@ executable playground
         binary ^>=0.8.9,
         bytestring ^>= 0.11,
         entropy ^>=0.4,
+        text ^>=2.0,
         time ^>=1.11,
     hs-source-dirs:   src
     default-language: Haskell2010
@@ -41,9 +45,11 @@ executable playground
 
 library
     exposed-modules:
+        Data.TypeID,
         Data.UUID.V7
     -- other-modules:
     default-extensions:
+        BlockArguments
         InstanceSigs
         MultiWayIf
     build-depends:
@@ -52,6 +58,7 @@ library
         binary ^>=0.8.9,
         bytestring ^>= 0.11,
         entropy ^>=0.4,
+        text ^>=2.0,
         time ^>=1.11,
     hs-source-dirs:   src
     default-language: Haskell2010

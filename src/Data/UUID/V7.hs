@@ -48,11 +48,15 @@ instance Show UUID where
 -- | Generate a UUID V7.
 genUUID :: IO UUID
 genUUID = head <$> genUUIDs 1
+{-# INLINE genUUID #-}
 
 -- | Generate @n@ UUID V7s.
 --
--- It tries its best to generate UUIDs at the same timestamp, but it may not be
--- possible if we are asking too many UUIDs at the same time.
+-- It tries its best to generate @UUIDs@ at the same timestamp, but it may not
+-- be possible if we are asking too many @UUID@s at the same time.
+--
+-- It is guaranteed that the first 32768 @UUIDs@ are generated at the same
+-- timestamp.
 genUUIDs :: Word16 -> IO [UUID]
 genUUIDs 0 = pure []
 genUUIDs n = do
@@ -80,7 +84,7 @@ genUUIDs n = do
     else do
       uuids <- forM [0..(n' - 1)] $ \curN -> do
         entropy64 <- getEntropyWord64
-        pure . UUID . runPut $ do
+        pure . UUID $ runPut do
           fillTime timestamp
           fillVerAndRandA (seqNo + curN)
           fillVarAndRandB (seqNo + curN) entropy64
@@ -89,6 +93,9 @@ genUUIDs n = do
         else (uuids ++) <$> genUUIDs (n - n')
 
 -- | The global mutable state of (timestamp, sequence number).
+--
+-- The "NOINLINE" pragma is IMPORTANT! The logic would be flawed if @__state__@
+-- is inlined by its definition.
 __state__ :: IORef (Word64, Word16)
 __state__ = unsafePerformIO (newIORef (0, 0))
 {-# NOINLINE __state__ #-}
