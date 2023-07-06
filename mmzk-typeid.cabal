@@ -31,6 +31,7 @@ executable playground
         BlockArguments
         InstanceSigs
         MultiWayIf
+        OverloadedStrings
     build-depends:
         base ^>=4.16.4.0,
         array ^>=0.5,
@@ -53,6 +54,7 @@ library
         BlockArguments
         InstanceSigs
         MultiWayIf
+        OverloadedStrings
     build-depends:
         base ^>=4.16.4.0,
         array ^>=0.5,

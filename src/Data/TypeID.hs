@@ -12,12 +12,13 @@ import           Data.Char
 import           Data.String
 import           Data.Text (Text)
 import qualified Data.Text as T
-import           Data.UUID.V7
+import           Data.UUID.V7 (UUID)
+import qualified Data.UUID.V7 as UUID
 import           Data.Word
 
 data TypeID = TypeID { getPrefix :: Text
                      , getUUID   :: UUID }
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Show)
 
 data TypeIDError = TypeIDErrorPrefixTooLong Int
                  | TypeIDErrorPrefixInvalidChar Char
@@ -31,6 +32,25 @@ instance Show TypeIDError where
     = concat ["Prefix contains invalid character ", show c, "!"]
 
 instance Exception TypeIDError
+
+-- | Pretty-print a @TypeID@.
+toString :: TypeID -> String
+toString (TypeID prefix uuid) = if T.null prefix
+  then suffixEncode (UUID.unUUID uuid)
+  else T.unpack prefix ++ "_" ++ suffixEncode (UUID.unUUID uuid)
+{-# INLINE toString #-}
+
+-- | Pretty-print a @TypeID@ to strict @Text@.
+toText :: TypeID -> Text
+toText (TypeID prefix uuid) = if T.null prefix
+  then T.pack (suffixEncode $ UUID.unUUID uuid)
+  else prefix <> "_" <> T.pack (suffixEncode $ UUID.unUUID uuid)
+{-# INLINE toText #-}
+
+-- | Pretty-print a @TypeID@ to lazy @ByteString@.
+toByteString :: TypeID -> ByteString
+toByteString = fromString . toString
+{-# INLINE toByteString #-}
 
 -- | Generates a new @TypeID@ from a prefix.
 --
@@ -50,7 +70,7 @@ genTypeID = fmap head . genTypeIDs 1
 -- timestamp.
 genTypeIDs :: Word16 -> Text -> IO [TypeID]
 genTypeIDs n prefix = case checkPrefix prefix of
-  Nothing  -> map (TypeID prefix) <$> genUUIDs n
+  Nothing  -> map (TypeID prefix) <$> UUID.genUUIDs n
   Just err -> throwIO err
 {-# INLINE genTypeIDs #-}
 
@@ -96,6 +116,3 @@ suffixEncode bs = (alphabet !) <$> runST do
   elems <$> unsafeFreeze dest
   where
     alphabet = listArray (0, 31) "0123456789abcdefghjkmnpqrstvwxyz"
-
-foo :: String
-foo = suffixEncode $ fromString ""
