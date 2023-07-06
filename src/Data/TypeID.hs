@@ -1,5 +1,5 @@
 module Data.TypeID
-  ( TypeID(..)
+  ( TypeID(getPrefix, getUUID)
   , TypeIDError(..)
   , toString
   , toText
