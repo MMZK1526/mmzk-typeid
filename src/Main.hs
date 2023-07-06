@@ -1,13 +1,14 @@
 module Main where
 
-import           Data.UUID.V7
-import           Data.ByteString.Lazy (ByteString)
-import qualified Data.ByteString.Lazy as BSL
-import           Data.Binary.Put
-import           Data.Binary.Get
-import           Data.Int
+import           Data.TypeID
+import Control.Exception
 
 main :: IO ()
 main = do
-  timestamp <- getEpochMilli
-  print timestamp
+  putStrLn "Making a TypeID:"
+  typeID <- genTypeID "mmzk"
+  putStrLn $ toString typeID
+  putStrLn "Making a TypeID from a String:"
+  case parseString "mmzk_01h455vb4pex5vsknk084sn02q" of
+    Left err     -> throwIO err
+    Right typeID -> putStrLn $ toString typeID
