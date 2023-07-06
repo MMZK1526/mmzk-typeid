@@ -1,4 +1,13 @@
-module Data.TypeID where
+module Data.TypeID
+  ( TypeID(..)
+  , TypeIDError(..)
+  , toString
+  , toText
+  , toByteString
+  , genTypeID
+  , genTypeIDs
+  , checkPrefix
+  ) where
 
 import           Control.Exception
 import           Control.Monad.ST
@@ -74,12 +83,14 @@ genTypeIDs n prefix = case checkPrefix prefix of
   Just err -> throwIO err
 {-# INLINE genTypeIDs #-}
 
+-- | Check if the given prefix is a valid TypeID prefix.
 checkPrefix :: Text -> Maybe TypeIDError
 checkPrefix prefix
   | T.length prefix > 63 = Just $ TypeIDErrorPrefixTooLong (T.length prefix)
   | otherwise            = case T.uncons (T.dropWhile isLower prefix) of
       Nothing     -> Nothing
       Just (c, _) -> Just $ TypeIDErrorPrefixInvalidChar c
+{-# INLINE checkPrefix #-}
 
 -- The helpers below are verbatim and translation from the official highly
 -- magical Go implementation.
