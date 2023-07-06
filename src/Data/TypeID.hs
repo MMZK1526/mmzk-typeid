@@ -17,7 +17,7 @@ import           Control.Monad
 import           Control.Monad.ST
 import           Data.Array
 import           Data.Array.ST
-import           Data.Array.Unsafe
+import           Data.Array.Unsafe (unsafeFreeze)
 import           Data.Bifunctor
 import           Data.Bits
 import           Data.ByteString.Lazy (ByteString)
