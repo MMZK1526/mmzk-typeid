@@ -105,7 +105,7 @@ parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
       Nothing  -> TypeID prefix' <$> decodeUUID suffix
       Just err -> Left err
 
--- | Generates a new @TypeID@ from a prefix.
+-- | Generate a new @TypeID@ from a prefix.
 --
 -- It throws a @TypeIDError@ if the prefix does not match the specification,
 -- namely if it's longer than 63 characters or if it contains characters other
@@ -114,7 +114,7 @@ genTypeID :: Text -> IO TypeID
 genTypeID = fmap head . genTypeIDs 1
 {-# INLINE genTypeID #-}
 
--- | Generates @n@ @TypeID@s from a prefix.
+-- | Generate @n@ @TypeID@s from a prefix.
 --
 -- It tries its best to generate @TypeID@s at the same timestamp, but it may not
 -- be possible if we are asking too many @UUID@s at the same time.
