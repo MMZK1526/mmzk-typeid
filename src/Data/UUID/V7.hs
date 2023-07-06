@@ -3,9 +3,17 @@ module Data.UUID.V7
   , genUUID
   , genUUIDs
   , getEpochMilli
+  , parseString
+  , parseText
+  , parseByteString
+  , toString
+  , toText
+  , toByteString
   ) where
 
 import           Control.Monad
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.Maybe
 import           Data.Array
 import           Data.Binary.Get
 import           Data.Binary.Put
@@ -13,17 +21,21 @@ import           Data.Bits
 import           Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Lazy as BSL
 import           Data.IORef
+import           Data.String
+import           Data.Text (Text)
+import qualified Data.Text as T
+import           Data.Text.Encoding
 import           Data.Time.Clock.POSIX
 import           Data.Word
 import           System.Entropy
 import           System.IO.Unsafe (unsafePerformIO)
 
 newtype UUID = UUID { unUUID :: ByteString }
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Show)
 
-instance Show UUID where
-  show :: UUID -> String
-  show (UUID bs)
+-- | Pretty-print a UUID v7. 
+toString :: UUID -> String
+toString (UUID bs)
     | BSL.length bs /= 16 = "<INVALID-UUID>"
     | otherwise           = word16ToHex b0
                           . word16ToHex b1
@@ -44,6 +56,71 @@ instance Show UUID where
              (q2, r2) = q1 `divMod` 16
              (q3, r3) = q2 `divMod` 16
          in  hexTable ! r3 : hexTable ! r2 : hexTable ! r1 : hexTable ! r0 : rem
+
+-- | Pretty-print a UUID v7 to strict @Text@.
+toText :: UUID -> Text
+toText = T.pack . toString
+{-# INLINE toText #-}
+
+-- | Pretty-print a UUID v7 to lazy @ByteString@.
+toByteString :: UUID -> ByteString
+toByteString = fromString . toString
+{-# INLINE toByteString #-}
+
+-- | Parse a UUID v7 from its @String@ representation.
+--
+-- The representation is either standard or has no dashes. Does not care about
+-- the case of the letters.
+parseString :: String -> Maybe UUID
+parseString = parseByteString . fromString
+{-# INLINE parseString #-}
+
+-- | Parse a UUID v7 from its string representation as a strict @Text@.
+--
+-- The representation is either standard or has no dashes. Does not care about
+-- the case of the letters.
+parseText :: Text -> Maybe UUID
+parseText = parseByteString . BSL.fromStrict . encodeUtf8
+{-# INLINE parseText #-}
+
+-- | Parse a UUID v7 from its string representation as a lazy @ByteString@.
+--
+-- The representation is either standard or has no dashes. Does not care about
+-- the case of the letters.
+parseByteString :: ByteString -> Maybe UUID
+parseByteString bs
+  | BSL.length bs == 32 = UUID <$> parse False
+  | BSL.length bs == 36 = UUID <$> parse True
+  | otherwise           = Nothing
+  where
+    parse hasDashes    = (`runGet` bs) $ runMaybeT do
+      raw1 <- lift $ replicateM 4 (liftM2 (,) getWord8 getWord8)
+      seg1 <- hoistMaybe $ mapM readHexPair raw1
+      when hasDashes checkDash
+      raw2 <- lift $ replicateM 2 (liftM2 (,) getWord8 getWord8)
+      seg2 <- hoistMaybe $ mapM readHexPair raw2
+      when hasDashes checkDash
+      raw3 <- lift $ replicateM 2 (liftM2 (,) getWord8 getWord8)
+      seg3 <- hoistMaybe $ mapM readHexPair raw3
+      when hasDashes checkDash
+      raw4 <- lift $ replicateM 2 (liftM2 (,) getWord8 getWord8)
+      seg4 <- hoistMaybe $ mapM readHexPair raw4
+      when hasDashes checkDash
+      raw5 <- lift $ replicateM 6 (liftM2 (,) getWord8 getWord8)
+      seg5 <- hoistMaybe $ mapM readHexPair raw5
+      pure . runPut . mapM_ putWord8 $ concat [seg1, seg2, seg3, seg4, seg5]
+    readHex w
+      | w >= 48 && w <= 57  = Just (w - 48)
+      | w >= 65 && w <= 70  = Just (w - 55)
+      | w >= 97 && w <= 102 = Just (w - 87)
+      | otherwise           = Nothing
+    readHexPair (x, y) = do
+      x' <- readHex x
+      y' <- readHex y
+      pure (x' * 16 + y')
+    checkDash          = do
+      w <- lift getWord8
+      guard (w == 45)
 
 -- | Generate a UUID V7.
 genUUID :: IO UUID
