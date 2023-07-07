@@ -10,7 +10,9 @@ author:             MMZK1526
 maintainer:         mmzk1526@ic.ac.uk
 extra-source-files:
     CHANGELOG.md
+    LICENSE
     test/invalid.json
+    test/valid.json
 
 
 test-suite test
