@@ -1,6 +1,15 @@
+-- | An implementation of the typeid specification: https://github.com/jetpack-io/typeid.
 module Data.TypeID
-  ( TypeID(getPrefix, getUUID)
+  (
+  -- * Data types
+    TypeID(getPrefix, getUUID)
   , TypeIDError(..)
+  -- * typeid generation
+  , genTypeID
+  , genTypeIDs
+  -- * Prefix validation
+  , checkPrefix
+  -- * Encoding & decoding
   , toString
   , toText
   , toByteString
@@ -10,9 +19,6 @@ module Data.TypeID
   , parseStringWithPrefix
   , parseTextWithPrefix
   , parseByteStringWithPrefix
-  , genTypeID
-  , genTypeIDs
-  , checkPrefix
   ) where
 
 import           Control.Exception
@@ -35,6 +41,7 @@ import           Data.UUID.V7 (UUID(..))
 import qualified Data.UUID.V7 as UUID
 import           Data.Word
 
+-- | The constructor is not exposed to prevent generating invalid @TypeID@s.
 data TypeID = TypeID { getPrefix :: Text
                      , getUUID   :: UUID }
   deriving (Eq, Ord, Show)

@@ -1,14 +1,24 @@
+-- | UUID v7 implementation.
+--
+-- UUID v7 is not currently present in the uuid package, therefore I have to
+-- make a quick patch of my own. In the future I will try to add uuid as a
+-- dependency and try to use the same interface.
 module Data.UUID.V7
-  ( UUID(..)
+  ( 
+  -- * Data type
+    UUID(..)
+  -- * UUID generation
   , genUUID
   , genUUIDs
-  , getEpochMilli
+  -- * Encoding & decoding
   , parseString
   , parseText
   , parseByteString
   , toString
   , toText
   , toByteString
+  -- * Miscellaneous helper(s)
+  , getEpochMilli
   ) where
 
 import           Control.Monad
