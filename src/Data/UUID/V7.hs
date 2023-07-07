@@ -8,6 +8,7 @@ module Data.UUID.V7
   -- * Data type
     UUID(..)
   -- * UUID generation
+  , nil
   , genUUID
   , genUUIDs
   -- * Encoding & decoding
@@ -146,6 +147,11 @@ parseByteString bs
     checkDash          = do
       w <- lift getWord8
       guard (w == 45)
+
+-- | The nil UUID.
+nil :: UUID
+nil = UUID $ BSL.replicate 16 0
+{-# INLINE nil #-}
 
 -- | Generate a UUID V7.
 genUUID :: IO UUID
