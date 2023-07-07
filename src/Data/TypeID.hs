@@ -120,7 +120,7 @@ parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
 -- suffix.
 parseStringWithPrefix :: Text -> String -> Either TypeIDError TypeID
 parseStringWithPrefix prefix str = case parseString str of
-  Right (TypeID "" uuid) -> Right $ TypeID prefix uuid
+  Right (TypeID "" uuid) -> decorate prefix uuid
   Right (TypeID p  _)    -> Left $ TypeIDErrorAlreadyHasPrefix p
   Left err               -> Left err
 {-# INLINE parseStringWithPrefix #-}
@@ -129,7 +129,7 @@ parseStringWithPrefix prefix str = case parseString str of
 -- suffix as a strict @Text@.
 parseTextWithPrefix :: Text -> Text -> Either TypeIDError TypeID
 parseTextWithPrefix prefix text = case parseText text of
-  Right (TypeID "" uuid) -> Right $ TypeID prefix uuid
+  Right (TypeID "" uuid) -> decorate prefix uuid
   Right (TypeID p  _)    -> Left $ TypeIDErrorAlreadyHasPrefix p
   Left err               -> Left err
 {-# INLINE parseTextWithPrefix #-}
@@ -138,7 +138,7 @@ parseTextWithPrefix prefix text = case parseText text of
 -- suffix as a lazy @ByteString@.
 parseByteStringWithPrefix :: Text -> ByteString -> Either TypeIDError TypeID
 parseByteStringWithPrefix prefix bs = case parseByteString bs of
-  Right (TypeID "" uuid) -> Right $ TypeID prefix uuid
+  Right (TypeID "" uuid) -> decorate prefix uuid
   Right (TypeID p  _)    -> Left $ TypeIDErrorAlreadyHasPrefix p
   Left err               -> Left err
 {-# INLINE parseByteStringWithPrefix #-}
