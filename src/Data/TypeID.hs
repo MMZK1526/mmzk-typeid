@@ -132,7 +132,7 @@ checkPrefix :: Text -> Maybe TypeIDError
 checkPrefix prefix
   | T.length prefix > 63 = Just $ TypeIDErrorPrefixTooLong (T.length prefix)
   | otherwise  
-      = case T.uncons (T.dropWhile (liftM2 (&&) isAlpha isAscii) prefix) of
+      = case T.uncons (T.dropWhile (liftM2 (&&) isLower isAscii) prefix) of
         Nothing     -> Nothing
         Just (c, _) -> Just $ TypeIDErrorPrefixInvalidChar c
 {-# INLINE checkPrefix #-}
