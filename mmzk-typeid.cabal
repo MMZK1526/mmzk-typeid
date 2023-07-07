@@ -30,13 +30,18 @@ test-suite test
     main-is:          Spec.hs
     type:             exitcode-stdio-1.0
     other-modules:
+        Data.KindID,
         Data.TypeID,
+        Data.TypeID.Internal,
         Data.UUID.V7
     default-extensions:
         BlockArguments
+        DataKinds
+        KindSignatures
         InstanceSigs
         MultiWayIf
         OverloadedStrings
+        TypeApplications
     build-depends:
         base ^>=4.16.4.0,
         aeson ^>=2.1,
@@ -57,13 +62,18 @@ test-suite test
 executable playground
     main-is:          Main.hs
     other-modules:
+        Data.KindID,
         Data.TypeID,
+        Data.TypeID.Internal,
         Data.UUID.V7
     default-extensions:
         BlockArguments
+        DataKinds
+        KindSignatures
         InstanceSigs
         MultiWayIf
         OverloadedStrings
+        TypeApplications
     build-depends:
         base ^>=4.16.4.0,
         aeson ^>=2.1,
@@ -80,14 +90,19 @@ executable playground
 
 library
     exposed-modules:
+        Data.KindID,
         Data.TypeID,
         Data.UUID.V7
-    -- other-modules:
+    other-modules:
+        Data.TypeID.Internal
     default-extensions:
         BlockArguments
+        DataKinds
+        KindSignatures
         InstanceSigs
         MultiWayIf
         OverloadedStrings
+        TypeApplications
     build-depends:
         base ^>=4.16.4.0,
         aeson ^>=2.1,
