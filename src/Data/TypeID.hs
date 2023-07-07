@@ -54,6 +54,7 @@ instance FromJSON TypeID where
   {-# INLINE parseJSON #-}
 
 data TypeIDError = TypeIDErrorPrefixTooLong Int
+                 | TypeIDExtraSeparator
                  | TypeIDErrorPrefixInvalidChar Char
                  | TypeIDErrorAlreadyHasPrefix Text
                  | TypeIDErrorUUIDError
@@ -63,6 +64,8 @@ instance Show TypeIDError where
   show :: TypeIDError -> String
   show (TypeIDErrorPrefixTooLong n)
     = concat ["Prefix with ", show n, " characters is too long!"]
+  show TypeIDExtraSeparator
+    = "The underscore separator should not be present if the prefix is empty!"
   show (TypeIDErrorPrefixInvalidChar c)
     = concat ["Prefix contains invalid character ", show c, "!"]
   show (TypeIDErrorAlreadyHasPrefix prefix)
@@ -94,6 +97,7 @@ toByteString = fromString . toString
 -- | Parse a @TypeID@ from its @String@ representation.
 parseString :: String -> Either TypeIDError TypeID
 parseString str = case span (/= '_') str of
+  ("", _)              -> Left TypeIDExtraSeparator
   (_, "")              -> TypeID "" <$> decodeUUID bs
   (prefix, _ : suffix) -> do
     let prefix' = T.pack prefix
@@ -107,6 +111,7 @@ parseString str = case span (/= '_') str of
 -- | Parse a @TypeID@ from its string representation as a strict @Text@.
 parseText :: Text -> Either TypeIDError TypeID
 parseText text = case second T.uncons $ T.span (/= '_') text of
+  ("", _)                    -> Left TypeIDExtraSeparator
   (_, Nothing)               -> TypeID "" <$> decodeUUID bs
   (prefix, Just (_, suffix)) -> do
     let bs = BSL.fromStrict $ encodeUtf8 suffix
@@ -119,6 +124,7 @@ parseText text = case second T.uncons $ T.span (/= '_') text of
 -- | Parse a @TypeID@ from its string representation as a lazy @ByteString@.
 parseByteString :: ByteString -> Either TypeIDError TypeID
 parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
+  ("", _)                    -> Left TypeIDExtraSeparator
   (_, Nothing)               -> TypeID "" <$> decodeUUID bs
   (prefix, Just (_, suffix)) -> do
     let prefix' = decodeUtf8 $ BSL.toStrict prefix
