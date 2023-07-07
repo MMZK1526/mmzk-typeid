@@ -1,24 +1,13 @@
-cabal-version:      2.4
+cabal-version:      3.6
 name:               mmzk-typeid
 version:            0.1.0.0
 
--- A short (one-line) description of the package.
 -- synopsis:
-
--- A longer description of the package.
 -- description:
-
--- A URL where users can report bugs.
--- bug-reports:
-
--- The license under which the package is released.
--- license:
-author:             mmzk1526
-maintainer:         yc4120@ic.ac.uk
-
--- A copyright notice.
--- copyright:
--- category:
+bug-reports:        https://github.com/MMZK1526/mmzk-typeid/issues
+license:            MIT
+author:             MMZK1526
+maintainer:         mmzk1526@ic.ac.uk
 extra-source-files:
     CHANGELOG.md
     test/invalid.json
