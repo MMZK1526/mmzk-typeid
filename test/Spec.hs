@@ -24,6 +24,7 @@ main :: IO ()
 main = do
   invalid <- BSL.readFile "test/invalid.json" >>= throwDecode :: IO [TestData]
   valid   <- BSL.readFile "test/valid.json" >>= throwDecode :: IO [TestData]
+  uuid    <- V7.genUUID
 
   hspec do
     describe "Generate typeid" do
@@ -48,6 +49,9 @@ main = do
       describe "Can detect invalid prefix" do
         forM_ invalidPrefixes \(reason, prefix) -> it reason do
           TID.genTypeID prefix `shouldThrow` anyTypeIDError
+          case TID.decorate prefix uuid of
+            Left _  -> pure ()
+            Right _ -> expectationFailure "Should not be able to decorate with invalid prefix"
       let invalidSuffixes = [ ("spaces", " ")
                             , ("short", "01234")
                             , ("long", "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789")
