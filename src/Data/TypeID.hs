@@ -170,8 +170,8 @@ checkPrefix prefix
         Just (c, _) -> Just $ TypeIDErrorPrefixInvalidChar c
 {-# INLINE checkPrefix #-}
 
--- The helpers below are verbatim and translation from the official highly
--- magical Go implementation.
+-- The helpers below are verbatim translations from the official highly magical
+-- Go implementation.
 
 suffixEncode :: ByteString -> String
 suffixEncode bs = (alphabet !) <$> runST do
