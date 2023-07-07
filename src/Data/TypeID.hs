@@ -18,6 +18,7 @@ module Data.TypeID
 import           Control.Exception
 import           Control.Monad
 import           Control.Monad.ST
+import           Data.Aeson.Types hiding (Array)
 import           Data.Array
 import           Data.Array.ST
 import           Data.Array.Unsafe (unsafeFreeze)
@@ -37,6 +38,20 @@ import           Data.Word
 data TypeID = TypeID { getPrefix :: Text
                      , getUUID   :: UUID }
   deriving (Eq, Ord, Show)
+
+instance ToJSON TypeID where
+  toJSON :: TypeID -> Value
+  toJSON = toJSON . toText
+  {-# INLINE toJSON #-}
+
+instance FromJSON TypeID where
+  parseJSON :: Value -> Parser TypeID
+  parseJSON str = do
+    s <- parseJSON str
+    case parseString s of
+      Left err     -> fail $ show err
+      Right typeID -> pure typeID
+  {-# INLINE parseJSON #-}
 
 data TypeIDError = TypeIDErrorPrefixTooLong Int
                  | TypeIDErrorPrefixInvalidChar Char

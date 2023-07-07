@@ -19,7 +19,9 @@ maintainer:         yc4120@ic.ac.uk
 -- A copyright notice.
 -- copyright:
 -- category:
-extra-source-files: CHANGELOG.md
+extra-source-files:
+    CHANGELOG.md
+    test/invalid.json
 
 
 test-suite test
@@ -37,6 +39,7 @@ test-suite test
         OverloadedStrings
     build-depends:
         base ^>=4.16.4.0,
+        aeson ^>=2.1,
         array ^>=0.5,
         binary ^>=0.8.9,
         bytestring ^>= 0.11,
@@ -63,6 +66,7 @@ executable playground
         OverloadedStrings
     build-depends:
         base ^>=4.16.4.0,
+        aeson ^>=2.1,
         array ^>=0.5,
         binary ^>=0.8.9,
         bytestring ^>= 0.11,
@@ -86,6 +90,7 @@ library
         OverloadedStrings
     build-depends:
         base ^>=4.16.4.0,
+        aeson ^>=2.1,
         array ^>=0.5,
         binary ^>=0.8.9,
         bytestring ^>= 0.11,

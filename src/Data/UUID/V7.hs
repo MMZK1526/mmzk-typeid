@@ -14,6 +14,7 @@ module Data.UUID.V7
 import           Control.Monad
 import           Control.Monad.Trans.Class
 import           Control.Monad.Trans.Maybe
+import           Data.Aeson.Types
 import           Data.Array
 import           Data.Binary.Get
 import           Data.Binary.Put
@@ -32,6 +33,20 @@ import           System.IO.Unsafe (unsafePerformIO)
 
 newtype UUID = UUID { unUUID :: ByteString }
   deriving (Eq, Ord, Show)
+
+instance ToJSON UUID where
+  toJSON :: UUID -> Value
+  toJSON = toJSON . toString
+  {-# INLINE toJSON #-}
+
+instance FromJSON UUID where
+  parseJSON :: Value -> Parser UUID
+  parseJSON str = do
+    s <- parseJSON str
+    case parseString s of
+      Nothing   -> fail "Invalid UUID"
+      Just uuid -> pure uuid
+  {-# INLINE parseJSON #-}
 
 -- | Pretty-print a UUID v7. 
 toString :: UUID -> String
