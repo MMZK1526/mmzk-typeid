@@ -7,6 +7,9 @@ module Data.TypeID
   , parseString
   , parseText
   , parseByteString
+  , parseStringWithPrefix
+  , parseTextWithPrefix
+  , parseByteStringWithPrefix
   , genTypeID
   , genTypeIDs
   , checkPrefix
@@ -37,6 +40,7 @@ data TypeID = TypeID { getPrefix :: Text
 
 data TypeIDError = TypeIDErrorPrefixTooLong Int
                  | TypeIDErrorPrefixInvalidChar Char
+                 | TypeIDErrorAlreadyHasPrefix Text
                  | TypeIDErrorUUIDError
   deriving (Eq, Ord)
 
@@ -46,6 +50,8 @@ instance Show TypeIDError where
     = concat ["Prefix with ", show n, " characters is too long!"]
   show (TypeIDErrorPrefixInvalidChar c)
     = concat ["Prefix contains invalid character ", show c, "!"]
+  show (TypeIDErrorAlreadyHasPrefix prefix)
+    = concat ["TypeID already has prefix ", show prefix, "!"]
   show TypeIDErrorUUIDError
     = "Invalid UUID part!"
 
@@ -104,6 +110,33 @@ parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
     case checkPrefix prefix' of
       Nothing  -> TypeID prefix' <$> decodeUUID suffix
       Just err -> Left err
+
+-- | Parse a @TypeID@ from the given prefix and the @String@ representation of a
+-- suffix.
+parseStringWithPrefix :: Text -> String -> Either TypeIDError TypeID
+parseStringWithPrefix prefix str = case parseString str of
+  Right (TypeID "" uuid) -> Right $ TypeID prefix uuid
+  Right (TypeID p  _)    -> Left $ TypeIDErrorAlreadyHasPrefix p
+  Left err               -> Left err
+{-# INLINE parseStringWithPrefix #-}
+
+-- | Parse a @TypeID@ from the given prefix and the string representation of a
+-- suffix as a strict @Text@.
+parseTextWithPrefix :: Text -> Text -> Either TypeIDError TypeID
+parseTextWithPrefix prefix text = case parseText text of
+  Right (TypeID "" uuid) -> Right $ TypeID prefix uuid
+  Right (TypeID p  _)    -> Left $ TypeIDErrorAlreadyHasPrefix p
+  Left err               -> Left err
+{-# INLINE parseTextWithPrefix #-}
+
+-- | Parse a @TypeID@ from the given prefix and the string representation of a
+-- suffix as a lazy @ByteString@.
+parseByteStringWithPrefix :: Text -> ByteString -> Either TypeIDError TypeID
+parseByteStringWithPrefix prefix bs = case parseByteString bs of
+  Right (TypeID "" uuid) -> Right $ TypeID prefix uuid
+  Right (TypeID p  _)    -> Left $ TypeIDErrorAlreadyHasPrefix p
+  Left err               -> Left err
+{-# INLINE parseByteStringWithPrefix #-}
 
 -- | Generate a new @TypeID@ from a prefix.
 --
