@@ -10,6 +10,6 @@ Not explicitly exported functions are considered internal and are subjected to c
 The [Main](src/Main.hs) file serves as a temporary playground and its contents are ephemeral.
 
 # Next up
-- [ ] Unit tests
+- [x] Unit tests
 - [ ] Type-level typeid prefixes
 - [ ] Publish a package
