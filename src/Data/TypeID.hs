@@ -7,6 +7,7 @@ module Data.TypeID
   -- * typeid generation
   , genTypeID
   , genTypeIDs
+  , decorate
   -- * Prefix validation
   , checkPrefix
   -- * Encoding & decoding
@@ -69,6 +70,13 @@ toText (TypeID prefix uuid) = if T.null prefix
 toByteString :: TypeID -> ByteString
 toByteString = fromString . toString
 {-# INLINE toByteString #-}
+
+-- | Obtain a @TypeID@ from a prefix and a @UUID@.
+decorate :: Text -> UUID -> Either TypeIDError TypeID
+decorate prefix uuid = case checkPrefix prefix of
+  Nothing  -> Right $ TypeID prefix uuid
+  Just err -> Left err
+{-# INLINE decorate #-}
 
 -- | Parse a @TypeID@ from its @String@ representation.
 parseString :: String -> Either TypeIDError TypeID
