@@ -241,7 +241,7 @@ fillVarAndRandB seqNo entropy = do
 getEpochMilli :: IO Word64
 getEpochMilli = do
   t <- getPOSIXTime
-  return $ round $ t * 1000
+  pure $ round $ t * 1000
 {-# INLINE getEpochMilli #-}
 
 splitWord64ToWord16s :: Word64 -> (Word16, Word16, Word16, Word16)
@@ -256,11 +256,11 @@ splitWord64ToWord16s n =
 getEntropyWord16 :: IO Word16
 getEntropyWord16 = do
   bs <- BSL.fromStrict <$> getEntropy 2
-  return $ runGet getWord16host bs
+  pure $ runGet getWord16host bs
 {-# INLINE getEntropyWord16 #-}
 
 getEntropyWord64 :: IO Word64
 getEntropyWord64 = do
   bs <- BSL.fromStrict <$> getEntropy 8
-  return $ runGet getWord64host bs
+  pure $ runGet getWord64host bs
 {-# INLINE getEntropyWord64 #-}
