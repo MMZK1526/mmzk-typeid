@@ -7,6 +7,7 @@ module Data.TypeID
   -- * typeid generation
   , genTypeID
   , genTypeIDs
+  , nil
   , decorate
   -- * Prefix validation
   , checkPrefix
@@ -52,6 +53,40 @@ instance FromJSON TypeID where
       Right typeID -> pure typeID
   {-# INLINE parseJSON #-}
 
+-- | Generate a new @TypeID@ from a prefix.
+--
+-- It throws a @TypeIDError@ if the prefix does not match the specification,
+-- namely if it's longer than 63 characters or if it contains characters other
+-- than lowercase latin letters.
+genTypeID :: Text -> IO TypeID
+genTypeID = fmap head . genTypeIDs 1
+{-# INLINE genTypeID #-}
+
+-- | Generate @n@ @TypeID@s from a prefix.
+--
+-- It tries its best to generate @TypeID@s at the same timestamp, but it may not
+-- be possible if we are asking too many @UUID@s at the same time.
+--
+-- It is guaranteed that the first 32768 @TypeID@s are generated at the same
+-- timestamp.
+genTypeIDs :: Word16 -> Text -> IO [TypeID]
+genTypeIDs n prefix = case checkPrefix prefix of
+  Nothing  -> map (TypeID prefix) <$> UUID.genUUIDs n
+  Just err -> throwIO err
+{-# INLINE genTypeIDs #-}
+
+-- | The nil @TypeID@.
+nil :: TypeID
+nil = TypeID "" UUID.nil
+{-# INLINE nil #-}
+
+-- | Obtain a @TypeID@ from a prefix and a @UUID@.
+decorate :: Text -> UUID -> Either TypeIDError TypeID
+decorate prefix uuid = case checkPrefix prefix of
+  Nothing  -> Right $ TypeID prefix uuid
+  Just err -> Left err
+{-# INLINE decorate #-}
+
 -- | Pretty-print a @TypeID@.
 toString :: TypeID -> String
 toString (TypeID prefix uuid) = if T.null prefix
@@ -70,13 +105,6 @@ toText (TypeID prefix uuid) = if T.null prefix
 toByteString :: TypeID -> ByteString
 toByteString = fromString . toString
 {-# INLINE toByteString #-}
-
--- | Obtain a @TypeID@ from a prefix and a @UUID@.
-decorate :: Text -> UUID -> Either TypeIDError TypeID
-decorate prefix uuid = case checkPrefix prefix of
-  Nothing  -> Right $ TypeID prefix uuid
-  Just err -> Left err
-{-# INLINE decorate #-}
 
 -- | Parse a @TypeID@ from its @String@ representation.
 parseString :: String -> Either TypeIDError TypeID
@@ -142,28 +170,6 @@ parseByteStringWithPrefix prefix bs = case parseByteString bs of
   Right (TypeID p  _)    -> Left $ TypeIDErrorAlreadyHasPrefix p
   Left err               -> Left err
 {-# INLINE parseByteStringWithPrefix #-}
-
--- | Generate a new @TypeID@ from a prefix.
---
--- It throws a @TypeIDError@ if the prefix does not match the specification,
--- namely if it's longer than 63 characters or if it contains characters other
--- than lowercase latin letters.
-genTypeID :: Text -> IO TypeID
-genTypeID = fmap head . genTypeIDs 1
-{-# INLINE genTypeID #-}
-
--- | Generate @n@ @TypeID@s from a prefix.
---
--- It tries its best to generate @TypeID@s at the same timestamp, but it may not
--- be possible if we are asking too many @UUID@s at the same time.
---
--- It is guaranteed that the first 32768 @TypeID@s are generated at the same
--- timestamp.
-genTypeIDs :: Word16 -> Text -> IO [TypeID]
-genTypeIDs n prefix = case checkPrefix prefix of
-  Nothing  -> map (TypeID prefix) <$> UUID.genUUIDs n
-  Just err -> throwIO err
-{-# INLINE genTypeIDs #-}
 
 -- | Check if the given prefix is a valid TypeID prefix.
 checkPrefix :: Text -> Maybe TypeIDError

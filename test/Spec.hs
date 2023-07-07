@@ -27,16 +27,16 @@ main = do
 
   hspec do
     describe "Generate typeid" do
-      it "Can generate typeid with prefix" do
-        newID <- TID.genTypeID "mmzk"
-        putStrLn $ "New typeid: " ++ TID.toString newID
-      it "Can generate typeid without prefix" do
-        newID <- TID.genTypeID ""
-        putStrLn $ "New typeid without prefix: " ++ TID.toString newID
-      it "Can parse typeid from String" do
+      it "can generate typeid with prefix" do
+        void $ TID.genTypeID "mmzk"
+      it "can generate typeid without prefix" do
+        void $ TID.genTypeID ""
+      it "can parse typeid from String" do
         case TID.parseString "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
-          Right tid -> putStrLn $ "Parsed typeid: " ++ TID.toString tid
+          Right tid -> pure ()
+      it "has the correct nil" do
+        Right TID.nil `shouldBe` TID.parseString "00000000000000000000000000"
 
     describe "Parse typeid" do
       let invalidPrefixes = [ ("caps", "PREFIX")
@@ -45,7 +45,7 @@ main = do
                             , ("spaces", "  ")
                             , ("long", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz")
                             , ("ascii", "château") ]
-      describe "Can detect invalid prefix" do
+      describe "can detect invalid prefix" do
         forM_ invalidPrefixes \(reason, prefix) -> it reason do
           TID.genTypeID prefix `shouldThrow` anyTypeIDError
           case TID.decorate prefix V7.nil of
@@ -59,7 +59,7 @@ main = do
                             , ("crockford_ambiguous", "ooo41o61o5or3gg28a1c6ot3gi") -- Would be valid if we followed Crockford's substitution rules
                             , ("symbols", "00041061050.3gg28a1_60t3gf")
                             , ("wrong_alphabet", "ooooooiiiiiiuuuuuuulllllll") ]
-      describe "Can detect invalid suffix" do
+      describe "can detect invalid suffix" do
         forM_ invalidSuffixes \(reason, suffix) -> it reason do
           case TID.parseStringWithPrefix "mmzk" suffix of
             Left _    -> pure ()
