@@ -23,6 +23,7 @@ data TypeIDError = TypeIDErrorPrefixTooLong Int
                  | TypeIDExtraSeparator
                  | TypeIDErrorPrefixInvalidChar Char
                  | TypeIDErrorAlreadyHasPrefix Text
+                 | TypeIDErrorPrefixMismatch Text Text
                  | TypeIDErrorUUIDError
   deriving (Eq, Ord)
 
@@ -37,6 +38,10 @@ instance Show TypeIDError where
     = concat ["Prefix contains invalid character ", show c, "!"]
   show (TypeIDErrorAlreadyHasPrefix prefix)
     = concat ["TypeID already has prefix ", show prefix, "!"]
+  show (TypeIDErrorPrefixMismatch expPrefix actPrefix)
+    = concat [ "Expected prefix ", show expPrefix, " but got "
+             , show actPrefix, "!" ]
+
   show TypeIDErrorUUIDError
     = "Invalid UUID part!"
 
