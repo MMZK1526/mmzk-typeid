@@ -24,6 +24,7 @@ main :: IO ()
 main = do
   invalid <- BSL.readFile "test/invalid.json" >>= throwDecode :: IO [TestData]
   valid   <- BSL.readFile "test/valid.json" >>= throwDecode :: IO [TestData]
+
   hspec do
     describe "Generate typeid" do
       it "Can generate typeid with prefix" do
