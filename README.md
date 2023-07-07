@@ -1,6 +1,6 @@
 # mmzk-typeid
 
-An [typeid](https://github.com/jetpack-io/typeid) implementation in Haskell.
+A [typeid](https://github.com/jetpack-io/typeid) implementation in Haskell.
 
 # Usage
 TODO; for now please see the [Main](src/Main.hs) file which contains some very simple usages.
