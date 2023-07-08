@@ -94,10 +94,10 @@ main = do
 
     describe "Generate type-level typeid" do
       it "can generate typeid with prefix" do
-        tid <- KID.genTypeID @"mmzk"
+        tid <- KID.genKindID @"mmzk"
         KID.getPrefix tid `shouldBe` "mmzk"
       it "can generate typeid without prefix" do
-        tid <- KID.genTypeID @""
+        tid <- KID.genKindID @""
         KID.getPrefix tid `shouldBe` ""
       it "can parse typeid from String" do
         case KID.parseString @"mmzk" "mmzk_00041061050r3gg28a1c60t3gf" of
