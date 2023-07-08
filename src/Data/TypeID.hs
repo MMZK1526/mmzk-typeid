@@ -53,21 +53,21 @@ instance FromJSON TypeID where
       Right typeID -> pure typeID
   {-# INLINE parseJSON #-}
 
--- | Generate a new @TypeID@ from a prefix.
+-- | Generate a new 'TypeID' from a prefix.
 --
--- It throws a @TypeIDError@ if the prefix does not match the specification,
+-- It throws a 'TypeIDError' if the prefix does not match the specification,
 -- namely if it's longer than 63 characters or if it contains characters other
 -- than lowercase latin letters.
 genTypeID :: Text -> IO TypeID
 genTypeID = fmap head . genTypeIDs 1
 {-# INLINE genTypeID #-}
 
--- | Generate @n@ @TypeID@s from a prefix.
+-- | Generate 'n' 'TypeID's from a prefix.
 --
--- It tries its best to generate @TypeID@s at the same timestamp, but it may not
--- be possible if we are asking too many @UUID@s at the same time.
+-- It tries its best to generate 'TypeID's at the same timestamp, but it may not
+-- be possible if we are asking too many 'UUID's at the same time.
 --
--- It is guaranteed that the first 32768 @TypeID@s are generated at the same
+-- It is guaranteed that the first 32768 'TypeID's are generated at the same
 -- timestamp.
 genTypeIDs :: Word16 -> Text -> IO [TypeID]
 genTypeIDs n prefix = case checkPrefix prefix of
@@ -75,38 +75,38 @@ genTypeIDs n prefix = case checkPrefix prefix of
   Just err -> throwIO err
 {-# INLINE genTypeIDs #-}
 
--- | The nil @TypeID@.
+-- | The nil 'TypeID'.
 nil :: TypeID
 nil = TypeID "" UUID.nil
 {-# INLINE nil #-}
 
--- | Obtain a @TypeID@ from a prefix and a @UUID@.
+-- | Obtain a 'TypeID' from a prefix and a 'UUID'.
 decorate :: Text -> UUID -> Either TypeIDError TypeID
 decorate prefix uuid = case checkPrefix prefix of
   Nothing  -> Right $ TypeID prefix uuid
   Just err -> Left err
 {-# INLINE decorate #-}
 
--- | Pretty-print a @TypeID@.
+-- | Pretty-print a 'TypeID'.
 toString :: TypeID -> String
 toString (TypeID prefix uuid) = if T.null prefix
   then suffixEncode (UUID.unUUID uuid)
   else T.unpack prefix ++ "_" ++ suffixEncode (UUID.unUUID uuid)
 {-# INLINE toString #-}
 
--- | Pretty-print a @TypeID@ to strict @Text@.
+-- | Pretty-print a 'TypeID' to strict 'Text'.
 toText :: TypeID -> Text
 toText (TypeID prefix uuid) = if T.null prefix
   then T.pack (suffixEncode $ UUID.unUUID uuid)
   else prefix <> "_" <> T.pack (suffixEncode $ UUID.unUUID uuid)
 {-# INLINE toText #-}
 
--- | Pretty-print a @TypeID@ to lazy @ByteString@.
+-- | Pretty-print a 'TypeID' to lazy 'ByteString'.
 toByteString :: TypeID -> ByteString
 toByteString = fromString . toString
 {-# INLINE toByteString #-}
 
--- | Parse a @TypeID@ from its @String@ representation.
+-- | Parse a 'TypeID' from its String' representation.
 parseString :: String -> Either TypeIDError TypeID
 parseString str = case span (/= '_') str of
   ("", _)              -> Left TypeIDExtraSeparator
@@ -120,7 +120,7 @@ parseString str = case span (/= '_') str of
   where
     bs = fromString str
 
--- | Parse a @TypeID@ from its string representation as a strict @Text@.
+-- | Parse a 'TypeID' from its string representation as a strict 'Text'.
 parseText :: Text -> Either TypeIDError TypeID
 parseText text = case second T.uncons $ T.span (/= '_') text of
   ("", _)                    -> Left TypeIDExtraSeparator
@@ -133,7 +133,7 @@ parseText text = case second T.uncons $ T.span (/= '_') text of
   where
     bs = BSL.fromStrict $ encodeUtf8 text
 
--- | Parse a @TypeID@ from its string representation as a lazy @ByteString@.
+-- | Parse a 'TypeID' from its string representation as a lazy @ByteString@.
 parseByteString :: ByteString -> Either TypeIDError TypeID
 parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
   ("", _)                    -> Left TypeIDExtraSeparator
@@ -144,7 +144,7 @@ parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
       Nothing  -> TypeID prefix' <$> decodeUUID suffix
       Just err -> Left err
 
--- | Parse a @TypeID@ from the given prefix and the @String@ representation of a
+-- | Parse a 'TypeID' from the given prefix and the 'String' representation of a
 -- suffix.
 parseStringWithPrefix :: Text -> String -> Either TypeIDError TypeID
 parseStringWithPrefix prefix str = case parseString str of
@@ -153,8 +153,8 @@ parseStringWithPrefix prefix str = case parseString str of
   Left err               -> Left err
 {-# INLINE parseStringWithPrefix #-}
 
--- | Parse a @TypeID@ from the given prefix and the string representation of a
--- suffix as a strict @Text@.
+-- | Parse a 'TypeID' from the given prefix and the string representation of a
+-- suffix as a strict 'Text'.
 parseTextWithPrefix :: Text -> Text -> Either TypeIDError TypeID
 parseTextWithPrefix prefix text = case parseText text of
   Right (TypeID "" uuid) -> decorate prefix uuid
@@ -162,8 +162,8 @@ parseTextWithPrefix prefix text = case parseText text of
   Left err               -> Left err
 {-# INLINE parseTextWithPrefix #-}
 
--- | Parse a @TypeID@ from the given prefix and the string representation of a
--- suffix as a lazy @ByteString@.
+-- | Parse a 'TypeID' from the given prefix and the string representation of a
+-- suffix as a lazy 'ByteString'.
 parseByteStringWithPrefix :: Text -> ByteString -> Either TypeIDError TypeID
 parseByteStringWithPrefix prefix bs = case parseByteString bs of
   Right (TypeID "" uuid) -> decorate prefix uuid
