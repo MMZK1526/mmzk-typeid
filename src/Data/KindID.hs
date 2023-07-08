@@ -56,6 +56,7 @@ module Data.KindID
   ) where
 
 import           Control.Monad
+import           Data.Aeson.Types
 import           Data.ByteString.Lazy (ByteString)
 import           Data.Proxy
 import           Data.Text (Text)
@@ -77,6 +78,20 @@ import           GHC.TypeLits
 -- a type.
 newtype KindID (prefix :: Symbol) = KindID { getUUID :: UUID }
   deriving (Eq, Ord, Show)
+
+instance ValidPrefix prefix => ToJSON (KindID prefix) where
+  toJSON :: KindID prefix -> Value
+  toJSON = toJSON . toText
+  {-# INLINE toJSON #-}
+
+instance ValidPrefix prefix => FromJSON (KindID prefix) where
+  parseJSON :: Value -> Parser (KindID prefix)
+  parseJSON str = do
+    s <- parseJSON str
+    case parseText s of
+      Left err  -> fail $ show err
+      Right kid -> pure kid
+  {-# INLINE parseJSON #-}
 
 -- | Generate a new 'KindID' from a prefix.
 --

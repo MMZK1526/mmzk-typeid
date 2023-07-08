@@ -1,4 +1,5 @@
--- | An implementation of the typeid specification: https://github.com/jetpack-io/typeid.
+-- | An implementation of the typeid specification:
+-- https://github.com/jetpack-io/typeid.
 module Data.TypeID
   (
   -- * Data types
@@ -48,9 +49,9 @@ instance FromJSON TypeID where
   parseJSON :: Value -> Parser TypeID
   parseJSON str = do
     s <- parseJSON str
-    case parseString s of
-      Left err     -> fail $ show err
-      Right typeID -> pure typeID
+    case parseText s of
+      Left err  -> fail $ show err
+      Right tid -> pure tid
   {-# INLINE parseJSON #-}
 
 -- | Generate a new 'TypeID' from a prefix.
