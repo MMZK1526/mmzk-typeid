@@ -11,5 +11,5 @@ The [Main](src/Main.hs) file serves as a temporary playground and its contents a
 
 # Next up
 - [x] Unit tests
-- [ ] Type-level typeid prefixes
+- [x] Type-level typeid prefixes
 - [ ] Publish a package
