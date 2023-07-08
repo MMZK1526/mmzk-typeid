@@ -19,6 +19,7 @@ data TypeID = TypeID { getPrefix :: Text
                      , getUUID   :: UUID }
   deriving (Eq, Ord, Show)
 
+-- | Errors from parsing a @TypeID@.
 data TypeIDError = TypeIDErrorPrefixTooLong Int
                  | TypeIDExtraSeparator
                  | TypeIDErrorPrefixInvalidChar Char
@@ -27,7 +28,6 @@ data TypeIDError = TypeIDErrorPrefixTooLong Int
                  | TypeIDErrorUUIDError
   deriving (Eq, Ord)
 
--- | Errors from parsing a @TypeID@.
 instance Show TypeIDError where
   show :: TypeIDError -> String
   show (TypeIDErrorPrefixTooLong n)
