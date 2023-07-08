@@ -134,7 +134,7 @@ parseText text = case second T.uncons $ T.span (/= '_') text of
   where
     bs = BSL.fromStrict $ encodeUtf8 text
 
--- | Parse a 'TypeID' from its string representation as a lazy @ByteString@.
+-- | Parse a 'TypeID' from its string representation as a lazy 'ByteString'.
 parseByteString :: ByteString -> Either TypeIDError TypeID
 parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
   ("", _)                    -> Left TypeIDExtraSeparator

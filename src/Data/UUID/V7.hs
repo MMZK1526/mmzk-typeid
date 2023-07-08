@@ -83,17 +83,17 @@ toString (UUID bs)
              (q3, r3) = q2 `divMod` 16
          in  hexTable ! r3 : hexTable ! r2 : hexTable ! r1 : hexTable ! r0 : rem
 
--- | Pretty-print a UUID v7 to strict @Text@.
+-- | Pretty-print a UUID v7 to strict 'Text'.
 toText :: UUID -> Text
 toText = T.pack . toString
 {-# INLINE toText #-}
 
--- | Pretty-print a UUID v7 to lazy @ByteString@.
+-- | Pretty-print a UUID v7 to lazy 'ByteString'.
 toByteString :: UUID -> ByteString
 toByteString = fromString . toString
 {-# INLINE toByteString #-}
 
--- | Parse a UUID v7 from its @String@ representation.
+-- | Parse a UUID v7 from its 'String' representation.
 --
 -- The representation is either standard or has no dashes. Does not care about
 -- the case of the letters.
@@ -101,7 +101,7 @@ parseString :: String -> Maybe UUID
 parseString = parseByteString . fromString
 {-# INLINE parseString #-}
 
--- | Parse a UUID v7 from its string representation as a strict @Text@.
+-- | Parse a UUID v7 from its string representation as a strict 'Text'.
 --
 -- The representation is either standard or has no dashes. Does not care about
 -- the case of the letters.
@@ -109,7 +109,7 @@ parseText :: Text -> Maybe UUID
 parseText = parseByteString . BSL.fromStrict . encodeUtf8
 {-# INLINE parseText #-}
 
--- | Parse a UUID v7 from its string representation as a lazy @ByteString@.
+-- | Parse a UUID v7 from its string representation as a lazy 'ByteString'.
 --
 -- The representation is either standard or has no dashes. Does not care about
 -- the case of the letters.
@@ -158,12 +158,12 @@ genUUID :: IO UUID
 genUUID = head <$> genUUIDs 1
 {-# INLINE genUUID #-}
 
--- | Generate @n@ UUID V7s.
+-- | Generate 'n' UUID V7s.
 --
--- It tries its best to generate @UUIDs@ at the same timestamp, but it may not
--- be possible if we are asking too many @UUID@s at the same time.
+-- It tries its best to generate 'UUID's at the same timestamp, but it may not
+-- be possible if we are asking too many 'UUID's at the same time.
 --
--- It is guaranteed that the first 32768 @UUIDs@ are generated at the same
+-- It is guaranteed that the first 32768 'UUID's are generated at the same
 -- timestamp.
 genUUIDs :: Word16 -> IO [UUID]
 genUUIDs 0 = pure []
@@ -202,7 +202,7 @@ genUUIDs n = do
 
 -- | The global mutable state of (timestamp, sequence number).
 --
--- The "NOINLINE" pragma is IMPORTANT! The logic would be flawed if @__state__@
+-- The "NOINLINE" pragma is IMPORTANT! The logic would be flawed if '__state__'
 -- is inlined by its definition.
 __state__ :: IORef (Word64, Word16)
 __state__ = unsafePerformIO (newIORef (0, 0))
