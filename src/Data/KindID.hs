@@ -26,9 +26,13 @@
 -- This module contains functions to generate and parse these type-level typeids
 -- as well as conversion functions to and from the usual term-level typeids.
 -- These functions are usually used with a type application, e.g.
+--
 -- > do
 -- >   tid <- genKindID @"user"
 -- >   ...
+--
+-- All the prefixes are type-checked at compile time, so if we try to pass in
+-- invalid prefixes, the compiler (again) will complain.
 module Data.KindID
   (
   -- * Data types
