@@ -4,6 +4,8 @@
 import           Control.Monad
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as BSL
+import           Data.KindID (KindID)
+import qualified Data.KindID as KID
 import qualified Data.Text as T
 import           Data.TypeID (TypeID, TypeIDError)
 import qualified Data.TypeID as TID
@@ -89,3 +91,21 @@ main = do
           Right tid -> do
             TID.getPrefix tid `shouldBe` T.pack prefix
             V7.toString (TID.getUUID tid) `shouldBe` uuid
+
+    describe "Generate type-level typeid" do
+      it "can generate typeid with prefix" do
+        tid <- KID.genTypeID @"mmzk"
+        KID.getPrefix tid `shouldBe` "mmzk"
+      it "can generate typeid without prefix" do
+        tid <- KID.genTypeID @""
+        KID.getPrefix tid `shouldBe` ""
+      it "can parse typeid from String" do
+        case KID.parseString @"mmzk" "mmzk_00041061050r3gg28a1c60t3gf" of
+          Left err  -> expectationFailure $ "Parse error: " ++ show err
+          Right tid -> pure ()
+      it "cannot parse typeid into wrong prefix" do
+        case KID.parseString @"foo" "mmzk_00041061050r3gg28a1c60t3gf" of
+          Left err  -> pure ()
+          Right tid -> expectationFailure $ "Parsed typeid: " ++ KID.toString tid
+      it "has the correct nil" do
+        Right KID.nil `shouldBe` KID.parseString @"" "00000000000000000000000000"

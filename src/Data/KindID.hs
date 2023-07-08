@@ -18,6 +18,8 @@ import           Data.TypeID (TypeID)
 import qualified Data.TypeID.Internal as TID
 import qualified Data.TypeID as TID
 import           Data.UUID.V7 (UUID)
+import qualified Data.UUID.V7 as V7
+import           Data.Word
 import           GHC.TypeLits
 
 class KnownSymbol prefix => ValidPrefix (prefix :: Symbol)
@@ -47,6 +49,19 @@ type family ILSUH (uncons :: Maybe (Char, Symbol)) :: Bool where
   ILSUH ('Just '(c, s)) = IsLowerChar c && IsLowerSymbol s
 
 newtype KindID (prefix :: Symbol) = KindID { getUUID :: UUID }
+  deriving (Eq, Ord, Show)
+
+genTypeID :: forall prefix. ValidPrefix prefix => IO (KindID prefix)
+genTypeID = KindID <$> V7.genUUID
+{-# INLINE genTypeID #-}
+
+genTypeIDs :: forall prefix. ValidPrefix prefix => Word16 -> IO [KindID prefix]
+genTypeIDs n = fmap KindID <$> V7.genUUIDs n
+{-# INLINE genTypeIDs #-}
+
+nil :: KindID ""
+nil = KindID V7.nil
+{-# INLINE nil #-}
 
 getPrefix :: forall prefix. ValidPrefix prefix => KindID prefix -> Text
 getPrefix _ = T.pack $ symbolVal (Proxy @prefix)
