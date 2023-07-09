@@ -10,7 +10,7 @@ main = do
   typeID <- genTypeID "mmzk"
   putStrLn $ toString typeID
   putStrLn "Make 10 typeids in a batch. They are guaranteed to have the same timestamp and of ascending order:"
-  typeIDs <- genTypeIDs 10 "mmzk"
+  typeIDs <- genTypeIDs "mmzk" 10
   mapM_ (putStrLn . toString) typeIDs
   putStrLn "Making a typeid from a String:"
   case parseString "mmzk_01h455vb4pex5vsknk084sn02q" of
