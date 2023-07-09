@@ -23,6 +23,7 @@ module Data.UUID.V7
   , toText
   , toByteString
   -- * Miscellaneous helper
+  , getTime
   , getEpochMilli
   ) where
 
@@ -204,6 +205,18 @@ genUUIDs n = do
         then pure uuids
         else (uuids ++) <$> genUUIDs (n - n')
 
+-- | Get the current time in milliseconds since the Unix epoch.
+getEpochMilli :: IO Word64
+getEpochMilli = do
+  t <- getPOSIXTime
+  pure $ round $ t * 1000
+{-# INLINE getEpochMilli #-}
+
+-- | Get the time field (unix_ts_ms) of a 'UUID'v7.
+getTime :: UUID -> Word64
+getTime (UUID bs) = runGet getWord64be bs `shiftR` 16
+{-# INLINE getTime #-}
+
 -- | The global mutable state of (timestamp, sequence number).
 --
 -- The "NOINLINE" pragma is IMPORTANT! The logic would be flawed if '__state__'
@@ -246,13 +259,6 @@ fillVarAndRandB seqNo entropy = do
   let seqNoRandB   = seqNo .&. 0xF
   let randBWithVar = fromIntegral (seqNoRandB .|. (0x2 `shiftL` 4))
   putWord64be $ (entropy .&. 0x3FFFFFFFFFFFFFF) .|. (randBWithVar `shiftL` 58)
-
--- | Get the current time in milliseconds since the Unix epoch.
-getEpochMilli :: IO Word64
-getEpochMilli = do
-  t <- getPOSIXTime
-  pure $ round $ t * 1000
-{-# INLINE getEpochMilli #-}
 
 splitWord64ToWord16s :: Word64 -> (Word16, Word16, Word16, Word16)
 splitWord64ToWord16s n =
