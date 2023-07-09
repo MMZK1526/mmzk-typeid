@@ -4,6 +4,7 @@ module Data.TypeID
   (
   -- * Data types
     TypeID(getPrefix, getUUID)
+  , getTime
   , TypeIDError(..)
   -- * typeid generation
   , genTypeID
@@ -87,6 +88,11 @@ decorate prefix uuid = case checkPrefix prefix of
   Nothing  -> Right $ TypeID prefix uuid
   Just err -> Left err
 {-# INLINE decorate #-}
+
+-- | Get the timestamp of a 'TypeID'.
+getTime :: TypeID -> Word64
+getTime (TypeID _ uuid) = UUID.getTime uuid
+{-# INLINE getTime #-}
 
 -- | Pretty-print a 'TypeID'.
 toString :: TypeID -> String
