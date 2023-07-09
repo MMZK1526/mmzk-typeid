@@ -1,6 +1,6 @@
 # Revision history for mmzk-typeid
 
-## 0.1.0.0 -- 2023-07-08
+## 0.1.0.0 -- 2023-07-09
 
 * First version. Released on an unsuspecting world.
 
@@ -9,3 +9,5 @@
 * Add unit tests.
 
 * Add type-level typeid prefixes.
+
+* Add `FromJSON` and ``ToJSON` instances for `TypeID` and `KindID`.
