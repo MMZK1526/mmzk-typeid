@@ -42,7 +42,7 @@ main = do
       it "has the correct nil" do
         Right TID.nil `shouldBe` TID.parseString "00000000000000000000000000"
       it "can generate in batch with same timestamp and in ascending order" do
-        tids <- TID.genTypeIDs 1526 "mmzk"
+        tids <- TID.genTypeIDs "mmzk" 1526
         all ((== "mmzk") . TID.getPrefix) tids `shouldBe` True
         let timestamp = TID.getTime $ head tids
         all ((== timestamp) . TID.getTime) tids `shouldBe` True

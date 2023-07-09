@@ -61,7 +61,7 @@ instance FromJSON TypeID where
 -- namely if it's longer than 63 characters or if it contains characters other
 -- than lowercase latin letters.
 genTypeID :: Text -> IO TypeID
-genTypeID = fmap head . genTypeIDs 1
+genTypeID = fmap head . (`genTypeIDs` 1)
 {-# INLINE genTypeID #-}
 
 -- | Generate 'n' 'TypeID's from a prefix.
@@ -71,8 +71,8 @@ genTypeID = fmap head . genTypeIDs 1
 --
 -- It is guaranteed that the first 32768 'TypeID's are generated at the same
 -- timestamp.
-genTypeIDs :: Word16 -> Text -> IO [TypeID]
-genTypeIDs n prefix = case checkPrefix prefix of
+genTypeIDs :: Text -> Word16 -> IO [TypeID]
+genTypeIDs prefix n = case checkPrefix prefix of
   Nothing  -> map (TypeID prefix) <$> UUID.genUUIDs n
   Just err -> throwIO err
 {-# INLINE genTypeIDs #-}
