@@ -12,7 +12,16 @@ TypeIDs are canonically encoded as lowercase strings consisting of three parts:
 
 For more information, please check out the [specification](https://github.com/jetpack-io/typeid/blob/main/README.md).
 
+## Highlights
+
+In addition to the features provided by [typeid](https://github.com/jetpack-io/typeid), this implementation also supports:
+
+1. Generating typeids in a batch. They are guaranteed (up to the first 32768 ids) to have the same timestamp and of ascending order;
+2. Supports encoding the prefix in the [type level](src/Data/KindID.hs), so that if you accidentally pass in a wrong prefix, the code won't compile, avoiding the need for runtime checks.
+
 ## Quick start
+
+### Basic Usage
 ```Haskell
 {-# LANGUAGE OverloadedStrings #-}
 
