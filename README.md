@@ -16,7 +16,7 @@ For more information, please check out the [specification](https://github.com/je
 
 In addition to the features provided by [typeid](https://github.com/jetpack-io/typeid), this implementation also supports:
 
-1. Generating typeids in a batch. They are guaranteed (up to the first 32768 ids) to have the same timestamp and of ascending order;
+1. Generating typeids in a batch. They are guaranteed to have the same timestamp (up to the first 32768 ids) and of ascending order;
 2. Supports encoding the prefix in the [type level](src/Data/KindID.hs), so that if you accidentally pass in a wrong prefix, the code won't compile, avoiding the need for runtime checks.
 
 ## Quick start
@@ -48,6 +48,20 @@ main = do
   case TID.parseString "mmzk_01h455vb4pex5vsknk084sn02q" of
     Left err     -> throwIO err
     Right typeID -> TID.putStrLn $ TID.toString typeID
+```
+
+### Generate in batch
+```Haskell
+{-# LANGUAGE OverloadedStrings #-}
+TODO
+```
+
+### Type-level prefix
+```Haskell
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
+TODO
 ```
 
 # Note
