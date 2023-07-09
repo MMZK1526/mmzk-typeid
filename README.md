@@ -17,7 +17,7 @@ For more information, please check out the [specification](https://github.com/je
 In addition to the features provided by [TypeID](https://github.com/jetpack-io/typeid), this implementation also supports:
 
 1. Generating typeids in a batch. They are guaranteed to have the same timestamp (up to the first 32768 ids) and of ascending order;
-2. Supports encoding the prefix in the [type level](src/Data/KindID.hs), so that if you accidentally pass in a wrong prefix, the code won't compile, avoiding the need for runtime checks.
+2. Encoding the prefix in the [type level](src/Data/KindID.hs), so that if you accidentally pass in a wrong prefix, the code won't compile, avoiding the need for runtime checks.
 
 ## Quick start
 
@@ -81,11 +81,11 @@ main = do
     Right kindID -> KID.putStrLn $ KID.toString kindID
 ```
 
-# Note
+## Note
 Not explicitly exported functions are considered internal and are subjected to changes.
 The [Main](src/Main.hs) file serves as a temporary playground and its contents are ephemeral.
 
-# Next up
+## Next up
 - [x] Unit tests
 - [x] Type-level TypeID prefixes
 - [ ] Publish a package

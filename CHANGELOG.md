@@ -10,4 +10,4 @@
 
 * Add type-level TypeID prefixes.
 
-* Add `FromJSON` and ``ToJSON` instances for `TypeID` and `KindID`.
+* Add `FromJSON` and `ToJSON` instances for `TypeID` and `KindID`.
