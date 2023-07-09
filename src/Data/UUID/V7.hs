@@ -1,8 +1,12 @@
--- | UUID v7 implementation.
+-- | UUIDv7 implementation.
 --
--- UUID v7 is not currently present in the uuid package, therefore I have to
+-- UUIDv7 is not currently present in the uuid package, therefore I have to
 -- make a quick patch of my own. In the future I will try to add uuid as a
 -- dependency and try to use the same interface.
+--
+-- Note that since the specification for v7 is not yet finalised, this module's
+-- implementation may change in the future according to the potential
+-- adjustments in the specification.
 module Data.UUID.V7
   ( 
   -- * Data type
@@ -18,7 +22,7 @@ module Data.UUID.V7
   , toString
   , toText
   , toByteString
-  -- * Miscellaneous helper(s)
+  -- * Miscellaneous helper
   , getEpochMilli
   ) where
 
@@ -59,7 +63,7 @@ instance FromJSON UUID where
       Just uuid -> pure uuid
   {-# INLINE parseJSON #-}
 
--- | Pretty-print a UUID v7. 
+-- | Pretty-print a 'UUID'v7. 
 toString :: UUID -> String
 toString (UUID bs)
     | BSL.length bs /= 16 = "<INVALID-UUID>"
@@ -83,17 +87,17 @@ toString (UUID bs)
              (q3, r3) = q2 `divMod` 16
          in  hexTable ! r3 : hexTable ! r2 : hexTable ! r1 : hexTable ! r0 : rem
 
--- | Pretty-print a UUID v7 to strict 'Text'.
+-- | Pretty-print a 'UUID'v7 to strict 'Text'.
 toText :: UUID -> Text
 toText = T.pack . toString
 {-# INLINE toText #-}
 
--- | Pretty-print a UUID v7 to lazy 'ByteString'.
+-- | Pretty-print a 'UUID'v7 to lazy 'ByteString'.
 toByteString :: UUID -> ByteString
 toByteString = fromString . toString
 {-# INLINE toByteString #-}
 
--- | Parse a UUID v7 from its 'String' representation.
+-- | Parse a 'UUID'v7 from its 'String' representation.
 --
 -- The representation is either standard or has no dashes. Does not care about
 -- the case of the letters.
@@ -101,7 +105,7 @@ parseString :: String -> Maybe UUID
 parseString = parseByteString . fromString
 {-# INLINE parseString #-}
 
--- | Parse a UUID v7 from its string representation as a strict 'Text'.
+-- | Parse a 'UUID'v7 from its string representation as a strict 'Text'.
 --
 -- The representation is either standard or has no dashes. Does not care about
 -- the case of the letters.
@@ -109,7 +113,7 @@ parseText :: Text -> Maybe UUID
 parseText = parseByteString . BSL.fromStrict . encodeUtf8
 {-# INLINE parseText #-}
 
--- | Parse a UUID v7 from its string representation as a lazy 'ByteString'.
+-- | Parse a 'UUID'v7 from its string representation as a lazy 'ByteString'.
 --
 -- The representation is either standard or has no dashes. Does not care about
 -- the case of the letters.
@@ -153,12 +157,12 @@ nil :: UUID
 nil = UUID $ BSL.replicate 16 0
 {-# INLINE nil #-}
 
--- | Generate a UUID V7.
+-- | Generate a 'UUID'v7.
 genUUID :: IO UUID
 genUUID = head <$> genUUIDs 1
 {-# INLINE genUUID #-}
 
--- | Generate 'n' UUID V7s.
+-- | Generate 'n' 'UUID'v7s.
 --
 -- It tries its best to generate 'UUID's at the same timestamp, but it may not
 -- be possible if we are asking too many 'UUID's at the same time.
@@ -208,7 +212,7 @@ __state__ :: IORef (Word64, Word16)
 __state__ = unsafePerformIO (newIORef (0, 0))
 {-# NOINLINE __state__ #-}
 
--- | Fill in the 48-bit time field (unix_ts_ms) of a UUID V7 with the given
+-- | Fill in the 48-bit time field (unix_ts_ms) of a 'UUID'v7 with the given
 -- time.
 fillTime :: Word64 -> Put
 fillTime timestamp = do
@@ -216,7 +220,7 @@ fillTime timestamp = do
   mapM_ putWord16be [p2, p1, p0]
 {-# INLINE fillTime #-}
 
--- | Fill in the version and rand_a part of a UUID V7 with the given sequence
+-- | Fill in the version and rand_a part of a 'UUID'v7 with the given sequence
 -- number.
 --
 -- The sequence number is a 16-bit integer, of which the first 12 bits are used
@@ -228,7 +232,7 @@ fillVerAndRandA seqNo = do
   putWord16be randAWithVer
 {-# INLINE fillVerAndRandA #-}
 
--- | Fill in the variant and rand_b part of a UUID V7 with the given sequence
+-- | Fill in the variant and rand_b part of a 'UUID'v7 with the given sequence
 -- number and random number. The variant is 2.
 --
 -- The sequence number is a 16-bit integer, of which the last 4 bits are used

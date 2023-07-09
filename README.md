@@ -1,8 +1,18 @@
 # mmzk-typeid
 
-A [typeid](https://github.com/jetpack-io/typeid) implementation in Haskell.
+## Introduction
 
-# Quick start
+A [typeid](https://github.com/jetpack-io/typeid) implementation in Haskell. It is "type-safe, K-sortable, globally unique identifier" extended on top of UUIDv7.
+
+TypeIDs are canonically encoded as lowercase strings consisting of three parts:
+
+1. A type prefix (at most 63 characters in all lowercase ASCII [a-z]);
+2. An underscore '_' separator;
+3. A 128-bit UUIDv7 encoded as a 26-character string using a modified base32 encoding.
+
+For more information, please check out the [specification](https://github.com/jetpack-io/typeid/blob/main/README.md).
+
+## Quick start
 ```Haskell
 {-# LANGUAGE OverloadedStrings #-}
 
