@@ -6,7 +6,7 @@ module Data.TypeID
     TypeID(getPrefix, getUUID)
   , getTime
   , TypeIDError(..)
-  -- * typeid generation
+  -- * TypeID generation
   , genTypeID
   , genTypeIDs
   , nil

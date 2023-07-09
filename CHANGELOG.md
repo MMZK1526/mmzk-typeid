@@ -4,10 +4,10 @@
 
 * First version. Released on an unsuspecting world.
 
-* Implement typeid as specified at https://github.com/jetpack-io/typeid.
+* Implement TypeID as specified at https://github.com/jetpack-io/typeid.
 
 * Add unit tests.
 
-* Add type-level typeid prefixes.
+* Add type-level TypeID prefixes.
 
 * Add `FromJSON` and ``ToJSON` instances for `TypeID` and `KindID`.

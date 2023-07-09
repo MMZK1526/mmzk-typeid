@@ -7,8 +7,8 @@
 -- | Similar to "Data.TypeID", but the type is statically determined in the type
 -- level.
 --
--- When using typeid, if we want to check if the type matches, we usually need
--- to get the prefix of the typeid and compare it with the desired prefix at
+-- When using TypeID, if we want to check if the type matches, we usually need
+-- to get the prefix of the TypeID and compare it with the desired prefix at
 -- runtime. However, with Haskell's type system, we can do this at compile time
 -- instead.
 --
@@ -16,11 +16,11 @@
 -- This is actually quite common, especially when we are using one prefix for
 -- one table in the database.
 --
--- For example, suppos we have a function that takes a typeid with the prefix
+-- For example, suppos we have a function that takes a TypeID with the prefix
 -- "user", it may have a signature like this:
 -- @ f :: KindID "user" -> IO () @
 --
--- Then if we try to pass in a typeid with prefix "post", the compiler will
+-- Then if we try to pass in a TypeID with prefix "post", the compiler will
 -- complain, thus removing the runtime check and the associated overhead.
 --
 -- This module contains functions to generate and parse these type-level typeids
@@ -39,7 +39,7 @@ module Data.KindID
     KindID(getUUID)
   , getPrefix
   , getTime
-  -- * typeid generation
+  -- * TypeID generation
   , genKindID
   , genKindIDs
   , nil
@@ -73,7 +73,7 @@ import qualified Data.UUID.V7 as V7
 import           Data.Word
 import           GHC.TypeLits
 
--- | A typeid with the prefix encoded at type level.
+-- | A TypeID with the prefix encoded at type level.
 --
 -- It is dubbed 'KindID' because we the prefix here is a data kind rather than
 -- a type.

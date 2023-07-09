@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A [typeid](https://github.com/jetpack-io/typeid) implementation in Haskell. It is "type-safe, K-sortable, globally unique identifier" extended on top of UUIDv7.
+A [TypeID](https://github.com/jetpack-io/typeid) implementation in Haskell. It is "type-safe, K-sortable, globally unique identifier" extended on top of UUIDv7.
 
 TypeIDs are canonically encoded as lowercase strings consisting of three parts:
 
@@ -14,7 +14,7 @@ For more information, please check out the [specification](https://github.com/je
 
 ## Highlights
 
-In addition to the features provided by [typeid](https://github.com/jetpack-io/typeid), this implementation also supports:
+In addition to the features provided by [TypeID](https://github.com/jetpack-io/typeid), this implementation also supports:
 
 1. Generating typeids in a batch. They are guaranteed to have the same timestamp (up to the first 32768 ids) and of ascending order;
 2. Supports encoding the prefix in the [type level](src/Data/KindID.hs), so that if you accidentally pass in a wrong prefix, the code won't compile, avoiding the need for runtime checks.
@@ -32,11 +32,11 @@ import qualified Data.TypeID as TID
 main :: IO ()
 main = do
 
-  -- Make a typeid with prefix 'mmzk':
+  -- Make a TypeID with prefix 'mmzk':
   typeID <- TID.genTypeID "mmzk"
   putStrLn $ TID.toString typeID
 
-  -- Make a typeid without prefix:
+  -- Make a TypeID without prefix:
   typeID <- TID.genTypeID ""
   putStrLn $ TID.toString typeID
 
@@ -44,7 +44,7 @@ main = do
   typeIDs <- TID.genTypeIDs 10 "mmzk"
   mapM_ (putStrLn . TID.toString) typeIDs
 
-  -- Parse a typeid from string:
+  -- Parse a TypeID from string:
   case TID.parseString "mmzk_01h455vb4pex5vsknk084sn02q" of
     Left err     -> throwIO err
     Right typeID -> TID.putStrLn $ TID.toString typeID
@@ -70,5 +70,5 @@ The [Main](src/Main.hs) file serves as a temporary playground and its contents a
 
 # Next up
 - [x] Unit tests
-- [x] Type-level typeid prefixes
+- [x] Type-level TypeID prefixes
 - [ ] Publish a package

@@ -28,14 +28,14 @@ main = do
   valid   <- BSL.readFile "test/valid.json" >>= throwDecode :: IO [TestData]
 
   hspec do
-    describe "Generate typeid" do
-      it "can generate typeid with prefix" do
+    describe "Generate TypeID" do
+      it "can generate TypeID with prefix" do
         tid <- TID.genTypeID "mmzk"
         TID.getPrefix tid `shouldBe` "mmzk"
-      it "can generate typeid without prefix" do
+      it "can generate TypeID without prefix" do
         tid <- TID.genTypeID ""
         TID.getPrefix tid `shouldBe` ""
-      it "can parse typeid from String" do
+      it "can parse TypeID from String" do
         case TID.parseString "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
           Right tid -> pure ()
@@ -48,7 +48,7 @@ main = do
         all ((== timestamp) . TID.getTime) tids `shouldBe` True
         all (uncurry (<)) (zip tids $ tail tids) `shouldBe` True
 
-    describe "Parse typeid" do
+    describe "Parse TypeID" do
       let invalidPrefixes = [ ("caps", "PREFIX")
                             , ("numeric", "12323")
                             , ("symbols", "pre.fix")
@@ -73,7 +73,7 @@ main = do
         forM_ invalidSuffixes \(reason, suffix) -> it reason do
           case TID.parseStringWithPrefix "mmzk" suffix of
             Left _    -> pure ()
-            Right tid -> expectationFailure $ "Parsed typeid: " ++ TID.toString tid
+            Right tid -> expectationFailure $ "Parsed TypeID: " ++ TID.toString tid
 
     describe "Parse special values" do
       let specialValues = [ ("nil", "00000000000000000000000000", "00000000-0000-0000-0000-000000000000")
@@ -81,40 +81,40 @@ main = do
                           , ("ten", "0000000000000000000000000a", "00000000-0000-0000-0000-00000000000a")
                           , ("sixteen", "0000000000000000000000000g", "00000000-0000-0000-0000-000000000010")
                           , ("thirty-two", "00000000000000000000000010", "00000000-0000-0000-0000-000000000020") ]
-      forM_ specialValues \(reason, typeid, uuid) -> it reason do
-        case TID.parseString typeid of
+      forM_ specialValues \(reason, tid, uuid) -> it reason do
+        case TID.parseString tid of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
           Right tid -> V7.toString (TID.getUUID tid) `shouldBe` uuid
 
     describe "Test invalid.json" do
-      forM_ invalid \(TestData name typeid _ _) -> it name do 
-        case TID.parseString typeid of
+      forM_ invalid \(TestData name tid _ _) -> it name do 
+        case TID.parseString tid of
           Left _    -> pure ()
-          Right tid -> expectationFailure $ "Parsed typeid: " ++ TID.toString tid
+          Right tid -> expectationFailure $ "Parsed TypeID: " ++ TID.toString tid
 
     describe "Test valid.json" do
-      forM_ valid \(TestData name typeid (Just prefix) (Just uuid)) -> it name do
-        case TID.parseString typeid of
+      forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
+        case TID.parseString tid of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
           Right tid -> do
             TID.getPrefix tid `shouldBe` T.pack prefix
             V7.toString (TID.getUUID tid) `shouldBe` uuid
 
-    describe "Generate type-level typeid" do
-      it "can generate typeid with prefix" do
+    describe "Generate type-level TypeID" do
+      it "can generate TypeID with prefix" do
         tid <- KID.genKindID @"mmzk"
         KID.getPrefix tid `shouldBe` "mmzk"
-      it "can generate typeid without prefix" do
+      it "can generate TypeID without prefix" do
         tid <- KID.genKindID @""
         KID.getPrefix tid `shouldBe` ""
-      it "can parse typeid from String" do
+      it "can parse TypeID from String" do
         case KID.parseString @"mmzk" "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
           Right tid -> pure ()
-      it "cannot parse typeid into wrong prefix" do
+      it "cannot parse TypeID into wrong prefix" do
         case KID.parseString @"foo" "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> pure ()
-          Right tid -> expectationFailure $ "Parsed typeid: " ++ KID.toString tid
+          Right tid -> expectationFailure $ "Parsed TypeID: " ++ KID.toString tid
       it "has the correct nil" do
         Right KID.nil `shouldBe` KID.parseString @"" "00000000000000000000000000"
       it "can generate in batch with same timestamp and in ascending order" do
