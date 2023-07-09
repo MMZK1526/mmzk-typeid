@@ -41,7 +41,7 @@ main = do
   putStrLn $ TID.toString typeID'
 
   -- Make 10 TypeIDs in a batch. They are guaranteed to have the same timestamp and of ascending order:
-  typeIDs <- TID.genTypeIDs 10 "mmzk"
+  typeIDs <- TID.genTypeIDs "mmzk" 10
   mapM_ (putStrLn . TID.toString) typeIDs
 
   -- Parse a TypeID from string:
@@ -72,7 +72,7 @@ main = do
   putStrLn $ KID.toString kindID'
 
   -- Make 10 KindIDs in a batch. They are guaranteed to have the same timestamp and of ascending order:
-  kindIDs <- KID.genKindIDs 10 "mmzk"
+  kindIDs <- KID.genKindIDs @"mmzk" 10
   mapM_ (putStrLn . KID.toString) kindIDs
 
   -- Parse a KindID from string:
