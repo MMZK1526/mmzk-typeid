@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A [TypeID](https://github.com/jetpack-io/typeid) implementation in Haskell. It is "type-safe, K-sortable, globally unique identifier" extended on top of UUIDv7.
+A [TypeID](https://github.com/jetpack-io/typeid) implementation in Haskell. It is a "type-safe, K-sortable, globally unique identifier" extended on top of UUIDv7.
 
 TypeIDs are canonically encoded as lowercase strings consisting of three parts:
 
@@ -37,10 +37,10 @@ main = do
   putStrLn $ TID.toString typeID
 
   -- Make a TypeID without prefix:
-  typeID <- TID.genTypeID ""
-  putStrLn $ TID.toString typeID
+  typeID' <- TID.genTypeID ""
+  putStrLn $ TID.toString typeID'
 
-  -- Make 10 typeids in a batch. They are guaranteed to have the same timestamp and of ascending order:
+  -- Make 10 TypeIDs in a batch. They are guaranteed to have the same timestamp and of ascending order:
   typeIDs <- TID.genTypeIDs 10 "mmzk"
   mapM_ (putStrLn . TID.toString) typeIDs
 
@@ -50,18 +50,35 @@ main = do
     Right typeID -> TID.putStrLn $ TID.toString typeID
 ```
 
-### Generate in batch
-```Haskell
-{-# LANGUAGE OverloadedStrings #-}
-TODO
-```
-
 ### Type-level prefix
 ```Haskell
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
-TODO
+
+import           Control.Exception
+import           Data.KindID (KindID)
+import qualified Data.KindID as KID
+
+main :: IO ()
+main = do
+
+  -- Make a KindID with prefix 'mmzk':
+  kindID <- TID.genKindID @"mmzk" -- Has type `KindID "mmzk"`
+  putStrLn $ KID.toString kindID
+
+  -- Make a KindID without prefix:
+  kindID' <- KID.genKindID @"" -- Has type `KindID ""`
+  putStrLn $ KID.toString kindID'
+
+  -- Make 10 KindIDs in a batch. They are guaranteed to have the same timestamp and of ascending order:
+  kindIDs <- KID.genKindIDs 10 "mmzk"
+  mapM_ (putStrLn . KID.toString) kindIDs
+
+  -- Parse a KindID from string:
+  case KID.parseString "mmzk_01h455vb4pex5vsknk084sn02q" of
+    Left err     -> throwIO err
+    Right kindID -> KID.putStrLn $ KID.toString kindID
 ```
 
 # Note

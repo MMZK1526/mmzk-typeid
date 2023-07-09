@@ -33,7 +33,6 @@ test-suite test
     default-extensions:
         BlockArguments
         DataKinds
-        KindSignatures
         InstanceSigs
         MultiWayIf
         OverloadedStrings
@@ -65,7 +64,6 @@ executable playground
     default-extensions:
         BlockArguments
         DataKinds
-        KindSignatures
         InstanceSigs
         MultiWayIf
         OverloadedStrings
@@ -94,7 +92,6 @@ library
     default-extensions:
         BlockArguments
         DataKinds
-        KindSignatures
         InstanceSigs
         MultiWayIf
         OverloadedStrings
