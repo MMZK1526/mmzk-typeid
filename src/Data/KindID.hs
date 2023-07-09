@@ -16,15 +16,15 @@
 -- This is actually quite common, especially when we are using one prefix for
 -- one table in the database.
 --
--- For example, suppos we have a function that takes a TypeID with the prefix
+-- For example, suppose we have a function that takes a TypeID with the prefix
 -- "user", it may have a signature like this:
 -- @ f :: KindID "user" -> IO () @
 --
--- Then if we try to pass in a TypeID with prefix "post", the compiler will
+-- Then if we try to pass in a TypeID with the prefix "post", the compiler will
 -- complain, thus removing the runtime check and the associated overhead.
 --
--- This module contains functions to generate and parse these type-level typeids
--- as well as conversion functions to and from the usual term-level typeids.
+-- This module contains functions to generate and parse these type-level TypeIDs
+-- as well as conversion functions to and from the usual term-level TypeIDs.
 -- These functions are usually used with a type application, e.g.
 --
 -- > do
