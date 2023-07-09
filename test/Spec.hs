@@ -30,15 +30,23 @@ main = do
   hspec do
     describe "Generate typeid" do
       it "can generate typeid with prefix" do
-        void $ TID.genTypeID "mmzk"
+        tid <- TID.genTypeID "mmzk"
+        TID.getPrefix tid `shouldBe` "mmzk"
       it "can generate typeid without prefix" do
-        void $ TID.genTypeID ""
+        tid <- TID.genTypeID ""
+        TID.getPrefix tid `shouldBe` ""
       it "can parse typeid from String" do
         case TID.parseString "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
           Right tid -> pure ()
       it "has the correct nil" do
         Right TID.nil `shouldBe` TID.parseString "00000000000000000000000000"
+      it "can generate in batch with same timestamp and in ascending order" do
+        tids <- TID.genTypeIDs 1526 "mmzk"
+        all ((== "mmzk") . TID.getPrefix) tids `shouldBe` True
+        let timestamp = TID.getTime $ head tids
+        all ((== timestamp) . TID.getTime) tids `shouldBe` True
+        all (uncurry (<)) (zip tids $ tail tids) `shouldBe` True
 
     describe "Parse typeid" do
       let invalidPrefixes = [ ("caps", "PREFIX")
@@ -109,3 +117,9 @@ main = do
           Right tid -> expectationFailure $ "Parsed typeid: " ++ KID.toString tid
       it "has the correct nil" do
         Right KID.nil `shouldBe` KID.parseString @"" "00000000000000000000000000"
+      it "can generate in batch with same timestamp and in ascending order" do
+        kids <- KID.genKindIDs @"mmzk" 1526
+        all ((== "mmzk") . KID.getPrefix) kids `shouldBe` True
+        let timestamp = KID.getTime $ head kids
+        all ((== timestamp) . KID.getTime) kids `shouldBe` True
+        all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
