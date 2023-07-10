@@ -39,8 +39,9 @@
 module Data.KindID
   (
   -- * Data types
-    KindID(getUUID)
+    KindID
   , getPrefix
+  , getUUID
   , getTime
   , ValidPrefix
   -- * TypeID generation
@@ -126,6 +127,11 @@ decorate = KindID
 getPrefix :: forall prefix. ValidPrefix prefix => KindID prefix -> Text
 getPrefix _ = T.pack $ symbolVal (Proxy @prefix)
 {-# INLINE getPrefix #-}
+
+-- | Get the 'UUID' of the 'KindID'.
+getUUID :: forall prefix. ValidPrefix prefix => KindID prefix -> UUID
+getUUID = _getUUID
+{-# INLINE getUUID #-}
 
 -- | Get the timestamp of the 'KindID'.
 getTime :: forall prefix. ValidPrefix prefix => KindID prefix -> Word64

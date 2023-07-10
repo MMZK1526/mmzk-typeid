@@ -28,7 +28,7 @@ module Data.UUID.V7
   , toString
   , toText
   , toByteString
-  -- * Miscellaneous helper
+  -- * Miscellaneous helpers
   , getTime
   , getEpochMilli
   ) where

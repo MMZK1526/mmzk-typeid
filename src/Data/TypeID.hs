@@ -9,7 +9,9 @@
 module Data.TypeID
   (
   -- * Data types
-    TypeID(getPrefix, getUUID)
+    TypeID
+  , getPrefix
+  , getUUID
   , getTime
   , TypeIDError(..)
   -- * TypeID generation
@@ -61,6 +63,21 @@ instance FromJSON TypeID where
       Right tid -> pure tid
   {-# INLINE parseJSON #-}
 
+-- | Get the prefix of the 'TypeID'.
+getPrefix :: TypeID -> Text
+getPrefix = _getPrefix
+{-# INLINE getPrefix #-}
+
+-- | Get the 'UUID' of the 'TypeID'.
+getUUID :: TypeID -> UUID
+getUUID = _getUUID
+{-# INLINE getUUID #-}
+
+-- | Get the timestamp of the 'TypeID'.
+getTime :: TypeID -> Word64
+getTime (TypeID _ uuid) = UUID.getTime uuid
+{-# INLINE getTime #-}
+
 -- | Generate a new 'TypeID' from a prefix.
 --
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
@@ -94,11 +111,6 @@ decorate prefix uuid = case checkPrefix prefix of
   Nothing  -> Right $ TypeID prefix uuid
   Just err -> Left err
 {-# INLINE decorate #-}
-
--- | Get the timestamp of the 'TypeID'.
-getTime :: TypeID -> Word64
-getTime (TypeID _ uuid) = UUID.getTime uuid
-{-# INLINE getTime #-}
 
 -- | Pretty-print a 'TypeID'.
 toString :: TypeID -> String

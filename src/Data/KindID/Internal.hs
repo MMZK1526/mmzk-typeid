@@ -16,9 +16,7 @@ import           GHC.TypeLits hiding (Text)
 --
 -- It is dubbed 'KindID' because we the prefix here is a data kind rather than
 -- a type.
-newtype KindID (prefix :: Symbol) = KindID
-  { -- | Get the 'UUID' of the 'KindID'.
-    getUUID :: UUID }
+newtype KindID (prefix :: Symbol) = KindID { _getUUID :: UUID }
   deriving (Eq, Ord, Show)
 
 -- | A constraint for valid prefix 'Symbol's.
