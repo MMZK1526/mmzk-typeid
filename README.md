@@ -83,7 +83,6 @@ main = do
 
 ## Note
 Not explicitly exported functions are considered internal and are subjected to changes.
-The [Main](src/Main.hs) file serves as a temporary playground and its contents are ephemeral.
 
 ## Next up
 - [x] Unit tests

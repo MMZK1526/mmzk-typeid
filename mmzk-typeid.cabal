@@ -56,35 +56,6 @@ test-suite test
         test
     default-language: Haskell2010
 
-
-executable playground
-    main-is:          Main.hs
-    other-modules:
-        Data.KindID,
-        Data.TypeID,
-        Data.TypeID.Internal,
-        Data.UUID.V7
-    default-extensions:
-        BlockArguments
-        DataKinds
-        InstanceSigs
-        MultiWayIf
-        OverloadedStrings
-        TypeApplications
-    build-depends:
-        base ^>=4.16.4.0,
-        aeson ^>=2.1,
-        array ^>=0.5,
-        binary ^>=0.8.9,
-        bytestring ^>= 0.11,
-        entropy ^>=0.4,
-        text ^>=2.0,
-        transformers ^>=0.6,
-        time ^>=1.11,
-    hs-source-dirs:   src
-    default-language: Haskell2010
-
-
 library
     exposed-modules:
         Data.KindID,
