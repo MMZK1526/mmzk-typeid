@@ -57,7 +57,7 @@ module Data.KindID
   , parseString
   , parseText
   , parseByteString
-  -- type-level and term-level conversion
+  -- * type-level and term-level conversion
   , toTypeID
   , fromTypeID
   ) where

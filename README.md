@@ -83,8 +83,3 @@ main = do
 
 ## Note
 Not explicitly exported functions are considered internal and are subjected to changes.
-
-## Next up
-- [x] Unit tests
-- [x] Type-level TypeID prefixes
-- [ ] Publish a package
