@@ -30,6 +30,7 @@ bug-reports:        https://github.com/MMZK1526/mmzk-typeid/issues
 license:            MIT
 author:             Yitang Chen <mmzk1526@ic.ac.uk>
 maintainer:         Yitang Chen <mmzk1526@ic.ac.uk>
+category:           Data, UUID, TypeID
 extra-source-files:
     CHANGELOG.md
     LICENSE
