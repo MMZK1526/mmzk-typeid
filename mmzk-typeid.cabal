@@ -54,7 +54,7 @@ library
         OverloadedStrings
         TypeApplications
     build-depends:
-        base ^>=4.16.4.0,
+        base >=4.16 && <5,
         aeson ^>=2.1,
         array ^>=0.5,
         binary ^>=0.8.9,
