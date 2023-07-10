@@ -1,3 +1,4 @@
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
@@ -20,13 +21,10 @@ newtype KindID (prefix :: Symbol) = KindID
     getUUID :: UUID }
   deriving (Eq, Ord, Show)
 
--- | A type class for valid prefix 'Symbol's.
-class KnownSymbol prefix => ValidPrefix (prefix :: Symbol)
-
-instance ( KnownSymbol prefix
-         , LengthSymbol prefix < 64
-         , IsLowerSymbol prefix ~ 'True
-         ) => ValidPrefix prefix
+-- | A constraint for valid prefix 'Symbol's.
+type ValidPrefix (prefix :: Symbol) = ( KnownSymbol prefix
+                                      , LengthSymbol prefix < 64
+                                      , IsLowerSymbol prefix ~ 'True )
 
 type family LengthSymbol (prefix :: Symbol) :: Nat where
   LengthSymbol prefix = LSUH (UnconsSymbol prefix)
