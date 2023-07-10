@@ -37,38 +37,6 @@ extra-source-files:
     test/valid.json
 
 
-test-suite test
-    main-is:          Spec.hs
-    type:             exitcode-stdio-1.0
-    other-modules:
-        Data.KindID,
-        Data.KindID.Internal,
-        Data.TypeID,
-        Data.TypeID.Internal,
-        Data.UUID.V7
-    default-extensions:
-        BlockArguments
-        DataKinds
-        InstanceSigs
-        MultiWayIf
-        OverloadedStrings
-        TypeApplications
-    build-depends:
-        base ^>=4.16.4.0,
-        aeson ^>=2.1,
-        array ^>=0.5,
-        binary ^>=0.8.9,
-        bytestring ^>= 0.11,
-        entropy ^>=0.4,
-        hspec ^>=2.11,
-        text ^>=2.0,
-        transformers ^>=0.6,
-        time ^>=1.11,
-    hs-source-dirs:
-        src
-        test
-    default-language: Haskell2010
-
 library
     exposed-modules:
         Data.KindID,
@@ -95,4 +63,37 @@ library
         transformers ^>=0.6,
         time ^>=1.11,
     hs-source-dirs:   src
+    default-language: Haskell2010
+
+
+test-suite test
+    main-is:          Spec.hs
+    type:             exitcode-stdio-1.0
+    other-modules:
+        Data.KindID,
+        Data.KindID.Internal,
+        Data.TypeID,
+        Data.TypeID.Internal,
+        Data.UUID.V7
+    default-extensions:
+        BlockArguments
+        DataKinds
+        InstanceSigs
+        MultiWayIf
+        OverloadedStrings
+        TypeApplications
+    build-depends:
+        base,
+        aeson,
+        array,
+        binary,
+        bytestring,
+        entropy,
+        hspec ^>=2.11,
+        text,
+        transformers,
+        time,
+    hs-source-dirs:
+        src
+        test
     default-language: Haskell2010
