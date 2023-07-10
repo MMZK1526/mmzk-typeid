@@ -30,6 +30,7 @@ test-suite test
     type:             exitcode-stdio-1.0
     other-modules:
         Data.KindID,
+        Data.KindID.Internal,
         Data.TypeID,
         Data.TypeID.Internal,
         Data.UUID.V7
@@ -62,6 +63,7 @@ library
         Data.TypeID,
         Data.UUID.V7
     other-modules:
+        Data.KindID.Internal,
         Data.TypeID.Internal
     default-extensions:
         BlockArguments
