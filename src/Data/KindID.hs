@@ -1,7 +1,13 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 
--- | Similar to "Data.TypeID", but the type is statically determined in the type
+-- |
+-- Module      : Data.KindID
+-- License     : MIT
+-- Maintainer  : mmzk1526@outlook.com
+-- Portability : GHC
+--
+-- Similar to "Data.TypeID", but the type is statically determined in the type
 -- level.
 --
 -- When using TypeID, if we want to check if the type matches, we usually need

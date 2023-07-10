@@ -1,4 +1,10 @@
--- | UUIDv7 implementation.
+-- |
+-- Module      : Data.KindID
+-- License     : MIT
+-- Maintainer  : mmzk1526@outlook.com
+-- Portability : GHC
+--
+-- UUIDv7 implementation.
 --
 -- UUIDv7 is not currently present in the uuid package, therefore I have to
 -- make a quick patch of my own. In the future I will try to add uuid as a

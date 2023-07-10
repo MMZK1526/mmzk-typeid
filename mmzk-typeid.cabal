@@ -13,6 +13,18 @@ description:
     - Batch generating TypeIDs with the same 'UUID'v7 timestamp
   .
     - Encode prefixes at type-level for better type-safety
+  .
+  The following extensions are recommended when using this library:
+  .
+  > {-# LANGUAGE BlockArguments #-}
+  > {-# LANGUAGE DataKinds #-}
+  > {-# LANGUAGE InstanceSigs #-}
+  > {-# LANGUAGE MultiWayIf #-}
+  > {-# LANGUAGE OverloadedStrings #-}
+  > {-# LANGUAGE TypeApplications #-}
+  .
+  For a quick "how-to-use" guide, please refer to the README.md file at https://github.com/MMZK1526/mmzk-typeid#readme.
+
 homepage:           https://github.com/MMZK1526/mmzk-typeid
 bug-reports:        https://github.com/MMZK1526/mmzk-typeid/issues
 license:            MIT

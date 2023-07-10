@@ -1,4 +1,10 @@
--- | An implementation of the typeid specification:
+-- |
+-- Module      : Data.KindID
+-- License     : MIT
+-- Maintainer  : mmzk1526@outlook.com
+-- Portability : GHC
+--
+-- An implementation of the typeid specification:
 -- https://github.com/jetpack-io/typeid.
 module Data.TypeID
   (
@@ -113,7 +119,7 @@ toByteString :: TypeID -> ByteString
 toByteString = fromString . toString
 {-# INLINE toByteString #-}
 
--- | Parse a 'TypeID' from its String' representation.
+-- | Parse a 'TypeID' from its 'String' representation.
 parseString :: String -> Either TypeIDError TypeID
 parseString str = case span (/= '_') str of
   ("", _)              -> Left TypeIDExtraSeparator
