@@ -39,6 +39,7 @@ module Data.KindID
     KindID(getUUID)
   , getPrefix
   , getTime
+  , ValidPrefix
   -- * TypeID generation
   , genKindID
   , genKindIDs
@@ -57,7 +58,7 @@ module Data.KindID
   ) where
 
 import           Control.Monad
-import           Data.Aeson.Types
+import           Data.Aeson.Types hiding (String)
 import           Data.ByteString.Lazy (ByteString)
 import           Data.Proxy
 import           Data.Text (Text)
@@ -65,19 +66,21 @@ import qualified Data.Text as T
 import           Data.Type.Bool
 import           Data.Type.Equality
 import           Data.Type.Ord
-import           Data.TypeID (TypeID)
+import           Data.TypeID (TypeID, TypeIDError)
 import qualified Data.TypeID.Internal as TID
 import qualified Data.TypeID as TID
 import           Data.UUID.V7 (UUID)
 import qualified Data.UUID.V7 as V7
 import           Data.Word
-import           GHC.TypeLits
+import           GHC.TypeLits hiding (Text)
 
 -- | A TypeID with the prefix encoded at type level.
 --
 -- It is dubbed 'KindID' because we the prefix here is a data kind rather than
 -- a type.
-newtype KindID (prefix :: Symbol) = KindID { getUUID :: UUID }
+newtype KindID (prefix :: Symbol) = KindID
+  { -- | Get the 'UUID' of the 'KindID'.
+    getUUID :: UUID }
   deriving (Eq, Ord, Show)
 
 instance ValidPrefix prefix => ToJSON (KindID prefix) where
@@ -103,7 +106,7 @@ genKindID :: forall prefix. ValidPrefix prefix => IO (KindID prefix)
 genKindID = KindID <$> V7.genUUID
 {-# INLINE genKindID #-}
 
--- | Generate 'n' 'KindID's from a prefix.
+-- | Generate n 'KindID's from a prefix.
 --
 -- It tries its best to generate 'KindID's at the same timestamp, but it may not
 -- be possible if we are asking too many 'UUID's at the same time.
@@ -124,11 +127,12 @@ decorate :: forall prefix. ValidPrefix prefix => UUID -> KindID prefix
 decorate = KindID
 {-# INLINE decorate #-}
 
+-- | Get the prefix of the 'KindID'.
 getPrefix :: forall prefix. ValidPrefix prefix => KindID prefix -> Text
 getPrefix _ = T.pack $ symbolVal (Proxy @prefix)
 {-# INLINE getPrefix #-}
 
--- | Get the timestamp of a 'KindID'.
+-- | Get the timestamp of the 'KindID'.
 getTime :: forall prefix. ValidPrefix prefix => KindID prefix -> Word64
 getTime = V7.getTime . getUUID
 {-# INLINE getTime #-}
@@ -162,7 +166,7 @@ toByteString :: forall prefix. ValidPrefix prefix => KindID prefix -> ByteString
 toByteString = TID.toByteString . toTypeID
 {-# INLINE toByteString #-}
 
--- | Parse a 'KindID' from its String' representation.
+-- | Parse a 'KindID' from its 'String' representation.
 parseString :: forall prefix. ValidPrefix prefix
             => String -> Either TID.TypeIDError (KindID prefix)
 parseString str = do
@@ -198,6 +202,7 @@ parseByteString str = do
     Just kid -> pure kid
 {-# INLINE parseByteString #-}
 
+-- | A type class for valid prefix 'Symbol's.
 class KnownSymbol prefix => ValidPrefix (prefix :: Symbol)
 
 instance ( KnownSymbol prefix

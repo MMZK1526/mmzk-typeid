@@ -30,7 +30,7 @@ module Data.UUID.V7
 import           Control.Monad
 import           Control.Monad.Trans.Class
 import           Control.Monad.Trans.Maybe
-import           Data.Aeson.Types
+import           Data.Aeson.Types hiding (String)
 import           Data.Array
 import           Data.Binary.Get
 import           Data.Binary.Put
@@ -47,6 +47,7 @@ import           Data.Word
 import           System.Entropy
 import           System.IO.Unsafe (unsafePerformIO)
 
+-- | A simple wrapper around a 'ByteString' representing a UUIDv7.
 newtype UUID = UUID { unUUID :: ByteString }
   deriving (Eq, Ord, Show)
 
@@ -163,7 +164,7 @@ genUUID :: IO UUID
 genUUID = head <$> genUUIDs 1
 {-# INLINE genUUID #-}
 
--- | Generate 'n' 'UUID'v7s.
+-- | Generate n 'UUID'v7s.
 --
 -- It tries its best to generate 'UUID's at the same timestamp, but it may not
 -- be possible if we are asking too many 'UUID's at the same time.
@@ -219,7 +220,7 @@ getTime (UUID bs) = runGet getWord64be bs `shiftR` 16
 
 -- | The global mutable state of (timestamp, sequence number).
 --
--- The "NOINLINE" pragma is IMPORTANT! The logic would be flawed if '__state__'
+-- The "NOINLINE" pragma is IMPORTANT! The logic would be flawed if it is
 -- is inlined by its definition.
 __state__ :: IORef (Word64, Word16)
 __state__ = unsafePerformIO (newIORef (0, 0))

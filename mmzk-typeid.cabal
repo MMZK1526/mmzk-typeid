@@ -1,18 +1,23 @@
-cabal-version:      3.6
+cabal-version:      2.4
 name:               mmzk-typeid
 version:            0.1.0.0
 
 synopsis:           A TypeID implementation for Haskell
 description:
   TypeID is a type-safe, K-sortable, globally unique identifier inspired by Stripe IDs.
+  .
   The specification is available at https://github.com/jetpack-io/typeid.
+  .
   This library supports generating and parsing speç-conforming TypeIDs, with the following additional features:
+  .
     - Batch generating TypeIDs with the same 'UUID'v7 timestamp
+  .
     - Encode prefixes at type-level for better type-safety
+homepage:           https://github.com/MMZK1526/mmzk-typeid
 bug-reports:        https://github.com/MMZK1526/mmzk-typeid/issues
 license:            MIT
-author:             MMZK1526
-maintainer:         mmzk1526@ic.ac.uk
+author:             Yitang Chen <mmzk1526@ic.ac.uk>
+maintainer:         Yitang Chen <mmzk1526@ic.ac.uk>
 extra-source-files:
     CHANGELOG.md
     LICENSE
@@ -21,8 +26,6 @@ extra-source-files:
 
 
 test-suite test
-    ghc-options:
-        -O0
     main-is:          Spec.hs
     type:             exitcode-stdio-1.0
     other-modules:

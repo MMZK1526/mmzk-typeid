@@ -15,8 +15,11 @@ import           Data.Word
 
 -- | The constructor is not exposed to the public API to prevent generating
 -- invalid @TypeID@s.
-data TypeID = TypeID { getPrefix :: Text
-                     , getUUID   :: UUID }
+data TypeID = TypeID 
+  { -- | Get the prefix of the 'TypeID'.
+    getPrefix :: Text
+    -- | Get the 'UUID' of the 'TypeID'.
+  , getUUID   :: UUID }
   deriving (Eq, Ord, Show)
 
 -- | Errors from parsing a @TypeID@.

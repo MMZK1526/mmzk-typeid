@@ -27,7 +27,7 @@ module Data.TypeID
 
 import           Control.Exception
 import           Control.Monad
-import           Data.Aeson.Types hiding (Array)
+import           Data.Aeson.Types hiding (Array, String)
 import           Data.Bifunctor
 import           Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Lazy as BSL
@@ -64,7 +64,7 @@ genTypeID :: Text -> IO TypeID
 genTypeID = fmap head . (`genTypeIDs` 1)
 {-# INLINE genTypeID #-}
 
--- | Generate 'n' 'TypeID's from a prefix.
+-- | Generate n 'TypeID's from a prefix.
 --
 -- It tries its best to generate 'TypeID's at the same timestamp, but it may not
 -- be possible if we are asking too many 'UUID's at the same time.
@@ -89,7 +89,7 @@ decorate prefix uuid = case checkPrefix prefix of
   Just err -> Left err
 {-# INLINE decorate #-}
 
--- | Get the timestamp of a 'TypeID'.
+-- | Get the timestamp of the 'TypeID'.
 getTime :: TypeID -> Word64
 getTime (TypeID _ uuid) = UUID.getTime uuid
 {-# INLINE getTime #-}
