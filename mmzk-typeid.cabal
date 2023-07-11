@@ -18,10 +18,13 @@ description:
   .
   > {-# LANGUAGE BlockArguments #-}
   > {-# LANGUAGE DataKinds #-}
+  > {-# LANGUAGE FunctionalDependencies #-}
   > {-# LANGUAGE InstanceSigs #-}
   > {-# LANGUAGE MultiWayIf #-}
   > {-# LANGUAGE OverloadedStrings #-}
+  > {-# LANGUAGE PolyKinds #-}
   > {-# LANGUAGE TypeApplications #-}
+  > {-# LANGUAGE TypeFamilies #-}
   .
   For a quick "how-to-use" guide, please refer to the README.md file at https://github.com/MMZK1526/mmzk-typeid#readme.
 
@@ -52,7 +55,9 @@ library
         InstanceSigs
         MultiWayIf
         OverloadedStrings
+        PolyKinds
         TypeApplications
+        TypeFamilies
     build-depends:
         base >=4.16 && <5,
         aeson ^>=2.1,
@@ -82,7 +87,9 @@ test-suite test
         InstanceSigs
         MultiWayIf
         OverloadedStrings
+        PolyKinds
         TypeApplications
+        TypeFamilies
     build-depends:
         base,
         aeson,

@@ -1,5 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 -- |
@@ -46,6 +46,7 @@ module Data.KindID
   , getUUID
   , getTime
   , ValidPrefix
+  , ToPrefix(..)
   -- * KindID generation
   , nil
   , genKindID
@@ -78,12 +79,12 @@ import qualified Data.UUID.V7 as V7
 import           Data.Word
 import           GHC.TypeLits hiding (Text)
 
-instance ValidPrefix prefix => ToJSON (KindID prefix) where
+instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix)) => ToJSON (KindID prefix) where
   toJSON :: KindID prefix -> Value
   toJSON = toJSON . toText
   {-# INLINE toJSON #-}
 
-instance ValidPrefix prefix => FromJSON (KindID prefix) where
+instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix)) => FromJSON (KindID prefix) where
   parseJSON :: Value -> Parser (KindID prefix)
   parseJSON str = do
     s <- parseJSON str
@@ -97,7 +98,8 @@ instance ValidPrefix prefix => FromJSON (KindID prefix) where
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
 -- namely if it's longer than 63 characters or if it contains characters other
 -- than lowercase latin letters.
-genKindID :: forall prefix. ValidPrefix prefix => IO (KindID prefix)
+genKindID :: forall prefix p. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+          => IO (KindID prefix)
 genKindID = KindID <$> V7.genUUID
 {-# INLINE genKindID #-}
 
@@ -108,7 +110,8 @@ genKindID = KindID <$> V7.genUUID
 --
 -- It is guaranteed that the first 32768 'KindID's are generated at the same
 -- timestamp.
-genKindIDs :: forall prefix. ValidPrefix prefix => Word16 -> IO [KindID prefix]
+genKindIDs :: forall prefix p. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+           => Word16 -> IO [KindID prefix]
 genKindIDs n = fmap KindID <$> V7.genUUIDs n
 {-# INLINE genKindIDs #-}
 
@@ -118,86 +121,94 @@ nil = KindID V7.nil
 {-# INLINE nil #-}
 
 -- | Obtain a 'KindID' from a prefix and a 'UUID'.
-decorate :: forall prefix. ValidPrefix prefix => UUID -> KindID prefix
+decorate :: forall prefix p. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+         => UUID -> KindID prefix
 decorate = KindID
 {-# INLINE decorate #-}
 
 -- | Get the prefix of the 'KindID'.
-getPrefix :: forall prefix. ValidPrefix prefix => KindID prefix -> Text
-getPrefix _ = T.pack $ symbolVal (Proxy @prefix)
+getPrefix :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+          => KindID prefix -> Text
+getPrefix _ = T.pack $ symbolVal (Proxy @(PrefixSymbol prefix))
 {-# INLINE getPrefix #-}
 
 -- | Get the 'UUID' of the 'KindID'.
-getUUID :: forall prefix. ValidPrefix prefix => KindID prefix -> UUID
+getUUID :: forall prefix p. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+        => KindID prefix -> UUID
 getUUID = _getUUID
 {-# INLINE getUUID #-}
 
 -- | Get the timestamp of the 'KindID'.
-getTime :: forall prefix. ValidPrefix prefix => KindID prefix -> Word64
+getTime :: forall prefix p. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+        => KindID prefix -> Word64
 getTime = V7.getTime . getUUID
 {-# INLINE getTime #-}
 
 -- | Convert a 'KindID' to a 'TypeID'.
-toTypeID :: forall prefix. ValidPrefix prefix => KindID prefix -> TypeID
+toTypeID :: forall prefix p. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+         => KindID prefix -> TypeID
 toTypeID kid = TID.TypeID (getPrefix kid) (getUUID kid)
 {-# INLINE toTypeID #-}
 
 -- | Convert a 'TypeID' to a 'KindID'. If the actual prefix does not match
 -- with the expected one as defined by the type, it returns @Nothing@.
-fromTypeID :: forall prefix. ValidPrefix prefix
+fromTypeID :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
            => TypeID -> Maybe (KindID prefix)
 fromTypeID tid = do
-  guard (T.pack (symbolVal (Proxy @prefix)) == TID.getPrefix tid)
+  guard (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))) == TID.getPrefix tid)
   pure $ KindID (TID.getUUID tid)
 {-# INLINE fromTypeID #-}
 
 -- | Pretty-print a 'KindID'.
-toString :: forall prefix. ValidPrefix prefix => KindID prefix -> String
+toString :: forall prefix p. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+         => KindID prefix -> String
 toString = TID.toString . toTypeID
 {-# INLINE toString #-}
 
 -- | Pretty-print a 'KindID' to strict 'Text'.
-toText :: forall prefix. ValidPrefix prefix => KindID prefix -> Text
+toText :: forall prefix p. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+       => KindID prefix -> Text
 toText = TID.toText . toTypeID
 {-# INLINE toText #-}
 
 -- | Pretty-print a 'KindID' to lazy 'ByteString'.
-toByteString :: forall prefix. ValidPrefix prefix => KindID prefix -> ByteString
+toByteString :: forall prefix p. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+             => KindID prefix -> ByteString
 toByteString = TID.toByteString . toTypeID
 {-# INLINE toByteString #-}
 
 -- | Parse a 'KindID' from its 'String' representation.
-parseString :: forall prefix. ValidPrefix prefix
+parseString :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
             => String -> Either TID.TypeIDError (KindID prefix)
 parseString str = do
   tid <- TID.parseString str
   case fromTypeID tid of
     Nothing  -> Left $ TID.TypeIDErrorPrefixMismatch
-                       (T.pack (symbolVal (Proxy @prefix)))
+                       (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))))
                        (TID.getPrefix tid)
     Just kid -> pure kid
 {-# INLINE parseString #-}
 
 -- | Parse a 'KindID' from its string representation as a strict 'Text'.
-parseText :: forall prefix. ValidPrefix prefix
+parseText :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
           => Text -> Either TID.TypeIDError (KindID prefix)
 parseText str = do
   tid <- TID.parseText str
   case fromTypeID tid of
     Nothing  -> Left $ TID.TypeIDErrorPrefixMismatch
-                       (T.pack (symbolVal (Proxy @prefix)))
+                       (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))))
                        (TID.getPrefix tid)
     Just kid -> pure kid
 {-# INLINE parseText #-}
 
 -- | Parse a 'KindID' from its string representation as a lazy 'ByteString'.
-parseByteString :: forall prefix. ValidPrefix prefix
+parseByteString :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                 => ByteString -> Either TID.TypeIDError (KindID prefix)
 parseByteString str = do
   tid <- TID.parseByteString str
   case fromTypeID tid of
     Nothing  -> Left $ TID.TypeIDErrorPrefixMismatch
-                       (T.pack (symbolVal (Proxy @prefix)))
+                       (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))))
                        (TID.getPrefix tid)
     Just kid -> pure kid
 {-# INLINE parseByteString #-}
