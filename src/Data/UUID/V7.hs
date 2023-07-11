@@ -163,7 +163,7 @@ parseByteString bs
       w <- lift getWord8
       guard (w == 45)
 
--- | The nil UUID.
+-- | The nil 'UUID'v7.
 nil :: UUID
 nil = UUID $ BSL.replicate 16 0
 {-# INLINE nil #-}

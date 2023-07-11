@@ -15,9 +15,9 @@ module Data.TypeID
   , getTime
   , TypeIDError(..)
   -- * TypeID generation
+  , nil
   , genTypeID
   , genTypeIDs
-  , nil
   , decorate
   -- * Prefix validation
   , checkPrefix

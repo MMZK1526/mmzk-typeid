@@ -47,9 +47,9 @@ module Data.KindID
   , getTime
   , ValidPrefix
   -- * KindID generation
+  , nil
   , genKindID
   , genKindIDs
-  , nil
   , decorate
   -- * Encoding & decoding
   , toString
