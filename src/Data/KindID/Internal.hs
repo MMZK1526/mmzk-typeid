@@ -16,6 +16,9 @@ import           GHC.TypeLits hiding (Text)
 --
 -- It is dubbed 'KindID' because we the prefix here is a data kind rather than
 -- a type.
+--
+-- Note that the 'Show' instance is for debugging purposes only. To pretty-print
+-- a 'KindID', use 'toString', 'toText' or 'toByteString'.
 newtype KindID (prefix :: Symbol) = KindID { _getUUID :: UUID }
   deriving (Eq, Ord, Show)
 

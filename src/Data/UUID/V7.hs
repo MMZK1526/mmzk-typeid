@@ -54,6 +54,9 @@ import           System.Entropy
 import           System.IO.Unsafe (unsafePerformIO)
 
 -- | A simple wrapper around a 'ByteString' representing a UUIDv7.
+--
+-- Note that the 'Show' instance is for debugging purposes only. To pretty-print
+-- a 'UUID'v7, use 'toString', 'toText' or 'toByteString'.
 newtype UUID = UUID { unUUID :: ByteString }
   deriving (Eq, Ord, Show)
 
@@ -266,6 +269,7 @@ fillVarAndRandB seqNo entropy = do
   let seqNoRandB   = seqNo .&. 0xF
   let randBWithVar = fromIntegral (seqNoRandB .|. (0x2 `shiftL` 4))
   putWord64be $ (entropy .&. 0x3FFFFFFFFFFFFFF) .|. (randBWithVar `shiftL` 58)
+{-# INLINE fillVarAndRandB #-}
 
 splitWord64ToWord16s :: Word64 -> (Word16, Word16, Word16, Word16)
 splitWord64ToWord16s n =

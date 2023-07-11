@@ -15,6 +15,9 @@ import           Data.Word
 
 -- | The constructor is not exposed to the public API to prevent generating
 -- invalid @TypeID@s.
+--
+-- Note that the 'Show' instance is for debugging purposes only. To pretty-print
+-- a 'TypeID', use 'toString', 'toText' or 'toByteString'.
 data TypeID = TypeID { _getPrefix :: Text
                      , _getUUID   :: UUID }
   deriving (Eq, Ord, Show)
@@ -41,9 +44,9 @@ instance Show TypeIDError where
   show (TypeIDErrorPrefixMismatch expPrefix actPrefix)
     = concat [ "Expected prefix ", show expPrefix, " but got "
              , show actPrefix, "!" ]
-
   show TypeIDErrorUUIDError
     = "Invalid UUID part!"
+  {-# INLINE show #-}
 
 instance Exception TypeIDError
 
