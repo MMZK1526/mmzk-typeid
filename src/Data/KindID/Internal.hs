@@ -8,7 +8,6 @@
 
 module Data.KindID.Internal where
 
-
 import           Control.Monad
 import           Data.Aeson.Types hiding (String)
 import           Data.ByteString.Lazy (ByteString)

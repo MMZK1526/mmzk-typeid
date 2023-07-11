@@ -7,6 +7,8 @@
   * It can be a `Symbol` as before, or it can be any type that implements
     `ToPrefix` which dictates how to translate the prefix type to a `Symbol`.
 
+* Fix orphan instances for `TypeID` and `KindID`.
+
 
 ## 0.1.0.0 -- 2023-07-11
 
