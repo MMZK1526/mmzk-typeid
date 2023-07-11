@@ -14,17 +14,16 @@ description:
   .
     - Encode prefixes at type-level for better type-safety
   .
-  The following extensions are recommended when using this library:
+  Please enable the following extensions if working with 'KindID':
   .
-  > {-# LANGUAGE BlockArguments #-}
   > {-# LANGUAGE DataKinds #-}
-  > {-# LANGUAGE FunctionalDependencies #-}
-  > {-# LANGUAGE InstanceSigs #-}
-  > {-# LANGUAGE MultiWayIf #-}
-  > {-# LANGUAGE OverloadedStrings #-}
   > {-# LANGUAGE PolyKinds #-}
   > {-# LANGUAGE TypeApplications #-}
   > {-# LANGUAGE TypeFamilies #-}
+  .
+  While the following is not required, it is quite convenient to have
+  .
+  > {-# LANGUAGE OverloadedStrings #-}
   .
   For a quick "how-to-use" guide, please refer to the README.md file at https://github.com/MMZK1526/mmzk-typeid#readme.
 
