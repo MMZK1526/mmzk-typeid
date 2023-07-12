@@ -86,11 +86,11 @@ instance FromJSON UUID where
 
 instance Binary UUID where
   put :: UUID -> Put
-  put (UUID bs) = error "Not implemented"
+  put (UUID bs) = putLazyByteString bs
   {-# INLINE put #-}
 
   get :: Get UUID
-  get = error "Not implemented"
+  get = UUID <$> getLazyByteString 16
   {-# INLINE get #-}
 
 -- | Pretty-print a 'UUID'v7.
