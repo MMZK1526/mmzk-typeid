@@ -1,23 +1,35 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DuplicateRecordFields #-}
 
 import           Control.Monad
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as BSL
 import           Data.KindID (KindID, ToPrefix(..))
 import qualified Data.KindID as KID
+import           Data.Map (Map)
+import qualified Data.Map as M
+import           Data.String
+import           Data.Text (Text)
 import qualified Data.Text as T
 import           Data.TypeID (TypeID)
 import           Data.TypeID.Error
 import qualified Data.TypeID as TID
+import           Data.UUID.V7 (UUID)
 import qualified Data.UUID.V7 as V7
 import           GHC.Generics (Generic)
 import           Test.Hspec
 
-data TestData = TestData { name        :: String
-                         , typeid      :: String
-                         , prefix      :: Maybe String
-                         , uuid        :: Maybe String }
+data TestData = TestData { name   :: String
+                         , typeid :: String
+                         , prefix :: Maybe Text
+                         , uuid   :: Maybe String }
+  deriving (Generic, FromJSON, ToJSON)
+
+data TestDataUUID = TestDataUUID { name   :: String
+                                 , typeid :: TypeID
+                                 , prefix :: Text
+                                 , uuid   :: UUID }
   deriving (Generic, FromJSON, ToJSON)
 
 data Prefix = User | Post | Comment
@@ -36,8 +48,9 @@ anyTypeIDError = const True
 
 main :: IO ()
 main = do
-  invalid <- BSL.readFile "test/invalid.json" >>= throwDecode :: IO [TestData]
-  valid   <- BSL.readFile "test/valid.json" >>= throwDecode :: IO [TestData]
+  invalid   <- BSL.readFile "test/invalid.json" >>= throwDecode :: IO [TestData]
+  valid     <- BSL.readFile "test/valid.json" >>= throwDecode :: IO [TestData]
+  validUUID <- BSL.readFile "test/valid.json" >>= throwDecode :: IO [TestDataUUID]
 
   hspec do
     describe "Generate TypeID" do
@@ -98,19 +111,60 @@ main = do
           Left err  -> expectationFailure $ "Parse error: " ++ show err
           Right tid -> V7.toString (TID.getUUID tid) `shouldBe` uuid
 
+    describe "TypeID valid JSON instances" do
+      it "Decode and then encode should be identity" do
+        tid  <- TID.genTypeID "mmzk"
+        tid' <- TID.genTypeID "foo"
+        let mapping = M.fromList [(tid, tid')]
+        let json    = encode mapping
+        decode json `shouldBe` Just mapping
+        fmap encode (decode json :: Maybe (Map TypeID TypeID)) `shouldBe` Just json
+      describe "Valid JSON value" do
+        forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
+          case decode (fromString $ show tid) :: Maybe TypeID of
+            Nothing  -> expectationFailure "Parse JSON failed!"
+            Just tid -> do
+              TID.getPrefix tid `shouldBe` prefix
+              V7.toString (TID.getUUID tid) `shouldBe` uuid
+      describe "Valid JSON key" do
+        forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
+          case decode (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") :: Maybe (Map TypeID Int) of
+            Nothing  -> expectationFailure "Parse JSON failed!"
+            Just tid -> do
+              let (tid', _) = M.elemAt 0 tid
+              TID.getPrefix tid' `shouldBe` prefix
+              V7.toString (TID.getUUID tid') `shouldBe` uuid
+
+    describe "TypeID invalid JSON instances" do
+      describe "Invalid JSON value" do
+        forM_ invalid \(TestData name tid _ _) -> it name do 
+          case decode (fromString $ show tid) :: Maybe TypeID of
+            Nothing  -> pure ()
+            Just tid -> expectationFailure $ "Parsed TypeID: " ++ TID.toString tid
+      describe "Invalid JSON key" do
+        forM_ invalid \(TestData name tid _ _) -> it name do 
+          case decode (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") :: Maybe (Map TypeID Int) of
+            Nothing  -> pure ()
+            Just tid -> expectationFailure "Invalid TypeID key shouldn't be parsed!"
+
     describe "Test invalid.json" do
       forM_ invalid \(TestData name tid _ _) -> it name do 
         case TID.parseString tid of
           Left _    -> pure ()
           Right tid -> expectationFailure $ "Parsed TypeID: " ++ TID.toString tid
 
-    describe "Test valid.json" do
+    describe "Test valid.json (TypeID as literal)" do
       forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
         case TID.parseString tid of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
           Right tid -> do
-            TID.getPrefix tid `shouldBe` T.pack prefix
+            TID.getPrefix tid `shouldBe` prefix
             V7.toString (TID.getUUID tid) `shouldBe` uuid
+
+    describe "Test valid.json (TypeID as JSON)" do
+      forM_ validUUID \(TestDataUUID name tid prefix uuid) -> it name do
+        TID.getPrefix tid `shouldBe` prefix
+        TID.getUUID tid `shouldBe` uuid
 
     describe "Generate type-level TypeID with 'Symbol' prefixes" do
       it "can generate TypeID with prefix" do

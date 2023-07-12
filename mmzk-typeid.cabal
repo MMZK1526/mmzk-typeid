@@ -99,6 +99,7 @@ test-suite test
         array,
         binary,
         bytestring,
+        containers ^>=0.6,
         entropy,
         hspec ^>=2.11,
         text,
