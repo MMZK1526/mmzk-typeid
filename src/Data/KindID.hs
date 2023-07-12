@@ -1,7 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE UndecidableInstances #-}
-
 -- |
 -- Module      : Data.KindID
 -- License     : MIT

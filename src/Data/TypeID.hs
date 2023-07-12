@@ -6,6 +6,7 @@
 --
 -- An implementation of the typeid specification:
 -- https://github.com/jetpack-io/typeid.
+--
 module Data.TypeID
   (
   -- * Data types

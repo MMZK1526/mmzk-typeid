@@ -14,9 +14,10 @@
 -- implementation may change in the future according to the potential
 -- adjustments in the specification.
 module Data.UUID.V7
-  ( 
+  (
   -- * Data type
     UUID(..)
+  , unUUID
   -- * UUID generation
   , nil
   , genUUID
@@ -38,6 +39,7 @@ import           Control.Monad.Trans.Class
 import           Control.Monad.Trans.Maybe
 import           Data.Aeson.Types hiding (String)
 import           Data.Array
+import           Data.Binary
 import           Data.Binary.Get
 import           Data.Binary.Put
 import           Data.Bits
@@ -49,7 +51,6 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 import           Data.Text.Encoding
 import           Data.Time.Clock.POSIX
-import           Data.Word
 import           System.Entropy
 import           System.IO.Unsafe (unsafePerformIO)
 
@@ -57,8 +58,17 @@ import           System.IO.Unsafe (unsafePerformIO)
 --
 -- Note that the 'Show' instance is for debugging purposes only. To pretty-print
 -- a 'UUID'v7, use 'toString', 'toText' or 'toByteString'.
-newtype UUID = UUID { unUUID :: ByteString }
+--
+-- The 'UUID' constructor will be hidden in favour of the 'Binary' instance in
+-- the future.
+newtype UUID = UUID ByteString
   deriving (Eq, Ord, Show)
+
+-- | Deprecated. Use the 'Binary' instance instead.
+unUUID :: UUID -> ByteString
+unUUID (UUID bs) = bs
+{-# INLINE unUUID #-}
+{-# DEPRECATED unUUID "Use the 'Binary' instance instead" #-}
 
 instance ToJSON UUID where
   toJSON :: UUID -> Value
@@ -74,7 +84,16 @@ instance FromJSON UUID where
       Just uuid -> pure uuid
   {-# INLINE parseJSON #-}
 
--- | Pretty-print a 'UUID'v7. 
+instance Binary UUID where
+  put :: UUID -> Put
+  put (UUID bs) = error "Not implemented"
+  {-# INLINE put #-}
+
+  get :: Get UUID
+  get = error "Not implemented"
+  {-# INLINE get #-}
+
+-- | Pretty-print a 'UUID'v7.
 toString :: UUID -> String
 toString (UUID bs)
     | BSL.length bs /= 16 = "<INVALID-UUID>"

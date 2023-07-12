@@ -123,16 +123,16 @@ decorate prefix uuid = case checkPrefix prefix of
 
 -- | Pretty-print a 'TypeID'.
 toString :: TypeID -> String
-toString (TypeID prefix uuid) = if T.null prefix
-  then suffixEncode (UUID.unUUID uuid)
-  else T.unpack prefix ++ "_" ++ suffixEncode (UUID.unUUID uuid)
+toString (TypeID prefix (UUID bs)) = if T.null prefix
+  then suffixEncode bs
+  else T.unpack prefix ++ "_" ++ suffixEncode bs
 {-# INLINE toString #-}
 
 -- | Pretty-print a 'TypeID' to strict 'Text'.
 toText :: TypeID -> Text
-toText (TypeID prefix uuid) = if T.null prefix
-  then T.pack (suffixEncode $ UUID.unUUID uuid)
-  else prefix <> "_" <> T.pack (suffixEncode $ UUID.unUUID uuid)
+toText (TypeID prefix (UUID bs)) = if T.null prefix
+  then T.pack (suffixEncode bs)
+  else prefix <> "_" <> T.pack (suffixEncode bs)
 {-# INLINE toText #-}
 
 -- | Pretty-print a 'TypeID' to lazy 'ByteString'.
@@ -186,6 +186,7 @@ parseStringWithPrefix prefix str = case parseString str of
   Right (TypeID p  _)    -> Left $ TypeIDErrorAlreadyHasPrefix p
   Left err               -> Left err
 {-# INLINE parseStringWithPrefix #-}
+{-# DEPRECATED parseStringWithPrefix "Use 'parseString' and 'decorate' instead" #-}
 
 -- | Parse a 'TypeID' from the given prefix and the string representation of a
 -- suffix as a strict 'Text'.
@@ -195,6 +196,7 @@ parseTextWithPrefix prefix text = case parseText text of
   Right (TypeID p  _)    -> Left $ TypeIDErrorAlreadyHasPrefix p
   Left err               -> Left err
 {-# INLINE parseTextWithPrefix #-}
+{-# DEPRECATED parseTextWithPrefix "Use 'parseText' and 'decorate' instead" #-}
 
 -- | Parse a 'TypeID' from the given prefix and the string representation of a
 -- suffix as a lazy 'ByteString'.
@@ -204,6 +206,7 @@ parseByteStringWithPrefix prefix bs = case parseByteString bs of
   Right (TypeID p  _)    -> Left $ TypeIDErrorAlreadyHasPrefix p
   Left err               -> Left err
 {-# INLINE parseByteStringWithPrefix #-}
+{-# DEPRECATED parseByteStringWithPrefix "Use 'parseByteString' and 'decorate' instead" #-}
 
 -- | Check if the given prefix is a valid TypeID prefix.
 checkPrefix :: Text -> Maybe TypeIDError
@@ -214,7 +217,6 @@ checkPrefix prefix
         Nothing     -> Nothing
         Just (c, _) -> Just $ TypeIDErrorPrefixInvalidChar c
 {-# INLINE checkPrefix #-}
-
 
 -- The helpers below are verbatim translations from the official highly magical
 -- Go implementation.

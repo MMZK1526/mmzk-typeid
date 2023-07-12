@@ -82,7 +82,7 @@ main = do
                             , ("wrong_alphabet", "ooooooiiiiiiuuuuuuulllllll") ]
       describe "can detect invalid suffix" do
         forM_ invalidSuffixes \(reason, suffix) -> it reason do
-          case TID.parseStringWithPrefix "mmzk" suffix of
+          case TID.parseString suffix of
             Left _    -> pure ()
             Right tid -> expectationFailure $ "Parsed TypeID: " ++ TID.toString tid
 
