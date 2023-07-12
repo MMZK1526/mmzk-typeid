@@ -17,6 +17,7 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 import           Data.Text.Encoding
 import           Data.TypeID.Class
+import           Data.TypeID.Error
 import           Data.UUID.V7 (UUID(..))
 import qualified Data.UUID.V7 as UUID
 import           Data.Word
@@ -29,34 +30,6 @@ import           Data.Word
 data TypeID = TypeID { _getPrefix :: Text
                      , _getUUID   :: UUID }
   deriving (Eq, Ord, Show)
-
--- | Errors from parsing a @TypeID@.
-data TypeIDError = TypeIDErrorPrefixTooLong Int
-                 | TypeIDExtraSeparator
-                 | TypeIDErrorPrefixInvalidChar Char
-                 | TypeIDErrorAlreadyHasPrefix Text
-                 | TypeIDErrorPrefixMismatch Text Text
-                 | TypeIDErrorUUIDError
-  deriving (Eq, Ord)
-
-instance Show TypeIDError where
-  show :: TypeIDError -> String
-  show (TypeIDErrorPrefixTooLong n)
-    = concat ["Prefix with ", show n, " characters is too long!"]
-  show TypeIDExtraSeparator
-    = "The underscore separator should not be present if the prefix is empty!"
-  show (TypeIDErrorPrefixInvalidChar c)
-    = concat ["Prefix contains invalid character ", show c, "!"]
-  show (TypeIDErrorAlreadyHasPrefix prefix)
-    = concat ["TypeID already has prefix ", show prefix, "!"]
-  show (TypeIDErrorPrefixMismatch expPrefix actPrefix)
-    = concat [ "Expected prefix ", show expPrefix, " but got "
-             , show actPrefix, "!" ]
-  show TypeIDErrorUUIDError
-    = "Invalid UUID part!"
-  {-# INLINE show #-}
-
-instance Exception TypeIDError
 
 instance ToJSON TypeID where
   toJSON :: TypeID -> Value

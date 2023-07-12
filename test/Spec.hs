@@ -7,7 +7,8 @@ import qualified Data.ByteString.Lazy as BSL
 import           Data.KindID (KindID, ToPrefix(..))
 import qualified Data.KindID as KID
 import qualified Data.Text as T
-import           Data.TypeID (TypeID, TypeIDError)
+import           Data.TypeID (TypeID)
+import           Data.TypeID.Error
 import qualified Data.TypeID as TID
 import qualified Data.UUID.V7 as V7
 import           GHC.Generics (Generic)

@@ -11,7 +11,6 @@ module Data.TypeID
   (
   -- * Data types
     TypeID
-  , TypeIDError(..)
   , IDType(..)
   -- * TypeID generation
   , nil

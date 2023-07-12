@@ -17,7 +17,8 @@ import           Data.Type.Bool
 import           Data.Type.Equality
 import           Data.Type.Ord
 import           Data.TypeID.Class
-import           Data.TypeID.Internal (TypeID, TypeIDError)
+import           Data.TypeID.Error
+import           Data.TypeID.Internal (TypeID)
 import qualified Data.TypeID.Internal as TID
 import           Data.UUID.V7 (UUID)
 import qualified Data.UUID.V7 as V7
@@ -160,11 +161,11 @@ toByteString = TID.toByteString . toTypeID
 -- | Parse a 'KindID' from its 'String' representation.
 parseString :: forall prefix
              . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
-            => String -> Either TID.TypeIDError (KindID prefix)
+            => String -> Either TypeIDError (KindID prefix)
 parseString str = do
   tid <- TID.parseString str
   case fromTypeID tid of
-    Nothing  -> Left $ TID.TypeIDErrorPrefixMismatch
+    Nothing  -> Left $ TypeIDErrorPrefixMismatch
                        (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))))
                        (getPrefix tid)
     Just kid -> pure kid
@@ -176,7 +177,7 @@ parseText :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
 parseText str = do
   tid <- TID.parseText str
   case fromTypeID tid of
-    Nothing  -> Left $ TID.TypeIDErrorPrefixMismatch
+    Nothing  -> Left $ TypeIDErrorPrefixMismatch
                        (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))))
                        (getPrefix tid)
     Just kid -> pure kid
@@ -185,11 +186,11 @@ parseText str = do
 -- | Parse a 'KindID' from its string representation as a lazy 'ByteString'.
 parseByteString :: forall prefix
                  . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
-                => ByteString -> Either TID.TypeIDError (KindID prefix)
+                => ByteString -> Either TypeIDError (KindID prefix)
 parseByteString str = do
   tid <- TID.parseByteString str
   case fromTypeID tid of
-    Nothing  -> Left $ TID.TypeIDErrorPrefixMismatch
+    Nothing  -> Left $ TypeIDErrorPrefixMismatch
                        (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))))
                        (getPrefix tid)
     Just kid -> pure kid
