@@ -11,10 +11,8 @@ module Data.TypeID
   (
   -- * Data types
     TypeID
-  , getPrefix
-  , getUUID
-  , getTime
   , TypeIDError(..)
+  , IDType(..)
   -- * TypeID generation
   , nil
   , genTypeID
@@ -34,4 +32,5 @@ module Data.TypeID
   , parseByteStringWithPrefix
   ) where
 
+import           Data.TypeID.Class
 import           Data.TypeID.Internal

@@ -16,6 +16,7 @@ import           Data.String
 import           Data.Text (Text)
 import qualified Data.Text as T
 import           Data.Text.Encoding
+import           Data.TypeID.Class
 import           Data.UUID.V7 (UUID(..))
 import qualified Data.UUID.V7 as UUID
 import           Data.Word
@@ -57,7 +58,6 @@ instance Show TypeIDError where
 
 instance Exception TypeIDError
 
-
 instance ToJSON TypeID where
   toJSON :: TypeID -> Value
   toJSON = toJSON . toText
@@ -72,20 +72,23 @@ instance FromJSON TypeID where
       Right tid -> pure tid
   {-# INLINE parseJSON #-}
 
--- | Get the prefix of the 'TypeID'.
-getPrefix :: TypeID -> Text
-getPrefix = _getPrefix
-{-# INLINE getPrefix #-}
+-- | Get the prefix, 'UUID', and timestamp of a 'TypeID'.
+--
+-- While the instance is available by importing "Data.TypeID", the class itself
+-- in the future will not be re-exported from "Data.TypeID". To use the class
+-- explicitly, please import "Data.TypeID.Class".
+instance IDType TypeID where
+  getPrefix :: TypeID -> Text
+  getPrefix = _getPrefix
+  {-# INLINE getPrefix #-}
 
--- | Get the 'UUID' of the 'TypeID'.
-getUUID :: TypeID -> UUID
-getUUID = _getUUID
-{-# INLINE getUUID #-}
+  getUUID :: TypeID -> UUID
+  getUUID = _getUUID
+  {-# INLINE getUUID #-}
 
--- | Get the timestamp of the 'TypeID'.
-getTime :: TypeID -> Word64
-getTime (TypeID _ uuid) = UUID.getTime uuid
-{-# INLINE getTime #-}
+  getTime :: TypeID -> Word64
+  getTime = UUID.getTime . getUUID
+  {-# INLINE getTime #-}
 
 -- | Generate a new 'TypeID' from a prefix.
 --

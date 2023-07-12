@@ -16,8 +16,8 @@ import qualified Data.Text as T
 import           Data.Type.Bool
 import           Data.Type.Equality
 import           Data.Type.Ord
-import           Data.TypeID (TypeID, TypeIDError)
-import qualified Data.TypeID as TID
+import           Data.TypeID.Class
+import           Data.TypeID.Internal (TypeID, TypeIDError)
 import qualified Data.TypeID.Internal as TID
 import           Data.UUID.V7 (UUID)
 import qualified Data.UUID.V7 as V7
@@ -55,6 +55,25 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
         Right kid -> pure kid
     {-# INLINE parseJSON #-}
 
+-- | Get the prefix, 'UUID', and timestamp of a 'KindID'.
+--
+-- While the instance is available by importing "Data.KindID", the class itself
+-- in the future will not be re-exported from "Data.KindID". To use the class
+-- explicitly, please import "Data.TypeID.Class".
+instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+  => IDType (KindID prefix) where
+    getPrefix :: KindID prefix -> Text
+    getPrefix _ = T.pack (symbolVal (Proxy @(PrefixSymbol prefix)))
+    {-# INLINE getPrefix #-}
+
+    getUUID :: KindID prefix -> UUID
+    getUUID = _getUUID
+    {-# INLINE getUUID #-}
+
+    getTime :: KindID prefix -> Word64
+    getTime = V7.getTime . getUUID
+    {-# INLINE getTime #-}
+
 -- | Generate a new 'KindID' from a prefix.
 --
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
@@ -89,24 +108,6 @@ decorate :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
 decorate = KindID
 {-# INLINE decorate #-}
 
--- | Get the prefix of the 'KindID'.
-getPrefix :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
-          => KindID prefix -> Text
-getPrefix _ = T.pack $ symbolVal (Proxy @(PrefixSymbol prefix))
-{-# INLINE getPrefix #-}
-
--- | Get the 'UUID' of the 'KindID'.
-getUUID :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
-        => KindID prefix -> UUID
-getUUID = _getUUID
-{-# INLINE getUUID #-}
-
--- | Get the timestamp of the 'KindID'.
-getTime :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
-        => KindID prefix -> Word64
-getTime = V7.getTime . getUUID
-{-# INLINE getTime #-}
-
 -- | Convert a 'KindID' to a 'TypeID'.
 toTypeID :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
          => KindID prefix -> TypeID
@@ -119,8 +120,8 @@ fromTypeID :: forall prefix
             . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
            => TypeID -> Maybe (KindID prefix)
 fromTypeID tid = do
-  guard (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))) == TID.getPrefix tid)
-  pure $ KindID (TID.getUUID tid)
+  guard (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))) == getPrefix tid)
+  pure $ KindID (getUUID tid)
 {-# INLINE fromTypeID #-}
 
 -- | Pretty-print a 'KindID'.
@@ -151,19 +152,19 @@ parseString str = do
   case fromTypeID tid of
     Nothing  -> Left $ TID.TypeIDErrorPrefixMismatch
                        (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))))
-                       (TID.getPrefix tid)
+                       (getPrefix tid)
     Just kid -> pure kid
 {-# INLINE parseString #-}
 
 -- | Parse a 'KindID' from its string representation as a strict 'Text'.
 parseText :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
-          => Text -> Either TID.TypeIDError (KindID prefix)
+          => Text -> Either TypeIDError (KindID prefix)
 parseText str = do
   tid <- TID.parseText str
   case fromTypeID tid of
     Nothing  -> Left $ TID.TypeIDErrorPrefixMismatch
                        (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))))
-                       (TID.getPrefix tid)
+                       (getPrefix tid)
     Just kid -> pure kid
 {-# INLINE parseText #-}
 
@@ -176,7 +177,7 @@ parseByteString str = do
   case fromTypeID tid of
     Nothing  -> Left $ TID.TypeIDErrorPrefixMismatch
                        (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))))
-                       (TID.getPrefix tid)
+                       (getPrefix tid)
     Just kid -> pure kid
 {-# INLINE parseByteString #-}
 

@@ -38,9 +38,7 @@ module Data.KindID
   (
   -- * Data types
     KindID
-  , getPrefix
-  , getUUID
-  , getTime
+  , IDType(..)
   , ValidPrefix
   , ToPrefix(..)
   -- * KindID generation
@@ -61,3 +59,4 @@ module Data.KindID
   ) where
 
 import           Data.KindID.Internal
+import           Data.TypeID.Class
