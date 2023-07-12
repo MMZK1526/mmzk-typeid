@@ -72,6 +72,18 @@ instance FromJSON TypeID where
       Right tid -> pure tid
   {-# INLINE parseJSON #-}
 
+instance ToJSONKey TypeID where
+  toJSONKey :: ToJSONKeyFunction TypeID
+  toJSONKey = toJSONKeyText toText
+  {-# INLINE toJSONKey #-}
+
+instance FromJSONKey TypeID where
+  fromJSONKey :: FromJSONKeyFunction TypeID
+  fromJSONKey = FromJSONKeyTextParser \t -> case parseText t of
+    Left err  -> fail $ show err
+    Right tid -> pure tid
+  {-# INLINE fromJSONKey #-}
+
 -- | Get the prefix, 'UUID', and timestamp of a 'TypeID'.
 --
 -- While the instance is available by importing "Data.TypeID", the class itself

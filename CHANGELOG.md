@@ -9,6 +9,10 @@
 
 * Fix orphan instances for `TypeID` and `KindID`.
 
+* Add `FromJSONKey` and `ToJSONKey` instances for `TypeID` and `KindID`.
+
+* More tests.
+
 
 ## 0.1.0.0 -- 2023-07-11
 

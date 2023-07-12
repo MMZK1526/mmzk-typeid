@@ -84,6 +84,18 @@ instance FromJSON UUID where
       Just uuid -> pure uuid
   {-# INLINE parseJSON #-}
 
+instance ToJSONKey UUID where
+  toJSONKey :: ToJSONKeyFunction UUID
+  toJSONKey = toJSONKeyText toText
+  {-# INLINE toJSONKey #-}
+
+instance FromJSONKey UUID where
+  fromJSONKey :: FromJSONKeyFunction UUID
+  fromJSONKey = FromJSONKeyTextParser \t -> case parseText t of
+    Nothing   -> fail "Invalid UUID"
+    Just uuid -> pure uuid
+  {-# INLINE fromJSONKey #-}
+
 instance Binary UUID where
   put :: UUID -> Put
   put (UUID bs) = putLazyByteString bs

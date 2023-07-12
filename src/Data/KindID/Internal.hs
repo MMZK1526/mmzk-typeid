@@ -55,6 +55,20 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
         Right kid -> pure kid
     {-# INLINE parseJSON #-}
 
+instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+  => ToJSONKey (KindID prefix) where
+    toJSONKey :: ToJSONKeyFunction (KindID prefix)
+    toJSONKey = toJSONKeyText toText
+    {-# INLINE toJSONKey #-}
+
+instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+  => FromJSONKey (KindID prefix) where
+    fromJSONKey :: FromJSONKeyFunction (KindID prefix)
+    fromJSONKey = FromJSONKeyTextParser \t -> case parseText t of
+      Left err  -> fail $ show err
+      Right kid -> pure kid
+    {-# INLINE fromJSONKey #-}
+
 -- | Get the prefix, 'UUID', and timestamp of a 'KindID'.
 --
 -- While the instance is available by importing "Data.KindID", the class itself
