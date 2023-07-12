@@ -12,11 +12,13 @@ TypeIDs are canonically encoded as lowercase strings consisting of three parts:
 
 For more information, please check out the [specification](https://github.com/jetpack-io/typeid/blob/main/README.md).
 
+If you notice any issues or have any suggestions, please feel free to open an issue or contact me via email.
+
 ## Highlights
 
 In addition to the features provided by [TypeID](https://github.com/jetpack-io/typeid), this implementation also supports:
 
-1. Generating typeids in a batch. They are guaranteed to have the same timestamp (up to the first 32768 ids) and of ascending order;
+1. Generating TypeIDs in a batch. They are guaranteed to have the same timestamp (up to the first 32768 ids) and of ascending order;
 2. Encoding the prefix in the [type level](src/Data/KindID.hs), so that if you accidentally pass in a wrong prefix, the code won't compile, avoiding the need for runtime checks.
 
 ## Quick start
@@ -35,6 +37,11 @@ main = do
   -- Make a TypeID with prefix 'mmzk':
   typeID <- TID.genTypeID "mmzk"
   putStrLn $ TID.toString typeID
+
+  -- Get components from the TypeID:
+  let prefix = TID.getPrefix typeID -- "mmzk"
+      uuid   = TID.getUUID typeID
+      time   = TID.getTime typeID -- A 'Word64' representing the timestamp in milliseconds
 
   -- Make a TypeID without prefix:
   typeID' <- TID.genTypeID ""
@@ -66,6 +73,11 @@ main = do
   -- Make a KindID with prefix 'mmzk':
   kindID <- TID.genKindID @"mmzk" -- Has type `KindID "mmzk"`
   putStrLn $ KID.toString kindID
+
+  -- Get components from the KindID:
+  let prefix = KID.getPrefix kindID -- "mmzk"
+      uuid   = KID.getUUID kindID
+      time   = KID.getTime kindID -- A 'Word64' representing the timestamp in milliseconds
 
   -- Make a KindID without prefix:
   kindID' <- KID.genKindID @"" -- Has type `KindID ""`

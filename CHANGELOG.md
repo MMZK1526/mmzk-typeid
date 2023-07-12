@@ -4,7 +4,7 @@
 ## 0.2.0.0 -- 2023-XX-XX
 
 * Implement `KindID` to take arbitrary prefix type.
-  * It can be a `Symbol` as before, or it can be any type that implements
+  * It can be a `Symbol` as before, but it can also be any type that implements
     `ToPrefix` which dictates how to translate the prefix type to a `Symbol`.
 
 * Fix orphan instances for `TypeID` and `KindID`.
