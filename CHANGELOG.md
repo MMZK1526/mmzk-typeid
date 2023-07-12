@@ -17,6 +17,10 @@
 * Deprecate `unUUID`, `parseStringWithPrefix`, `parseTextWithPrefix`,
   `parseByteStringWithPrefix`, `nil`, and `decorate`. They are either replaced
   by functions of other names or are no longer necessary.
+  * They will be removed in the next major version.
+
+* The `UUID` type is expected to be removed in the next major version in favour
+  of the type from the 'uuid-types' package.
 
 * More tests.
 
