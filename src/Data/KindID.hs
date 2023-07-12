@@ -43,9 +43,11 @@ module Data.KindID
   , ToPrefix(..)
   -- * KindID generation
   , nil
+  , nilKindID
   , genKindID
   , genKindIDs
   , decorate
+  , decorateKindID
   -- * Encoding & decoding
   , toString
   , toText

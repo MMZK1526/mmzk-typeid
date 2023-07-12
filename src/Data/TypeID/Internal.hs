@@ -101,6 +101,12 @@ genTypeIDs prefix n = case checkPrefix prefix of
 nil :: TypeID
 nil = TypeID "" UUID.nil
 {-# INLINE nil #-}
+{-# DEPRECATED nil "Use nilTypeID instead." #-}
+
+-- | The nil 'TypeID'.
+nilTypeID :: TypeID
+nilTypeID = TypeID "" UUID.nil
+{-# INLINE nilTypeID #-}
 
 -- | Obtain a 'TypeID' from a prefix and a 'UUID'.
 decorate :: Text -> UUID -> Either TypeIDError TypeID
@@ -108,6 +114,14 @@ decorate prefix uuid = case checkPrefix prefix of
   Nothing  -> Right $ TypeID prefix uuid
   Just err -> Left err
 {-# INLINE decorate #-}
+{-# DEPRECATED decorate "Use decorateTypeID instead." #-}
+
+-- | Obtain a 'TypeID' from a prefix and a 'UUID'.
+decorateTypeID :: Text -> UUID -> Either TypeIDError TypeID
+decorateTypeID prefix uuid = case checkPrefix prefix of
+  Nothing  -> Right $ TypeID prefix uuid
+  Just err -> Left err
+{-# INLINE decorateTypeID #-}
 
 -- | Pretty-print a 'TypeID'.
 toString :: TypeID -> String

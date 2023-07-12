@@ -14,9 +14,11 @@ module Data.TypeID
   , IDType(..)
   -- * TypeID generation
   , nil
+  , nilTypeID
   , genTypeID
   , genTypeIDs
   , decorate
+  , decorateTypeID
   -- * Prefix validation
   , checkPrefix
   -- * Encoding & decoding

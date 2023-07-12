@@ -4,11 +4,13 @@
 -- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
+-- IMPORTANT: In the next major release (breaking change), I will unify the
+-- 'UUID' type with the one from the uuid-type package.
+--
 -- UUIDv7 implementation.
 --
 -- UUIDv7 is not currently present in the uuid package, therefore I have to
--- make a quick patch of my own. In the future I will try to add uuid as a
--- dependency and try to use the same interface.
+-- make a quick patch of my own.
 --
 -- Note that since the specification for v7 is not yet finalised, this module's
 -- implementation may change in the future according to the potential

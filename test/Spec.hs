@@ -52,7 +52,7 @@ main = do
           Left err  -> expectationFailure $ "Parse error: " ++ show err
           Right tid -> TID.getPrefix tid `shouldBe` "mmzk"
       it "has the correct nil" do
-        Right TID.nil `shouldBe` TID.parseString "00000000000000000000000000"
+        Right TID.nilTypeID `shouldBe` TID.parseString "00000000000000000000000000"
       it "can generate in batch with same timestamp and in ascending order" do
         tids <- TID.genTypeIDs "mmzk" 1526
         all ((== "mmzk") . TID.getPrefix) tids `shouldBe` True
@@ -70,7 +70,7 @@ main = do
       describe "can detect invalid prefix" do
         forM_ invalidPrefixes \(reason, prefix) -> it reason do
           TID.genTypeID prefix `shouldThrow` anyTypeIDError
-          case TID.decorate prefix V7.nil of
+          case TID.decorateTypeID prefix V7.nil of
             Left _  -> pure ()
             Right _ -> expectationFailure "Should not be able to decorate with invalid prefix"
       let invalidSuffixes = [ ("spaces", " ")
@@ -128,7 +128,7 @@ main = do
           Left err  -> pure ()
           Right kid -> expectationFailure $ "Parsed TypeID: " ++ KID.toString kid
       it "has the correct nil" do
-        Right KID.nil `shouldBe` KID.parseString @"" "00000000000000000000000000"
+        Right KID.nilKindID `shouldBe` KID.parseString @"" "00000000000000000000000000"
       it "can generate in batch with same timestamp and in ascending order" do
         kids <- KID.genKindIDs @"mmzk" 1526
         all ((== "mmzk") . KID.getPrefix) kids `shouldBe` True

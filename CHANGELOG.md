@@ -11,6 +11,13 @@
 
 * Add `FromJSONKey` and `ToJSONKey` instances for `TypeID` and `KindID`.
 
+* Introduce `IDType` class to unify the `getPrefix`, `getUUID`, and `getTime`
+  functions of `TypeID` and `KindID`.
+
+* Deprecate `unUUID`, `parseStringWithPrefix`, `parseTextWithPrefix`,
+  `parseByteStringWithPrefix`, `nil`, and `decorate`. They are either replaced
+  by functions of other names or are no longer necessary.
+
 * More tests.
 
 
