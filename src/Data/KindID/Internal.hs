@@ -71,10 +71,6 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
     {-# INLINE fromJSONKey #-}
 
 -- | Get the prefix, 'UUID', and timestamp of a 'KindID'.
---
--- While the instance is available by importing "Data.KindID", the class itself
--- in the future will not be re-exported from "Data.KindID". To use the class
--- explicitly, please import "Data.TypeID.Class".
 instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
   => IDType (KindID prefix) where
     getPrefix :: KindID prefix -> Text

@@ -38,7 +38,9 @@ module Data.KindID
   (
   -- * Data types
     KindID
-  , IDType(..)
+  , getPrefix
+  , getUUID
+  , getTime
   , ValidPrefix
   , ToPrefix(..)
   -- * KindID generation

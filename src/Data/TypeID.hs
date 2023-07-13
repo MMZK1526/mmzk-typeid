@@ -11,7 +11,9 @@ module Data.TypeID
   (
   -- * Data types
     TypeID
-  , IDType(..)
+  , getPrefix
+  , getUUID
+  , getTime
   -- * TypeID generation
   , nil
   , nilTypeID

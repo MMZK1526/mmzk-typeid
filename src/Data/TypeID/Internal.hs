@@ -58,10 +58,6 @@ instance FromJSONKey TypeID where
   {-# INLINE fromJSONKey #-}
 
 -- | Get the prefix, 'UUID', and timestamp of a 'TypeID'.
---
--- While the instance is available by importing "Data.TypeID", the class itself
--- in the future will not be re-exported from "Data.TypeID". To use the class
--- explicitly, please import "Data.TypeID.Class".
 instance IDType TypeID where
   getPrefix :: TypeID -> Text
   getPrefix = _getPrefix

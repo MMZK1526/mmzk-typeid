@@ -5,14 +5,14 @@
 import           Control.Monad
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as BSL
-import           Data.KindID (KindID, ToPrefix(..))
+import           Data.KindID
 import qualified Data.KindID as KID
 import           Data.Map (Map)
 import qualified Data.Map as M
 import           Data.String
 import           Data.Text (Text)
 import qualified Data.Text as T
-import           Data.TypeID (TypeID)
+import           Data.TypeID
 import           Data.TypeID.Error
 import qualified Data.TypeID as TID
 import           Data.UUID.V7 (UUID)
@@ -56,21 +56,21 @@ main = do
     describe "Generate TypeID" do
       it "can generate TypeID with prefix" do
         tid <- TID.genTypeID "mmzk"
-        TID.getPrefix tid `shouldBe` "mmzk"
+        getPrefix tid `shouldBe` "mmzk"
       it "can generate TypeID without prefix" do
         tid <- TID.genTypeID ""
-        TID.getPrefix tid `shouldBe` ""
+        getPrefix tid `shouldBe` ""
       it "can parse TypeID from String" do
         case TID.parseString "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
-          Right tid -> TID.getPrefix tid `shouldBe` "mmzk"
+          Right tid -> getPrefix tid `shouldBe` "mmzk"
       it "has the correct nil" do
         Right TID.nilTypeID `shouldBe` TID.parseString "00000000000000000000000000"
       it "can generate in batch with same timestamp and in ascending order" do
         tids <- TID.genTypeIDs "mmzk" 1526
-        all ((== "mmzk") . TID.getPrefix) tids `shouldBe` True
-        let timestamp = TID.getTime $ head tids
-        all ((== timestamp) . TID.getTime) tids `shouldBe` True
+        all ((== "mmzk") . getPrefix) tids `shouldBe` True
+        let timestamp = getTime $ head tids
+        all ((== timestamp) . getTime) tids `shouldBe` True
         all (uncurry (<)) (zip tids $ tail tids) `shouldBe` True
 
     describe "Parse TypeID" do
@@ -109,7 +109,7 @@ main = do
       forM_ specialValues \(reason, tid, uuid) -> it reason do
         case TID.parseString tid of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
-          Right tid -> V7.toString (TID.getUUID tid) `shouldBe` uuid
+          Right tid -> V7.toString (KID.getUUID tid) `shouldBe` uuid
 
     describe "TypeID valid JSON instances" do
       it "Decode and then encode should be identity" do
@@ -124,16 +124,16 @@ main = do
           case decode (fromString $ show tid) :: Maybe TypeID of
             Nothing  -> expectationFailure "Parse JSON failed!"
             Just tid -> do
-              TID.getPrefix tid `shouldBe` prefix
-              V7.toString (TID.getUUID tid) `shouldBe` uuid
+              getPrefix tid `shouldBe` prefix
+              V7.toString (KID.getUUID tid) `shouldBe` uuid
       describe "Valid JSON key" do
         forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
           case decode (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") :: Maybe (Map TypeID Int) of
             Nothing  -> expectationFailure "Parse JSON failed!"
             Just tid -> do
               let (tid', _) = M.elemAt 0 tid
-              TID.getPrefix tid' `shouldBe` prefix
-              V7.toString (TID.getUUID tid') `shouldBe` uuid
+              getPrefix tid' `shouldBe` prefix
+              V7.toString (KID.getUUID tid') `shouldBe` uuid
 
     describe "TypeID invalid JSON instances" do
       describe "Invalid JSON value" do
@@ -158,25 +158,25 @@ main = do
         case TID.parseString tid of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
           Right tid -> do
-            TID.getPrefix tid `shouldBe` prefix
-            V7.toString (TID.getUUID tid) `shouldBe` uuid
+            getPrefix tid `shouldBe` prefix
+            V7.toString (KID.getUUID tid) `shouldBe` uuid
 
     describe "Test valid.json (TypeID as JSON)" do
       forM_ validUUID \(TestDataUUID name tid prefix uuid) -> it name do
-        TID.getPrefix tid `shouldBe` prefix
-        TID.getUUID tid `shouldBe` uuid
+        getPrefix tid `shouldBe` prefix
+        KID.getUUID tid `shouldBe` uuid
 
     describe "Generate type-level TypeID with 'Symbol' prefixes" do
       it "can generate TypeID with prefix" do
         kid <- KID.genKindID @"mmzk"
-        KID.getPrefix kid `shouldBe` "mmzk"
+        getPrefix kid `shouldBe` "mmzk"
       it "can generate TypeID without prefix" do
         kid <- KID.genKindID @""
-        KID.getPrefix kid `shouldBe` ""
+        getPrefix kid `shouldBe` ""
       it "can parse TypeID from String" do
         case KID.parseString @"mmzk" "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
-          Right kid -> KID.getPrefix kid `shouldBe` "mmzk"
+          Right kid -> getPrefix kid `shouldBe` "mmzk"
       it "cannot parse TypeID into wrong prefix" do
         case KID.parseString @"foo" "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> pure ()
@@ -185,26 +185,26 @@ main = do
         Right KID.nilKindID `shouldBe` KID.parseString @"" "00000000000000000000000000"
       it "can generate in batch with same timestamp and in ascending order" do
         kids <- KID.genKindIDs @"mmzk" 1526
-        all ((== "mmzk") . KID.getPrefix) kids `shouldBe` True
-        let timestamp = KID.getTime $ head kids
-        all ((== timestamp) . KID.getTime) kids `shouldBe` True
+        all ((== "mmzk") . getPrefix) kids `shouldBe` True
+        let timestamp = getTime $ head kids
+        all ((== timestamp) . getTime) kids `shouldBe` True
         all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
   
     describe "Generate type-level TypeID with custom data kind prefixes" do
       it "can generate TypeID with prefix" do
           kid <- KID.genKindID @'Post
-          KID.getPrefix kid `shouldBe` "post"
+          getPrefix kid `shouldBe` "post"
       it "can parse TypeID from String" do
         case KID.parseString @'User "user_00041061050r3gg28a1c60t3gf" of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
-          Right kid -> KID.getPrefix kid `shouldBe` "user"
+          Right kid -> getPrefix kid `shouldBe` "user"
       it "cannot parse TypeID into wrong prefix" do
         case KID.parseString @'Comment "user_00041061050r3gg28a1c60t3gf" of
           Left err  -> pure ()
           Right kid -> expectationFailure $ "Parsed TypeID: " ++ KID.toString kid
       it "can generate in batch with same timestamp and in ascending order" do
         kids <- KID.genKindIDs @'Comment 1526
-        all ((== "comment") . KID.getPrefix) kids `shouldBe` True
-        let timestamp = KID.getTime $ head kids
-        all ((== timestamp) . KID.getTime) kids `shouldBe` True
+        all ((== "comment") . getPrefix) kids `shouldBe` True
+        let timestamp = getTime $ head kids
+        all ((== timestamp) . getTime) kids `shouldBe` True
         all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
