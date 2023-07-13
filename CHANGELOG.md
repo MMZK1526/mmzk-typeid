@@ -1,7 +1,7 @@
 # Revision history for mmzk-typeid
 
 
-## 0.2.0.0 -- 2023-XX-XX
+## 0.2.0.0 -- 2023-07-14
 
 * Implement `KindID` to take arbitrary prefix type.
   * It can be a `Symbol` as before, but it can also be any type that implements
