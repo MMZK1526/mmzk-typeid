@@ -26,7 +26,9 @@ import           Data.Word
 -- invalid @TypeID@s.
 --
 -- Note that the 'Show' instance is for debugging purposes only. To pretty-print
--- a 'TypeID', use 'toString', 'toText' or 'toByteString'.
+-- a 'TypeID', use 'toString', 'toText' or 'toByteString'. However, this
+-- behaviour will be changed in the next major version as it is not useful. By
+-- then, the 'Show' instance will be the same as 'toString'.
 data TypeID = TypeID { _getPrefix :: Text
                      , _getUUID   :: UUID }
   deriving (Eq, Ord, Show)
