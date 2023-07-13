@@ -1,5 +1,9 @@
 -- | TypeID Error type.
-module Data.TypeID.Error where
+module Data.TypeID.Error
+ (
+  -- * Data type
+  TypeIDError(..)
+ ) where
 
 import           Control.Exception
 import           Data.Text (Text)
@@ -10,6 +14,7 @@ import           Data.Text (Text)
 data TypeIDError = TypeIDErrorPrefixTooLong Int
                  | TypeIDExtraSeparator
                  | TypeIDErrorPrefixInvalidChar Char
+                 -- | Will be removed in the next major release.
                  | TypeIDErrorAlreadyHasPrefix Text
                  | TypeIDErrorPrefixMismatch Text Text
                  | TypeIDErrorUUIDError

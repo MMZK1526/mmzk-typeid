@@ -71,3 +71,4 @@ module Data.KindID
 
 import           Data.KindID.Internal
 import           Data.TypeID.Class
+import           Data.TypeID.Internal (TypeID)
