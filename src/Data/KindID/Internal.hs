@@ -85,6 +85,33 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
     getTime = V7.getTime . getUUID
     {-# INLINE getTime #-}
 
+-- | Conversion between 'KindID' and 'String'/'Text'/'ByteString'.
+instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+  => IDConv (KindID prefix) where
+    string2ID :: String -> Either TypeIDError (KindID prefix)
+    string2ID = parseString
+    {-# INLINE string2ID #-}
+
+    text2ID :: Text -> Either TypeIDError (KindID prefix)
+    text2ID = parseText
+    {-# INLINE text2ID #-}
+
+    byteString2ID :: ByteString -> Either TypeIDError (KindID prefix)
+    byteString2ID = parseByteString
+    {-# INLINE byteString2ID #-}
+
+    id2String :: KindID prefix -> String
+    id2String = toString
+    {-# INLINE id2String #-}
+
+    id2Text :: KindID prefix -> Text
+    id2Text = toText
+    {-# INLINE id2Text #-}
+
+    id2ByteString :: KindID prefix -> ByteString
+    id2ByteString = toByteString
+    {-# INLINE id2ByteString #-}
+
 -- | Generate a new 'KindID' from a prefix.
 --
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
@@ -148,26 +175,29 @@ fromTypeID tid = do
   pure $ KindID (getUUID tid)
 {-# INLINE fromTypeID #-}
 
--- | Pretty-print a 'KindID'.
+-- | Pretty-print a 'KindID'. It is 'id2String' with concrete type.
 toString :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
          => KindID prefix -> String
 toString = TID.toString . toTypeID
 {-# INLINE toString #-}
 
--- | Pretty-print a 'KindID' to strict 'Text'.
+-- | Pretty-print a 'KindID' to strict 'Text'. It is 'id2Text' with concrete
+-- type.
 toText :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
        => KindID prefix -> Text
 toText = TID.toText . toTypeID
 {-# INLINE toText #-}
 
--- | Pretty-print a 'KindID' to lazy 'ByteString'.
+-- | Pretty-print a 'KindID' to lazy 'ByteString'. It is 'id2ByteString' with
+-- concrete type.
 toByteString :: forall prefix
               . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
              => KindID prefix -> ByteString
 toByteString = TID.toByteString . toTypeID
 {-# INLINE toByteString #-}
 
--- | Parse a 'KindID' from its 'String' representation.
+-- | Parse a 'KindID' from its 'String' representation. It is 'parseString'
+-- with concrete type.
 parseString :: forall prefix
              . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
             => String -> Either TypeIDError (KindID prefix)
@@ -180,7 +210,8 @@ parseString str = do
     Just kid -> pure kid
 {-# INLINE parseString #-}
 
--- | Parse a 'KindID' from its string representation as a strict 'Text'.
+-- | Parse a 'KindID' from its string representation as a strict 'Text'. It is
+-- 'parseText' with concrete type.
 parseText :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
           => Text -> Either TypeIDError (KindID prefix)
 parseText str = do
@@ -192,7 +223,8 @@ parseText str = do
     Just kid -> pure kid
 {-# INLINE parseText #-}
 
--- | Parse a 'KindID' from its string representation as a lazy 'ByteString'.
+-- | Parse a 'KindID' from its string representation as a lazy 'ByteString'. It
+-- is 'parseByteString' with concrete type.
 parseByteString :: forall prefix
                  . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                 => ByteString -> Either TypeIDError (KindID prefix)

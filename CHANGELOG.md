@@ -14,6 +14,11 @@
 * Introduce `IDType` class to unify the `getPrefix`, `getUUID`, and `getTime`
   functions of `TypeID` and `KindID`.
 
+* Introduce `IDConv` class to unify the various conversion functions between
+  `TypeID`/`KindID` and `String`/`Text`/`ByteString`.
+  * The original concrete functions remain, and the class is provided as an
+    alternative.
+
 * Deprecate `unUUID`, `parseStringWithPrefix`, `parseTextWithPrefix`,
   `parseByteStringWithPrefix`, `nil`, and `decorate`. They are either replaced
   by functions of other names or are no longer necessary.

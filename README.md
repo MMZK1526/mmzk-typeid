@@ -23,7 +23,6 @@ In addition to the features provided by [TypeID](https://github.com/jetpack-io/t
 
 ## Quick start
 
-### Basic Usage
 ```Haskell
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -54,10 +53,24 @@ main = do
   -- Parse a TypeID from string:
   case TID.parseString "mmzk_01h455vb4pex5vsknk084sn02q" of
     Left err     -> throwIO err
-    Right typeID -> TID.putStrLn $ TID.toString typeID
+    Right typeID -> putStrLn $ TID.toString typeID
 ```
 
-### Type-level prefix
+For a full list of functions on `TypeID`, see [Data.TypeID](src/Data/TypeID.hs).
+
+## More Usages
+
+### Type-level TypeID (KindID)
+When using `TypeID`, if we want to check if the type matches, we usually need to get the prefix of the `TypeID` and compare it with the desired prefix at runtime. However, with Haskell's type system, we can do this at compile time instead. We call this TypeID with compile-time prefix a KindID.
+
+Of course, that would require the desired prefix to be known at compile time. This is actually quite common, especially when we are using one prefix for one table in the database.
+
+For example, suppose we have a function that takes a KindID with the prefix "user", it may have a signature like this: `f :: KindID "user" -> IO ()`
+
+Then if we try to pass in a KindID with the prefix "post", the compiler will complain, thus removing the runtime check and the associated overhead.
+
+All the prefixes are type-checked at compile time, so if we try to pass in invalid prefixes, the compiler (again) will complain.
+
 ```Haskell
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -88,10 +101,42 @@ main = do
   mapM_ (putStrLn . KID.toString) kindIDs
 
   -- Parse a KindID from string:
-  case KID.parseString "mmzk_01h455vb4pex5vsknk084sn02q" of
+  case KID.parseString @"mmzk" "mmzk_01h455vb4pex5vsknk084sn02q" of
     Left err     -> throwIO err
-    Right kindID -> KID.putStrLn $ KID.toString kindID
+    Right kindID -> putStrLn $ KID.toString kindID
 ```
+
+For a full list of functions on `KindID`, see [Data.KindID](src/Data/KindID.hs).
+
+### Functions with More General Types
+`TypeID` and `KindID` shares many functions with the same name and functionality. So far, we are using qualified imports to diffentiate them (*e.g* `KID.fromString` and `TID.fromString`). Alternatively, we can use the methods of `IDConv` to use the same functions for both `TypeID` and `KindID`.
+
+```Haskell
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
+
+import           Control.Exception
+import           Data.KindID
+import           Data.TypeID
+
+main :: IO ()
+main = do
+  -- Parse a TypeID from string:
+  case string2ID "mmzk_01h455vb4pex5vsknk084sn02q" :: Maybe TypeID of
+    Left err     -> throwIO err
+    Right typeID -> putStrLn $ id2String typeID
+  -- Parse a KindID from string:
+  case string2ID "mmzk_01h455vb4pex5vsknk084sn02q" :: Maybe (KindID "mmzk") of
+    Left err     -> throwIO err
+    Right kindID -> putStrLn $ id2String kindID
+```
+
+We no longer need to use qualified imports, but on the down side, we need to add explicit type annotations. Therefore it is a matter of preference.
+
+Note that with the class methods, the type application with `Symbol` no longer works as the full type must be provided. For example, `string2ID @"mmzk" "mmzk_01h455vb4pex5vsknk084sn02q"` will not compile.
+
+For a full list of these functions, see [Data.TypeID.Class](src/Data/TypeID/Class.hs).
 
 ## Note
 Not explicitly exported functions are considered internal and are subjected to changes.

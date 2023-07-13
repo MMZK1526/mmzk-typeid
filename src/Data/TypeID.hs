@@ -23,7 +23,14 @@ module Data.TypeID
   , decorateTypeID
   -- * Prefix validation
   , checkPrefix
-  -- * Encoding & decoding
+  -- * Encoding & decoding (class methods)
+  , id2String
+  , id2Text
+  , id2ByteString
+  , string2ID
+  , text2ID
+  , byteString2ID
+  -- * Encoding & decoding ('TypeID'-specific)
   , toString
   , toText
   , toByteString

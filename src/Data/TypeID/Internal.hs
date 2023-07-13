@@ -71,6 +71,32 @@ instance IDType TypeID where
   getTime = UUID.getTime . getUUID
   {-# INLINE getTime #-}
 
+-- | Conversion between 'TypeID' and 'String'/'Text'/'ByteString'.
+instance IDConv TypeID where
+  string2ID :: String -> Either TypeIDError TypeID
+  string2ID = parseString
+  {-# INLINE string2ID #-}
+
+  text2ID :: Text -> Either TypeIDError TypeID
+  text2ID = parseText
+  {-# INLINE text2ID #-}
+
+  byteString2ID :: ByteString -> Either TypeIDError TypeID
+  byteString2ID = parseByteString
+  {-# INLINE byteString2ID #-}
+
+  id2String :: TypeID -> String
+  id2String = toString
+  {-# INLINE id2String #-}
+
+  id2Text :: TypeID -> Text
+  id2Text = toText
+  {-# INLINE id2Text #-}
+
+  id2ByteString :: TypeID -> ByteString
+  id2ByteString = toByteString
+  {-# INLINE id2ByteString #-}
+
 -- | Generate a new 'TypeID' from a prefix.
 --
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
@@ -119,26 +145,29 @@ decorateTypeID prefix uuid = case checkPrefix prefix of
   Just err -> Left err
 {-# INLINE decorateTypeID #-}
 
--- | Pretty-print a 'TypeID'.
+-- | Pretty-print a 'TypeID'. It is 'id2String' with concrete type.
 toString :: TypeID -> String
 toString (TypeID prefix (UUID bs)) = if T.null prefix
   then suffixEncode bs
   else T.unpack prefix ++ "_" ++ suffixEncode bs
 {-# INLINE toString #-}
 
--- | Pretty-print a 'TypeID' to strict 'Text'.
+-- | Pretty-print a 'TypeID' to strict 'Text'. It is 'id2Text' with concrete
+-- type.
 toText :: TypeID -> Text
 toText (TypeID prefix (UUID bs)) = if T.null prefix
   then T.pack (suffixEncode bs)
   else prefix <> "_" <> T.pack (suffixEncode bs)
 {-# INLINE toText #-}
 
--- | Pretty-print a 'TypeID' to lazy 'ByteString'.
+-- | Pretty-print a 'TypeID' to lazy 'ByteString'. It is 'id2ByteString' with
+-- concrete type.
 toByteString :: TypeID -> ByteString
 toByteString = fromString . toString
 {-# INLINE toByteString #-}
 
--- | Parse a 'TypeID' from its 'String' representation.
+-- | Parse a 'TypeID' from its 'String' representation. It is 'string2ID' with
+-- concrete type.
 parseString :: String -> Either TypeIDError TypeID
 parseString str = case span (/= '_') str of
   ("", _)              -> Left TypeIDExtraSeparator
@@ -152,7 +181,8 @@ parseString str = case span (/= '_') str of
   where
     bs = fromString str
 
--- | Parse a 'TypeID' from its string representation as a strict 'Text'.
+-- | Parse a 'TypeID' from its string representation as a strict 'Text'. It is
+-- 'text2ID' with concrete type.
 parseText :: Text -> Either TypeIDError TypeID
 parseText text = case second T.uncons $ T.span (/= '_') text of
   ("", _)                    -> Left TypeIDExtraSeparator
@@ -165,7 +195,8 @@ parseText text = case second T.uncons $ T.span (/= '_') text of
   where
     bs = BSL.fromStrict $ encodeUtf8 text
 
--- | Parse a 'TypeID' from its string representation as a lazy 'ByteString'.
+-- | Parse a 'TypeID' from its string representation as a lazy 'ByteString'. It
+-- is 'byteString2ID' with concrete type.
 parseByteString :: ByteString -> Either TypeIDError TypeID
 parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
   ("", _)                    -> Left TypeIDExtraSeparator

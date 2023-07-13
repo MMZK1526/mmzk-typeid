@@ -7,8 +7,8 @@
 -- Similar to "Data.TypeID", but the type is statically determined in the type
 -- level.
 --
--- When using TypeID, if we want to check if the type matches, we usually need
--- to get the prefix of the TypeID and compare it with the desired prefix at
+-- When using 'TypeID', if we want to check if the type matches, we usually need
+-- to get the prefix of the 'TypeID' and compare it with the desired prefix at
 -- runtime. However, with Haskell's type system, we can do this at compile time
 -- instead. We call this TypeID with compile-time prefix a 'KindID'.
 --
@@ -50,7 +50,14 @@ module Data.KindID
   , genKindIDs
   , decorate
   , decorateKindID
-  -- * Encoding & decoding
+  -- * Encoding & decoding (class methods)
+  , id2String
+  , id2Text
+  , id2ByteString
+  , string2ID
+  , text2ID
+  , byteString2ID
+  -- * Encoding & decoding ('KindID'-specific)
   , toString
   , toText
   , toByteString
