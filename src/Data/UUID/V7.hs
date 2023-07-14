@@ -12,6 +12,7 @@
 -- Note that since the specification for v7 is not yet finalised, this module's
 -- implementation may change in the future according to the potential
 -- adjustments in the specification.
+--
 module Data.UUID.V7
   (
   -- * Data type
@@ -98,7 +99,7 @@ genUUIDs n = do
 getEpochMilli :: IO Word64
 getEpochMilli = do
   t <- getPOSIXTime
-  pure $ round $ t * 1000
+  pure . round $ t * 1000
 {-# INLINE getEpochMilli #-}
 
 -- | Get the time field (unix_ts_ms) of a 'UUID'v7.

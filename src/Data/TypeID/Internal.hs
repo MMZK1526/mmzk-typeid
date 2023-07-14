@@ -265,7 +265,7 @@ unsafeParseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
 checkPrefix :: Text -> Maybe TypeIDError
 checkPrefix prefix
   | T.length prefix > 63 = Just $ TypeIDErrorPrefixTooLong (T.length prefix)
-  | otherwise  
+  | otherwise
       = case T.uncons (T.dropWhile (liftM2 (&&) isLower isAscii) prefix) of
         Nothing     -> Nothing
         Just (c, _) -> Just $ TypeIDErrorPrefixInvalidChar c
@@ -342,7 +342,7 @@ unsafeDecodeUUID bs
 {-# INLINE unsafeDecodeUUID #-}
 
 table :: Array Word8 Word8
-table = listArray (0, 255) 
+table = listArray (0, 255)
   [ 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
   , 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
   , 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF

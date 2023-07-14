@@ -138,18 +138,18 @@ main = do
 
     describe "TypeID invalid JSON instances" do
       describe "Invalid JSON value" do
-        forM_ invalid \(TestData name tid _ _) -> it name do 
+        forM_ invalid \(TestData name tid _ _) -> it name do
           case decode (fromString $ show tid) :: Maybe TypeID of
             Nothing  -> pure ()
             Just tid -> expectationFailure $ "Parsed TypeID: " ++ show tid
       describe "Invalid JSON key" do
-        forM_ invalid \(TestData name tid _ _) -> it name do 
+        forM_ invalid \(TestData name tid _ _) -> it name do
           case decode (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") :: Maybe (Map TypeID Int) of
             Nothing  -> pure ()
             Just tid -> expectationFailure "Invalid TypeID key shouldn't be parsed!"
 
     describe "Test invalid.json" do
-      forM_ invalid \(TestData name tid _ _) -> it name do 
+      forM_ invalid \(TestData name tid _ _) -> it name do
         case string2ID @TypeID tid of
           Left _    -> pure ()
           Right tid -> expectationFailure $ "Parsed TypeID: " ++ show tid
@@ -190,7 +190,7 @@ main = do
         let timestamp = getTime $ head kids
         all ((== timestamp) . getTime) kids `shouldBe` True
         all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
-  
+
     describe "Generate type-level TypeID with custom data kind prefixes" do
       it "can generate TypeID with prefix" do
           kid <- KID.genKindID @'Post
