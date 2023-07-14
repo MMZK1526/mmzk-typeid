@@ -1,6 +1,10 @@
 -- | A module with the APIs for any TypeID-ish identifier type.
 --
--- It is not completed as most of the functions are still implemented
+-- These type classes are useful to define custom TypeID-ish identifier types.
+-- For example, if one wishes to remove the constraints on prefix, or use a
+-- different UUID version for the suffix.
+--
+-- It is not completed as many of the functions are still implemented
 -- individually in the "Data.TypeID" and "Data.KindID" modules.
 module Data.TypeID.Class
   (
