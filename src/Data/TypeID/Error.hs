@@ -12,8 +12,6 @@ import           Data.Text (Text)
 data TypeIDError = TypeIDErrorPrefixTooLong Int
                  | TypeIDExtraSeparator
                  | TypeIDErrorPrefixInvalidChar Char
-                 -- | Will be removed in the next major release.
-                 | TypeIDErrorAlreadyHasPrefix Text
                  | TypeIDErrorPrefixMismatch Text Text
                  | TypeIDErrorUUIDError
   deriving (Eq, Ord)
@@ -26,8 +24,6 @@ instance Show TypeIDError where
     = "The underscore separator should not be present if the prefix is empty!"
   show (TypeIDErrorPrefixInvalidChar c)
     = concat ["Prefix contains invalid character ", show c, "!"]
-  show (TypeIDErrorAlreadyHasPrefix prefix)
-    = concat ["TypeID already has prefix ", show prefix, "!"]
   show (TypeIDErrorPrefixMismatch expPrefix actPrefix)
     = concat [ "Expected prefix ", show expPrefix, " but got "
              , show actPrefix, "!" ]
