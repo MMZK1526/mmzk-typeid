@@ -19,7 +19,6 @@ module Data.UUID.V7
   (
   -- * Data type
     UUID(..)
-  , unUUID
   -- * UUID generation
   , nil
   , genUUID
@@ -65,12 +64,6 @@ import           System.IO.Unsafe (unsafePerformIO)
 -- the future.
 newtype UUID = UUID ByteString
   deriving (Eq, Ord, Show)
-
--- | Deprecated. Use the 'Binary' instance instead.
-unUUID :: UUID -> ByteString
-unUUID (UUID bs) = bs
-{-# INLINE unUUID #-}
-{-# DEPRECATED unUUID "Use the 'Binary' instance instead" #-}
 
 instance ToJSON UUID where
   toJSON :: UUID -> Value

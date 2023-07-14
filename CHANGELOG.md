@@ -1,6 +1,12 @@
 # Revision history for mmzk-typeid
 
 
+## 0.2.0.0 -- 2023-MM-DD
+
+* Remove deprecated functions `unUUID`, `parseStringWithPrefix`,
+  `parseTextWithPrefix`, `parseByteStringWithPrefix`, `nil`, and `decorate`.
+
+
 ## 0.2.0.0 -- 2023-07-14
 
 * Implement `KindID` to take arbitrary prefix type.

@@ -138,22 +138,9 @@ genKindIDs n = fmap KindID <$> V7.genUUIDs n
 {-# INLINE genKindIDs #-}
 
 -- | The nil 'KindID'.
-nil :: KindID ""
-nil = KindID V7.nil
-{-# INLINE nil #-}
-{-# DEPRECATED nil "Use 'nilKindID' instead." #-}
-
--- | The nil 'KindID'.
 nilKindID :: KindID ""
 nilKindID = KindID V7.nil
 {-# INLINE nilKindID #-}
-
--- | Obtain a 'KindID' from a prefix and a 'UUID'.
-decorate :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
-         => UUID -> KindID prefix
-decorate = KindID
-{-# INLINE decorate #-}
-{-# DEPRECATED decorate "Use 'decorateKindID' instead." #-}
 
 -- | Obtain a 'KindID' from a prefix and a 'UUID'.
 decorateKindID :: forall prefix

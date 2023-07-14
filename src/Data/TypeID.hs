@@ -15,11 +15,9 @@ module Data.TypeID
   , getUUID
   , getTime
   -- * TypeID generation
-  , nil
   , nilTypeID
   , genTypeID
   , genTypeIDs
-  , decorate
   , decorateTypeID
   -- * Prefix validation
   , checkPrefix
@@ -37,9 +35,6 @@ module Data.TypeID
   , parseString
   , parseText
   , parseByteString
-  , parseStringWithPrefix
-  , parseTextWithPrefix
-  , parseByteStringWithPrefix
   ) where
 
 import           Data.TypeID.Class

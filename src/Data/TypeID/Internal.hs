@@ -122,23 +122,9 @@ genTypeIDs prefix n = case checkPrefix prefix of
 {-# INLINE genTypeIDs #-}
 
 -- | The nil 'TypeID'.
-nil :: TypeID
-nil = TypeID "" UUID.nil
-{-# INLINE nil #-}
-{-# DEPRECATED nil "Use nilTypeID instead." #-}
-
--- | The nil 'TypeID'.
 nilTypeID :: TypeID
 nilTypeID = TypeID "" UUID.nil
 {-# INLINE nilTypeID #-}
-
--- | Obtain a 'TypeID' from a prefix and a 'UUID'.
-decorate :: Text -> UUID -> Either TypeIDError TypeID
-decorate prefix uuid = case checkPrefix prefix of
-  Nothing  -> Right $ TypeID prefix uuid
-  Just err -> Left err
-{-# INLINE decorate #-}
-{-# DEPRECATED decorate "Use decorateTypeID instead." #-}
 
 -- | Obtain a 'TypeID' from a prefix and a 'UUID'.
 decorateTypeID :: Text -> UUID -> Either TypeIDError TypeID
@@ -208,36 +194,6 @@ parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
     case checkPrefix prefix' of
       Nothing  -> TypeID prefix' <$> decodeUUID suffix
       Just err -> Left err
-
--- | Parse a 'TypeID' from the given prefix and the 'String' representation of a
--- suffix.
-parseStringWithPrefix :: Text -> String -> Either TypeIDError TypeID
-parseStringWithPrefix prefix str = case parseString str of
-  Right (TypeID "" uuid) -> decorate prefix uuid
-  Right (TypeID p  _)    -> Left $ TypeIDErrorAlreadyHasPrefix p
-  Left err               -> Left err
-{-# INLINE parseStringWithPrefix #-}
-{-# DEPRECATED parseStringWithPrefix "Use 'parseString' and 'decorate' instead" #-}
-
--- | Parse a 'TypeID' from the given prefix and the string representation of a
--- suffix as a strict 'Text'.
-parseTextWithPrefix :: Text -> Text -> Either TypeIDError TypeID
-parseTextWithPrefix prefix text = case parseText text of
-  Right (TypeID "" uuid) -> decorate prefix uuid
-  Right (TypeID p  _)    -> Left $ TypeIDErrorAlreadyHasPrefix p
-  Left err               -> Left err
-{-# INLINE parseTextWithPrefix #-}
-{-# DEPRECATED parseTextWithPrefix "Use 'parseText' and 'decorate' instead" #-}
-
--- | Parse a 'TypeID' from the given prefix and the string representation of a
--- suffix as a lazy 'ByteString'.
-parseByteStringWithPrefix :: Text -> ByteString -> Either TypeIDError TypeID
-parseByteStringWithPrefix prefix bs = case parseByteString bs of
-  Right (TypeID "" uuid) -> decorate prefix uuid
-  Right (TypeID p  _)    -> Left $ TypeIDErrorAlreadyHasPrefix p
-  Left err               -> Left err
-{-# INLINE parseByteStringWithPrefix #-}
-{-# DEPRECATED parseByteStringWithPrefix "Use 'parseByteString' and 'decorate' instead" #-}
 
 -- | Check if the given prefix is a valid TypeID prefix.
 checkPrefix :: Text -> Maybe TypeIDError
