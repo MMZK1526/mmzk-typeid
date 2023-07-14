@@ -1,7 +1,11 @@
 # Revision history for mmzk-typeid
 
 
-## 0.2.0.0 -- 2023-MM-DD
+## 0.3.0.0 -- 2023-MM-DD
+
+* Use 'uuid-types' package's `UUID` instead of a custom type.
+  * `Data.UUID.V7` only retains the generation functions.
+  * Other modules are not affected by this change.
 
 * Move `ValidPrefix` and `ToPrefix` to `Data.KindID.Class` module.
   * They are no longer exported from `Data.KindID`.

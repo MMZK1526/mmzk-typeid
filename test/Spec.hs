@@ -110,7 +110,7 @@ main = do
       forM_ specialValues \(reason, tid, uuid) -> it reason do
         case string2ID @TypeID tid of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
-          Right tid -> V7.toString (KID.getUUID tid) `shouldBe` uuid
+          Right tid -> show (KID.getUUID tid) `shouldBe` uuid
 
     describe "TypeID valid JSON instances" do
       it "Decode and then encode should be identity" do
@@ -126,7 +126,7 @@ main = do
             Nothing  -> expectationFailure "Parse JSON failed!"
             Just tid -> do
               getPrefix tid `shouldBe` prefix
-              V7.toString (KID.getUUID tid) `shouldBe` uuid
+              show (KID.getUUID tid) `shouldBe` uuid
       describe "Valid JSON key" do
         forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
           case decode (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") :: Maybe (Map TypeID Int) of
@@ -134,7 +134,7 @@ main = do
             Just tid -> do
               let (tid', _) = M.elemAt 0 tid
               getPrefix tid' `shouldBe` prefix
-              V7.toString (KID.getUUID tid') `shouldBe` uuid
+              show (KID.getUUID tid') `shouldBe` uuid
 
     describe "TypeID invalid JSON instances" do
       describe "Invalid JSON value" do
@@ -160,7 +160,7 @@ main = do
           Left err  -> expectationFailure $ "Parse error: " ++ show err
           Right tid -> do
             getPrefix tid `shouldBe` prefix
-            V7.toString (KID.getUUID tid) `shouldBe` uuid
+            show (KID.getUUID tid) `shouldBe` uuid
 
     describe "Test valid.json (TypeID as JSON)" do
       forM_ validUUID \(TestDataUUID name tid prefix uuid) -> it name do

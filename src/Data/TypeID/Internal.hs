@@ -7,6 +7,8 @@ import           Data.Aeson.Types hiding (Array, String)
 import           Data.Array
 import           Data.Array.ST
 import           Data.Array.Unsafe (unsafeFreeze)
+import           Data.Binary.Get
+import           Data.Binary.Put
 import           Data.Bifunctor
 import           Data.Bits
 import           Data.ByteString.Lazy (ByteString)
@@ -18,7 +20,8 @@ import qualified Data.Text as T
 import           Data.Text.Encoding
 import           Data.TypeID.Class
 import           Data.TypeID.Error
-import           Data.UUID.V7 (UUID(..))
+import           Data.UUID.Types.Internal (UUID(..))
+import qualified Data.UUID.Types.Internal as UUID
 import qualified Data.UUID.V7 as UUID
 import           Data.Word
 
@@ -135,17 +138,21 @@ decorateTypeID prefix uuid = case checkPrefix prefix of
 
 -- | Pretty-print a 'TypeID'. It is 'id2String' with concrete type.
 toString :: TypeID -> String
-toString (TypeID prefix (UUID bs)) = if T.null prefix
+toString (TypeID prefix (UUID w1 w2)) = if T.null prefix
   then suffixEncode bs
   else T.unpack prefix ++ "_" ++ suffixEncode bs
+  where
+    bs = runPut $ mapM_ putWord64be [w1, w2]
 {-# INLINE toString #-}
 
 -- | Pretty-print a 'TypeID' to strict 'Text'. It is 'id2Text' with concrete
 -- type.
 toText :: TypeID -> Text
-toText (TypeID prefix (UUID bs)) = if T.null prefix
+toText (TypeID prefix (UUID w1 w2)) = if T.null prefix
   then T.pack (suffixEncode bs)
   else prefix <> "_" <> T.pack (suffixEncode bs)
+  where
+    bs = runPut $ mapM_ putWord64be [w1, w2]
 {-# INLINE toText #-}
 
 -- | Pretty-print a 'TypeID' to lazy 'ByteString'. It is 'id2ByteString' with
@@ -267,7 +274,7 @@ decodeUUID bs = do
   unless (BSL.length bs == 26) $ Left TypeIDErrorUUIDError
   unless (bs `BSL.index` 0 <= 55) $ Left TypeIDErrorUUIDError
   when (any ((== 0xFF) . (table !)) $ BSL.unpack bs) $ Left TypeIDErrorUUIDError
-  pure . UUID $ suffixDecode bs
+  pure . uncurry UUID . runGet (join (liftM2 (,)) getWord64be) $ suffixDecode bs
 
 table :: Array Word8 Word8
 table = listArray (0, 255) 
