@@ -41,8 +41,6 @@ module Data.KindID
   , getPrefix
   , getUUID
   , getTime
-  , ValidPrefix
-  , ToPrefix(..)
   -- * KindID generation
   , nilKindID
   , genKindID

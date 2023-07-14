@@ -3,6 +3,9 @@
 
 ## 0.2.0.0 -- 2023-MM-DD
 
+* Move `ValidPrefix` and `ToPrefix` to `Data.KindID.Class` module.
+  * They are no longer exported from `Data.KindID`.
+
 * Remove deprecated functions `unUUID`, `parseStringWithPrefix`,
   `parseTextWithPrefix`, `parseByteStringWithPrefix`, `nil`, and `decorate`.
 

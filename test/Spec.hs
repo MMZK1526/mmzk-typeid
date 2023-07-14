@@ -6,6 +6,7 @@ import           Control.Monad
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as BSL
 import           Data.KindID
+import           Data.KindID.Class
 import qualified Data.KindID as KID
 import           Data.Map (Map)
 import qualified Data.Map as M
