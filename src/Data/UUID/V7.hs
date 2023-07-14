@@ -1,11 +1,8 @@
 -- |
--- Module      : Data.KindID
+-- Module      : Data.UUID.V7
 -- License     : MIT
 -- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
---
--- IMPORTANT: In the next major release (breaking change), I will unify the
--- 'UUID' type with the one from the uuid-type package.
 --
 -- UUIDv7 implementation.
 --

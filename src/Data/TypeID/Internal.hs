@@ -1,3 +1,9 @@
+-- |
+-- Module      : Data.TypeID.Internal
+-- License     : MIT
+-- Maintainer  : mmzk1526@outlook.com
+-- Portability : GHC
+--
 module Data.TypeID.Internal where
 
 import           Control.Exception

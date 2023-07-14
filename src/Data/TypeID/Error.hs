@@ -1,4 +1,11 @@
--- | TypeID Error type.
+-- |
+-- Module      : Data.TypeID.Error
+-- License     : MIT
+-- Maintainer  : mmzk1526@outlook.com
+-- Portability : GHC
+--
+-- TypeID Error type.
+--
 module Data.TypeID.Error
  (
   -- * Data type

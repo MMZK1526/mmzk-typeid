@@ -2,6 +2,12 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE UndecidableInstances #-}
 
+-- |
+-- Module      : Data.KindID.Internal
+-- License     : MIT
+-- Maintainer  : mmzk1526@outlook.com
+-- Portability : GHC
+--
 module Data.KindID.Internal where
 
 import           Control.Monad
@@ -155,6 +161,9 @@ fromTypeID tid = do
   pure $ KindID (getUUID tid)
 {-# INLINE fromTypeID #-}
 
+-- | Convert a 'TypeID' to a 'KindID'. If the actual prefix does not match
+-- with the expected one as defined by the type, it does not complain and
+-- produces a wrong 'KindID'.
 unsafeFromTypeID :: forall prefix
                   . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                  => TypeID -> KindID prefix

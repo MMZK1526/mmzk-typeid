@@ -3,6 +3,15 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 
+-- |
+-- Module      : Data.KindID.Class
+-- License     : MIT
+-- Maintainer  : mmzk1526@outlook.com
+-- Portability : GHC
+--
+-- This module contains the type-level mechanisms that are used to define
+-- custom KindID-ish identifier types.
+--
 module Data.KindID.Class
   (
   -- * Prefix

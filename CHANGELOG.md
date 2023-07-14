@@ -20,6 +20,8 @@
   They do not check the validity of the input and only behave well when the
   input is guaranteed to be valid.
 
+* Fix typos in the documentation.
+
 
 ## 0.2.0.0 -- 2023-07-14
 
