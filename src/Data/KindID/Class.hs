@@ -9,8 +9,11 @@ module Data.KindID.Class
     ValidPrefix
   , ToPrefix(..)
   -- * Helpers
-  , LengthSymbol
-  , IsLowerSymbol
+  , LengthSymbol(..)
+  , IsLowerSymbol(..)
+  , IsLowerChar(..)
+  , LSUH(..)
+  , ILSUH(..)
   ) where
 
 import           Data.Type.Bool
@@ -23,7 +26,7 @@ type ValidPrefix prefix = ( KnownSymbol prefix
                           , LengthSymbol prefix < 64
                           , IsLowerSymbol prefix ~ 'True )
 
-
+-- | The length of a 'Symbol' as a 'Nat'.
 type family LengthSymbol (prefix :: Symbol) :: Nat where
   LengthSymbol prefix = LSUH (UnconsSymbol prefix)
 
@@ -32,9 +35,11 @@ type family LSUH (uncons :: Maybe (Char, Symbol)) :: Nat where
   LSUH 'Nothing        = 0
   LSUH ('Just '(c, s)) = 1 + LengthSymbol s
 
+-- | Is a type-level 'Char' lower case?
 type family IsLowerChar (ch :: Char) :: Bool where
   IsLowerChar ch = Compare '`' ch == LT && Compare ch '{' == LT
 
+-- | Is a 'Symbol' lower case?
 type family IsLowerSymbol (prefix :: Symbol) :: Bool where
   IsLowerSymbol prefix = ILSUH (UnconsSymbol prefix)
 
