@@ -287,5 +287,6 @@ type family ILSUH (uncons :: Maybe (Char, Symbol)) :: Bool where
 class ToPrefix a where
   type PrefixSymbol a :: Symbol
 
+-- | The 'PrefixSymbol' of a 'Symbol' is the 'Symbol' itself.
 instance ToPrefix (a :: Symbol) where
   type PrefixSymbol a = a
