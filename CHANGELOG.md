@@ -16,6 +16,10 @@
 * Re-implement `Show` instances for `TypeID` and `KindID` using pretty-print
   `toString`.
 
+* Introduce unsafe `TypeID` and `KindID` functions for parsing and generating.
+  They do not check the validity of the input and only behave well when the
+  input is guaranteed to be valid.
+
 
 ## 0.2.0.0 -- 2023-07-14
 

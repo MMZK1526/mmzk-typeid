@@ -116,6 +116,14 @@ genTypeID :: Text -> IO TypeID
 genTypeID = fmap head . (`genTypeIDs` 1)
 {-# INLINE genTypeID #-}
 
+-- | Generate a new 'TypeID' from a prefix, but without checking if the prefix
+-- is valid.
+unsafeGenTypeID :: Text -> IO TypeID
+unsafeGenTypeID prefix = case checkPrefix prefix of
+  Nothing  -> unsafeGenTypeID prefix
+  Just err -> throwIO err
+{-# INLINE unsafeGenTypeID #-}
+
 -- | Generate n 'TypeID's from a prefix.
 --
 -- It tries its best to generate 'TypeID's at the same timestamp, but it may not
@@ -125,9 +133,21 @@ genTypeID = fmap head . (`genTypeIDs` 1)
 -- timestamp.
 genTypeIDs :: Text -> Word16 -> IO [TypeID]
 genTypeIDs prefix n = case checkPrefix prefix of
-  Nothing  -> map (TypeID prefix) <$> UUID.genUUIDs n
+  Nothing  -> unsafeGenTypeIDs prefix n
   Just err -> throwIO err
 {-# INLINE genTypeIDs #-}
+
+-- | Generate n 'TypeID's from a prefix, but without checking if the prefix is
+-- valid.
+--
+-- It tries its best to generate 'TypeID's at the same timestamp, but it may not
+-- be possible if we are asking too many 'UUID's at the same time.
+--
+-- It is guaranteed that the first 32768 'TypeID's are generated at the same
+-- timestamp.
+unsafeGenTypeIDs :: Text -> Word16 -> IO [TypeID]
+unsafeGenTypeIDs prefix n = map (TypeID prefix) <$> UUID.genUUIDs n
+{-# INLINE unsafeGenTypeIDs #-}
 
 -- | The nil 'TypeID'.
 nilTypeID :: TypeID
@@ -181,6 +201,16 @@ parseString str = case span (/= '_') str of
   where
     bs = fromString str
 
+-- | Parse a 'TypeID' from its 'String' representation, but crashes when
+-- parsing fails.
+unsafeParseString :: String -> TypeID
+unsafeParseString str = case span (/= '_') str of
+  (_, "")              -> TypeID "" $ unsafeDecodeUUID bs
+  (prefix, _ : suffix) -> TypeID (T.pack prefix)
+                        . unsafeDecodeUUID $ fromString suffix
+  where
+    bs = fromString str
+
 -- | Parse a 'TypeID' from its string representation as a strict 'Text'. It is
 -- 'text2ID' with concrete type.
 parseText :: Text -> Either TypeIDError TypeID
@@ -195,6 +225,16 @@ parseText text = case second T.uncons $ T.span (/= '_') text of
   where
     bs = BSL.fromStrict $ encodeUtf8 text
 
+-- | Parse a 'TypeID' from its string representation as a strict 'Text', but
+-- crashes when parsing fails.
+unsafeParseText :: Text -> TypeID
+unsafeParseText text = case second T.uncons $ T.span (/= '_') text of
+  (_, Nothing)               -> TypeID "" $ unsafeDecodeUUID bs
+  (prefix, Just (_, suffix)) -> TypeID prefix . unsafeDecodeUUID
+                              . BSL.fromStrict . encodeUtf8 $ suffix
+  where
+    bs = BSL.fromStrict $ encodeUtf8 text
+
 -- | Parse a 'TypeID' from its string representation as a lazy 'ByteString'. It
 -- is 'byteString2ID' with concrete type.
 parseByteString :: ByteString -> Either TypeIDError TypeID
@@ -206,6 +246,14 @@ parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
     case checkPrefix prefix' of
       Nothing  -> TypeID prefix' <$> decodeUUID suffix
       Just err -> Left err
+
+-- | Parse a 'TypeID' from its string representation as a lazy 'ByteString',
+-- but crashes when parsing fails.
+unsafeParseByteString :: ByteString -> TypeID
+unsafeParseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
+  (_, Nothing)               -> TypeID "" $ unsafeDecodeUUID bs
+  (prefix, Just (_, suffix)) -> TypeID (decodeUtf8 $ BSL.toStrict prefix)
+                              . unsafeDecodeUUID $ suffix
 
 -- | Check if the given prefix is a valid TypeID prefix.
 checkPrefix :: Text -> Maybe TypeIDError
@@ -279,7 +327,13 @@ decodeUUID bs = do
   unless (BSL.length bs == 26) $ Left TypeIDErrorUUIDError
   unless (bs `BSL.index` 0 <= 55) $ Left TypeIDErrorUUIDError
   when (any ((== 0xFF) . (table !)) $ BSL.unpack bs) $ Left TypeIDErrorUUIDError
-  pure . uncurry UUID . runGet (join (liftM2 (,)) getWord64be) $ suffixDecode bs
+  pure $ unsafeDecodeUUID bs
+{-# INLINE decodeUUID #-}
+
+unsafeDecodeUUID :: ByteString -> UUID
+unsafeDecodeUUID bs
+  = uncurry UUID . runGet (join (liftM2 (,)) getWord64be) $ suffixDecode bs
+{-# INLINE unsafeDecodeUUID #-}
 
 table :: Array Word8 Word8
 table = listArray (0, 255) 

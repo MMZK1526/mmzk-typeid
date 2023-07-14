@@ -155,6 +155,11 @@ fromTypeID tid = do
   pure $ KindID (getUUID tid)
 {-# INLINE fromTypeID #-}
 
+unsafeFromTypeID :: forall prefix
+                  . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+                 => TypeID -> KindID prefix
+unsafeFromTypeID tid = KindID (getUUID tid)
+
 -- | Pretty-print a 'KindID'. It is 'id2String' with concrete type.
 toString :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
          => KindID prefix -> String
@@ -190,6 +195,17 @@ parseString str = do
     Just kid -> pure kid
 {-# INLINE parseString #-}
 
+-- | Parse a 'KindID' from its 'String' representation, but does not behave
+-- correctly when parsing fails.
+--
+-- More specifically, if the prefix does not match, it will not complain and
+-- produce the wrong 'KindID'. If there are other parse errors, it will crash.
+unsafeParseString :: forall prefix
+                   . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+                  => String -> KindID prefix
+unsafeParseString = unsafeFromTypeID . TID.unsafeParseString
+{-# INLINE unsafeParseString #-}
+
 -- | Parse a 'KindID' from its string representation as a strict 'Text'. It is
 -- 'parseText' with concrete type.
 parseText :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
@@ -202,6 +218,16 @@ parseText str = do
                        (getPrefix tid)
     Just kid -> pure kid
 {-# INLINE parseText #-}
+
+-- | Parse a 'KindID' from its string representation as a strict 'Text', but
+-- does not behave correctly when parsing fails.
+--
+-- More specifically, if the prefix does not match, it will not complain and
+-- produce the wrong 'KindID'. If there are other parse errors, it will crash.
+unsafeParseText :: forall prefix
+                 . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+                => Text -> KindID prefix
+unsafeParseText = unsafeFromTypeID . TID.unsafeParseText
 
 -- | Parse a 'KindID' from its string representation as a lazy 'ByteString'. It
 -- is 'parseByteString' with concrete type.
@@ -217,3 +243,13 @@ parseByteString str = do
     Just kid -> pure kid
 {-# INLINE parseByteString #-}
 
+-- | Parse a 'KindID' from its string representation as a lazy 'ByteString', but
+-- does not behave correctly when parsing fails.
+--
+-- More specifically, if the prefix does not match, it will not complain and
+-- produce the wrong 'KindID'. If there are other parse errors, it will crash.
+unsafeParseByteString :: forall prefix
+                       . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+                      => ByteString -> KindID prefix
+unsafeParseByteString = unsafeFromTypeID . TID.unsafeParseByteString
+{-# INLINE unsafeParseByteString #-}

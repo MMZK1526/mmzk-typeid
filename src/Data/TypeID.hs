@@ -14,7 +14,7 @@ module Data.TypeID
   , getPrefix
   , getUUID
   , getTime
-  -- * TypeID generation
+  -- * 'TypeID' generation
   , nilTypeID
   , genTypeID
   , genTypeIDs
