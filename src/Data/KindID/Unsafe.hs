@@ -11,9 +11,9 @@ module Data.KindID.Unsafe
   -- * Unsafe 'KindID' decoding
     unsafeParseString
   , unsafeParseText
-    , unsafeParseByteString
+  , unsafeParseByteString
   -- * Unsafe conversion
-    , unsafeFromTypeID
+  , unsafeFromTypeID
   ) where
 
 import           Data.KindID.Internal
