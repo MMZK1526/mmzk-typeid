@@ -14,6 +14,8 @@ description:
   .
     - Encode prefixes at type-level for better type-safety
   .
+  It also serves as a (temporary) UUIDv7 implementation in Haskell, since there are no official ones yet.
+  .
   Please enable the following extensions if working with 'KindID':
   .
   > {-# LANGUAGE DataKinds #-}
