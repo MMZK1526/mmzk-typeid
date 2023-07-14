@@ -9,8 +9,6 @@ import           Control.Exception
 import           Data.Text (Text)
 
 -- | Errors from parsing TypeIDs.
---
--- It will not be explicitly exported from "Data.TypeID" in the future.
 data TypeIDError = TypeIDErrorPrefixTooLong Int
                  | TypeIDExtraSeparator
                  | TypeIDErrorPrefixInvalidChar Char
