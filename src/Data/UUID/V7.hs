@@ -20,6 +20,7 @@ module Data.UUID.V7
   -- * UUID generation
   , nil
   , genUUID
+  , genUUID'
   , genUUIDs
   -- * Miscellaneous helpers
   , getTime
@@ -27,21 +28,12 @@ module Data.UUID.V7
   ) where
 
 import           Control.Monad
-import           Control.Monad.Trans.Class
-import           Control.Monad.Trans.Maybe
-import           Data.Aeson.Types hiding (String)
-import           Data.Array
 import           Data.Binary
 import           Data.Binary.Get
 import           Data.Binary.Put
 import           Data.Bits
-import           Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Lazy as BSL
 import           Data.IORef
-import           Data.String
-import           Data.Text (Text)
-import qualified Data.Text as T
-import           Data.Text.Encoding
 import           Data.Time.Clock.POSIX
 import           Data.UUID.Types.Internal
 import           System.Entropy
@@ -51,6 +43,24 @@ import           System.IO.Unsafe (unsafePerformIO)
 genUUID :: IO UUID
 genUUID = head <$> genUUIDs 1
 {-# INLINE genUUID #-}
+
+-- | Generate a stateless 'UUID'v7.
+--
+-- It is faster than 'genUUID' but it is not guaranteed to be monotonically
+-- increasing if multiple 'UUID's are generated at the same timestamp.
+--
+-- In use cases where the ordering is not important, this function is could be
+-- preferred.
+genUUID' :: IO UUID
+genUUID' = do
+  timestamp <- getEpochMilli
+  entropy16 <- getEntropyWord16
+  entropy64 <- getEntropyWord64
+  let bs = runPut do
+        fillTime timestamp
+        fillVerAndRandA entropy16
+        fillVarAndRandB entropy16 entropy64
+  pure . uncurry UUID $ runGet (join (liftM2 (,)) getWord64be) bs
 
 -- | Generate n 'UUID'v7s.
 --
