@@ -119,17 +119,17 @@ main = do
         let mapping = M.fromList [(tid, tid')]
         let json    = encode mapping
         decode json `shouldBe` Just mapping
-        fmap encode (decode json :: Maybe (Map TypeID TypeID)) `shouldBe` Just json
+        fmap encode (decode @(Map TypeID TypeID) json) `shouldBe` Just json
       describe "Valid JSON value" do
         forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
-          case decode (fromString $ show tid) :: Maybe TypeID of
+          case decode @TypeID (fromString $ show tid) of
             Nothing  -> expectationFailure "Parse JSON failed!"
             Just tid -> do
               getPrefix tid `shouldBe` prefix
               show (KID.getUUID tid) `shouldBe` uuid
       describe "Valid JSON key" do
         forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
-          case decode (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") :: Maybe (Map TypeID Int) of
+          case decode @(Map TypeID Int) (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") of
             Nothing  -> expectationFailure "Parse JSON failed!"
             Just tid -> do
               let (tid', _) = M.elemAt 0 tid
@@ -139,12 +139,12 @@ main = do
     describe "TypeID invalid JSON instances" do
       describe "Invalid JSON value" do
         forM_ invalid \(TestData name tid _ _) -> it name do
-          case decode (fromString $ show tid) :: Maybe TypeID of
+          case decode @TypeID (fromString $ show tid) of
             Nothing  -> pure ()
             Just tid -> expectationFailure $ "Parsed TypeID: " ++ show tid
       describe "Invalid JSON key" do
         forM_ invalid \(TestData name tid _ _) -> it name do
-          case decode (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") :: Maybe (Map TypeID Int) of
+          case decode @(Map TypeID Int) (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") of
             Nothing  -> pure ()
             Just tid -> expectationFailure "Invalid TypeID key shouldn't be parsed!"
 
