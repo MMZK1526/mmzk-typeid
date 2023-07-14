@@ -13,6 +13,9 @@
 * Remove deprecated functions `unUUID`, `parseStringWithPrefix`,
   `parseTextWithPrefix`, `parseByteStringWithPrefix`, `nil`, and `decorate`.
 
+* Re-implement `Show` instances for `TypeID` and `KindID` using pretty-print
+  `toString`.
+
 
 ## 0.2.0.0 -- 2023-07-14
 

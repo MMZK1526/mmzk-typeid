@@ -34,7 +34,12 @@ import           Data.Word
 -- then, the 'Show' instance will be the same as 'toString'.
 data TypeID = TypeID { _getPrefix :: Text
                      , _getUUID   :: UUID }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+
+instance Show TypeID where
+  show :: TypeID -> String
+  show = toString
+  {-# INLINE show #-}
 
 instance ToJSON TypeID where
   toJSON :: TypeID -> Value

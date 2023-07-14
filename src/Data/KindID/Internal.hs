@@ -24,13 +24,14 @@ import           GHC.TypeLits hiding (Text)
 --
 -- It is dubbed 'KindID' because we the prefix here is a data kind rather than
 -- a type.
---
--- Note that the 'Show' instance is for debugging purposes only. To pretty-print
--- a 'KindID', use 'toString', 'toText' or 'toByteString'. However, this
--- behaviour will be changed in the next major version as it is not useful. By
--- then, the 'Show' instance will be the same as 'toString'.
 newtype KindID prefix = KindID { _getUUID :: UUID }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+
+instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+  => Show (KindID prefix) where
+    show :: KindID prefix -> String
+    show = toString
+    {-# INLINE show #-}
 
 instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
   => ToJSON (KindID prefix) where

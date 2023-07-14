@@ -99,7 +99,7 @@ main = do
         forM_ invalidSuffixes \(reason, suffix) -> it reason do
           case string2ID @TypeID suffix of
             Left _    -> pure ()
-            Right tid -> expectationFailure $ "Parsed TypeID: " ++ id2String tid
+            Right tid -> expectationFailure $ "Parsed TypeID: " ++ show tid
 
     describe "Parse special values" do
       let specialValues = [ ("nil", "00000000000000000000000000", "00000000-0000-0000-0000-000000000000")
@@ -141,7 +141,7 @@ main = do
         forM_ invalid \(TestData name tid _ _) -> it name do 
           case decode (fromString $ show tid) :: Maybe TypeID of
             Nothing  -> pure ()
-            Just tid -> expectationFailure $ "Parsed TypeID: " ++ id2String tid
+            Just tid -> expectationFailure $ "Parsed TypeID: " ++ show tid
       describe "Invalid JSON key" do
         forM_ invalid \(TestData name tid _ _) -> it name do 
           case decode (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") :: Maybe (Map TypeID Int) of
@@ -152,7 +152,7 @@ main = do
       forM_ invalid \(TestData name tid _ _) -> it name do 
         case string2ID @TypeID tid of
           Left _    -> pure ()
-          Right tid -> expectationFailure $ "Parsed TypeID: " ++ id2String tid
+          Right tid -> expectationFailure $ "Parsed TypeID: " ++ show tid
 
     describe "Test valid.json (TypeID as literal)" do
       forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
@@ -181,7 +181,7 @@ main = do
       it "cannot parse TypeID into wrong prefix" do
         case string2ID @(KindID "foo") "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> pure ()
-          Right kid -> expectationFailure $ "Parsed TypeID: " ++ id2String kid
+          Right kid -> expectationFailure $ "Parsed TypeID: " ++ show kid
       it "has the correct nil" do
         Right KID.nilKindID `shouldBe` string2ID "00000000000000000000000000"
       it "can generate in batch with same timestamp and in ascending order" do
@@ -202,7 +202,7 @@ main = do
       it "cannot parse TypeID into wrong prefix" do
         case string2ID @(KindID Comment) "user_00041061050r3gg28a1c60t3gf" of
           Left err  -> pure ()
-          Right kid -> expectationFailure $ "Parsed TypeID: " ++ id2String kid
+          Right kid -> expectationFailure $ "Parsed TypeID: " ++ show kid
       it "can generate in batch with same timestamp and in ascending order" do
         kids <- KID.genKindIDs @'Comment 1526
         all ((== "comment") . getPrefix) kids `shouldBe` True
