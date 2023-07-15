@@ -303,7 +303,7 @@ unsafeParseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
   (_, Nothing)               -> TypeID "" $ unsafeDecodeUUID bs
   (prefix, Just (_, suffix)) -> TypeID (decodeUtf8 $ BSL.toStrict prefix)
                               . unsafeDecodeUUID $ suffix
-{-# INLINE unsafeParseByteString #-}
+
 
 -- | Check if the given prefix is a valid TypeID prefix.
 checkPrefix :: Text -> Maybe TypeIDError

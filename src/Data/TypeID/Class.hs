@@ -130,8 +130,8 @@ class IDGen a where
 
 -- | A function generator based on the 'IDGenPrefix' type family.
 type family GenFunc prefix res where
-  GenFunc (Just prefix) res = prefix -> res
-  GenFunc Nothing res       = res
+  GenFunc ('Just prefix) res = prefix -> res
+  GenFunc 'Nothing res       = res
 
 -- | A result that may contain an error, based on the 'IDGenPrefix' type family.
 --
@@ -139,5 +139,5 @@ type family GenFunc prefix res where
 -- we are certain that the prefix is valid, so the result type does not need the
 -- "Either TypeIDError" part.
 type family ResWithErr prefix res where
-  ResWithErr (Just prefix) res = Either TypeIDError res
-  ResWithErr Nothing res       = res
+  ResWithErr ('Just prefix) res = Either TypeIDError res
+  ResWithErr 'Nothing res       = res

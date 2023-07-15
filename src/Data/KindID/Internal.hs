@@ -22,10 +22,10 @@ import           Data.TypeID.Class
 import           Data.TypeID.Error
 import           Data.TypeID.Internal (TypeID)
 import qualified Data.TypeID.Internal as TID
-import           Data.UUID.V7 (UUID)
+import           Data.UUID.Types.Internal (UUID(..))
 import qualified Data.UUID.V7 as V7
 import           Data.Word
-import           GHC.TypeLits hiding (Text)
+import           GHC.TypeLits (symbolVal)
 
 -- | A TypeID with the prefix encoded at type level.
 --

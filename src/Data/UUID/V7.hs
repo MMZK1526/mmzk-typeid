@@ -14,10 +14,13 @@
 -- adjustments in the specification.
 --
 -- WARNING: The 'nil' re-export will be removed in the next major version.
+--
 module Data.UUID.V7
   (
   -- * Data type
     UUID
+  , Word16
+  , Word64
   -- * UUID generation
   , nil
   , genUUID
@@ -103,9 +106,7 @@ genUUIDs n = liftIO do
               fillVerAndRandA (seqNo + curN)
               fillVarAndRandB (seqNo + curN) entropy64
         pure . uncurry UUID $ runGet (join (liftM2 (,)) getWord64be) bs
-      if n' == n
-        then pure uuids
-        else (uuids ++) <$> genUUIDs (n - n')
+      if n' == n then pure uuids else (uuids ++) <$> genUUIDs (n - n')
 
 -- | Get the current time in milliseconds since the Unix epoch.
 getEpochMilli :: MonadIO m => m Word64

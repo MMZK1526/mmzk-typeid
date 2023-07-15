@@ -41,6 +41,8 @@ module Data.KindID
   , getPrefix
   , getUUID
   , getTime
+  , Word16
+  , Word64
   -- * 'KindID' generation (class methods)
   , genID
   , genIDs
@@ -72,3 +74,4 @@ module Data.KindID
 import           Data.KindID.Internal
 import           Data.TypeID.Class
 import           Data.TypeID.Internal (TypeID)
+import           Data.Word
