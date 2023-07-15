@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               mmzk-typeid
-version:            0.2.0.0
+version:            0.3.0.0
 
 synopsis:           A TypeID implementation for Haskell
 description:
@@ -35,6 +35,9 @@ license:            MIT
 author:             Yitang Chen <mmzk1526@ic.ac.uk>
 maintainer:         Yitang Chen <mmzk1526@ic.ac.uk>
 category:           Data, UUID, TypeID
+tested-with:
+    GHC == 9.2.8
+    GHC == 9.6.2
 extra-source-files:
     CHANGELOG.md
     LICENSE
