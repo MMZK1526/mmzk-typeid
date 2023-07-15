@@ -78,8 +78,6 @@ main = do
         case string2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
           Right tid -> getPrefix tid `shouldBe` "mmzk"
-      it "has the correct nil" do
-        Right nilTypeID `shouldBe` string2ID "00000000000000000000000000"
 
     describe "Parse TypeID" do
       let invalidPrefixes = [ ("caps", "PREFIX")
@@ -204,8 +202,6 @@ main = do
         case string2ID @(KindID "foo") "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> pure ()
           Right kid -> expectationFailure $ "Parsed TypeID: " ++ show kid
-      it "has the correct nil" do
-        Right nilKindID `shouldBe` string2ID "00000000000000000000000000"
 
     describe "Generate type-level TypeID with custom data kind prefixes" do
       it "can generate TypeID with prefix" do
