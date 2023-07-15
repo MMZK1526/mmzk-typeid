@@ -1,6 +1,5 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 -- |
@@ -46,7 +45,7 @@ type family LSUH (uncons :: Maybe (Char, Symbol)) :: Nat where
 
 -- | Is a type-level 'Char' lower case?
 type family IsLowerChar (ch :: Char) :: Bool where
-  IsLowerChar ch = Compare '`' ch == LT && Compare ch '{' == LT
+  IsLowerChar ch = Compare '`' ch == 'LT && Compare ch '{' == 'LT
 
 -- | Is a 'Symbol' lower case?
 type family IsLowerSymbol (prefix :: Symbol) :: Bool where
