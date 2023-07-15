@@ -116,7 +116,6 @@ For a full list of functions on `KindID`, see [Data.KindID](src/Data/KindID.hs).
 ```Haskell
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeApplications #-}
 
 import           Control.Exception
 import           Data.KindID
@@ -139,6 +138,45 @@ We no longer need to use qualified imports, but on the down side, we need to add
 Note that with the class methods, the type application with `Symbol` no longer works as the full type must be provided. For example, `string2ID @"mmzk" "mmzk_01h455vb4pex5vsknk084sn02q"` will not compile.
 
 For a full list of these functions, see [Data.TypeID.Class](src/Data/TypeID/Class.hs).
+
+### KindID with Data Kinds
+Instead of using raw `Symbol`s as `KindID` prefixes, we can also define our custom data type for better semantics.
+
+For example, suppose we have three tables for users, posts, and comments, and each table has a unique prefix, we can design the structure as following:
+
+```Haskell
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
+
+import           Data.KindID
+import           Data.KindID.Class
+
+data Prefix = User | Post | Comment
+
+instance ToPrefix 'User where
+  type PrefixSymbol 'User = "user"
+
+instance ToPrefix 'Post where
+  type PrefixSymbol 'Post = "post"
+
+instance ToPrefix 'Comment where
+  type PrefixSymbol 'Comment = "comment"
+```
+
+Now we can use `Prefix` as a prefix for `KindID`s, e.g.
+
+```Haskell
+main :: IO ()
+main = do
+  -- ...
+  userID <- genKindID @'User -- Same as genKindID @"user"
+  postID <- genKindID @'Post -- Same as genKindID @"post"
+  commentID <- genKindID @'Comment -- Same as genKindID @"comment"
+  -- ...
+```
+
+For more information, see [Data.KindID.Class](src/Data/KindID/Class.hs).
 
 ## Note
 Not explicitly exported functions are considered internal and are subjected to changes.
