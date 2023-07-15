@@ -6,7 +6,7 @@
 -- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
--- A module with the APIs for any TypeID-ish identifier type.
+-- A module with the APIs for any 'Data.TypeID'-ish identifier type.
 --
 -- These type classes are useful to define custom TypeID-ish identifier types.
 -- For example, if one wishes to remove the constraints on prefix, or use a

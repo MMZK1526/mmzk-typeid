@@ -13,6 +13,7 @@
 -- implementation may change in the future according to the potential
 -- adjustments in the specification.
 --
+-- WARNING: The 'nil' re-export will be removed in the next major version.
 module Data.UUID.V7
   (
   -- * Data type

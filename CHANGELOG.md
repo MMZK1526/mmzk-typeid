@@ -22,6 +22,8 @@
   They do not check the validity of the input and only behave well when the
   input is guaranteed to be valid.
 
+* Deprecate `nilTypeID` and `nilKindID` since they are not useful.
+
 * Fix typos in the documentation.
 
 * More tests.

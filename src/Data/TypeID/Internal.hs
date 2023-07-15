@@ -190,6 +190,7 @@ unsafeGenTypeIDs prefix n = map (TypeID prefix) <$> UUID.genUUIDs n
 nilTypeID :: TypeID
 nilTypeID = TypeID "" UUID.nil
 {-# INLINE nilTypeID #-}
+{-# DEPRECATED nilTypeID "Will be removed in the next major release." #-}
 
 -- | Obtain a 'TypeID' from a prefix and a 'UUID'.
 decorateTypeID :: Text -> UUID -> Either TypeIDError TypeID
