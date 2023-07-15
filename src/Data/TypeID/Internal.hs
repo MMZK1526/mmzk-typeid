@@ -8,6 +8,8 @@ module Data.TypeID.Internal where
 
 import           Control.Exception
 import           Control.Monad
+
+import           Control.Monad.IO.Class
 import           Control.Monad.ST
 import           Data.Aeson.Types hiding (Array, String)
 import           Data.Array
@@ -21,6 +23,7 @@ import           Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Lazy as BSL
 import           Data.Char
 import           Data.Hashable
+import           Data.Proxy
 import           Data.String
 import           Data.Text (Text)
 import qualified Data.Text as T
@@ -127,34 +130,48 @@ instance IDConv TypeID where
   id2ByteString = toByteString
   {-# INLINE id2ByteString #-}
 
+-- | Generate 'TypeID's.
+instance IDGen TypeID where
+  type IDGenPrefix TypeID = 'Just Text
+
+  genID_ :: MonadIO m => Proxy TypeID -> Text -> m TypeID
+  genID_ _ = genTypeID
+  {-# INLINE genID_ #-}
+
+  genIDs_ :: MonadIO m => Proxy TypeID -> Text -> Word16 -> m [TypeID]
+  genIDs_ _ = genTypeIDs
+  {-# INLINE genIDs_ #-}
+
+  decorate_ :: Proxy TypeID -> Text -> UUID -> Either TypeIDError TypeID
+  decorate_ _ = decorateTypeID
+  {-# INLINE decorate_ #-}
+
 -- | Generate a new 'TypeID' from a prefix.
 --
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
 -- namely if it's longer than 63 characters or if it contains characters other
 -- than lowercase latin letters.
-genTypeID :: Text -> IO TypeID
+genTypeID :: MonadIO m => Text -> m TypeID
 genTypeID = fmap head . (`genTypeIDs` 1)
 {-# INLINE genTypeID #-}
 
 -- | Generate a new 'TypeID' from a prefix, but without checking if the prefix
 -- is valid.
-unsafeGenTypeID :: Text -> IO TypeID
-unsafeGenTypeID prefix = case checkPrefix prefix of
-  Nothing  -> unsafeGenTypeID prefix
-  Just err -> throwIO err
+unsafeGenTypeID :: MonadIO m => Text -> m TypeID
+unsafeGenTypeID = fmap head . (`unsafeGenTypeIDs` 1)
 {-# INLINE unsafeGenTypeID #-}
 
--- | Generate n 'TypeID's from a prefix.
+-- | Generate a list of 'TypeID's from a prefix.
 --
 -- It tries its best to generate 'TypeID's at the same timestamp, but it may not
 -- be possible if we are asking too many 'UUID's at the same time.
 --
 -- It is guaranteed that the first 32768 'TypeID's are generated at the same
 -- timestamp.
-genTypeIDs :: Text -> Word16 -> IO [TypeID]
+genTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID]
 genTypeIDs prefix n = case checkPrefix prefix of
   Nothing  -> unsafeGenTypeIDs prefix n
-  Just err -> throwIO err
+  Just err -> liftIO $ throwIO err
 {-# INLINE genTypeIDs #-}
 
 -- | Generate n 'TypeID's from a prefix, but without checking if the prefix is
@@ -165,7 +182,7 @@ genTypeIDs prefix n = case checkPrefix prefix of
 --
 -- It is guaranteed that the first 32768 'TypeID's are generated at the same
 -- timestamp.
-unsafeGenTypeIDs :: Text -> Word16 -> IO [TypeID]
+unsafeGenTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID]
 unsafeGenTypeIDs prefix n = map (TypeID prefix) <$> UUID.genUUIDs n
 {-# INLINE unsafeGenTypeIDs #-}
 

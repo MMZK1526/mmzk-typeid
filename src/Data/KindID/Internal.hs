@@ -1,5 +1,4 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 -- |
@@ -11,6 +10,7 @@
 module Data.KindID.Internal where
 
 import           Control.Monad
+import           Control.Monad.IO.Class
 import           Data.Aeson.Types hiding (String)
 import           Data.ByteString.Lazy (ByteString)
 import           Data.Hashable
@@ -128,26 +128,42 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
     id2ByteString = toByteString
     {-# INLINE id2ByteString #-}
 
+-- | Generate 'KindID's.
+instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+  => IDGen (KindID prefix) where
+    type IDGenPrefix (KindID prefix) = 'Nothing
+
+    genID_ :: MonadIO m => Proxy (KindID prefix) -> m (KindID prefix)
+    genID_ _ = genKindID
+    {-# INLINE genID_ #-}
+
+    genIDs_ :: MonadIO m => Proxy (KindID prefix) -> Word16 -> m [KindID prefix]
+    genIDs_ _ = genKindIDs
+    {-# INLINE genIDs_ #-}
+
+    decorate_ :: Proxy (KindID prefix) -> UUID -> KindID prefix
+    decorate_ _ = decorateKindID
+    {-# INLINE decorate_ #-}
+
 -- | Generate a new 'KindID' from a prefix.
 --
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
 -- namely if it's longer than 63 characters or if it contains characters other
 -- than lowercase latin letters.
-genKindID :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
-          => IO (KindID prefix)
+genKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+          => m (KindID prefix)
 genKindID = KindID <$> V7.genUUID
 {-# INLINE genKindID #-}
 
--- | Generate n 'KindID's from a prefix.
+-- | Generate a list of 'KindID's from a prefix.
 --
 -- It tries its best to generate 'KindID's at the same timestamp, but it may not
 -- be possible if we are asking too many 'UUID's at the same time.
 --
 -- It is guaranteed that the first 32768 'KindID's are generated at the same
 -- timestamp.
-genKindIDs :: forall prefix
-            . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
-           => Word16 -> IO [KindID prefix]
+genKindIDs :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+           => Word16 -> m [KindID prefix]
 genKindIDs n = fmap KindID <$> V7.genUUIDs n
 {-# INLINE genKindIDs #-}
 
@@ -157,13 +173,12 @@ nilKindID = KindID V7.nil
 {-# INLINE nilKindID #-}
 
 -- | Obtain a 'KindID' from a prefix and a 'UUID'.
-decorateKindID :: forall prefix
-                . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+decorateKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                => UUID -> KindID prefix
 decorateKindID = KindID
 
 -- | Convert a 'KindID' to a 'TypeID'.
-toTypeID :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+toTypeID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
          => KindID prefix -> TypeID
 toTypeID kid = TID.TypeID (getPrefix kid) (getUUID kid)
 {-# INLINE toTypeID #-}
@@ -181,28 +196,26 @@ fromTypeID tid = do
 -- | Convert a 'TypeID' to a 'KindID'. If the actual prefix does not match
 -- with the expected one as defined by the type, it does not complain and
 -- produces a wrong 'KindID'.
-unsafeFromTypeID :: forall prefix
-                  . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+unsafeFromTypeID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                  => TypeID -> KindID prefix
 unsafeFromTypeID tid = KindID (getUUID tid)
 
 -- | Pretty-print a 'KindID'. It is 'id2String' with concrete type.
-toString :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+toString :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
          => KindID prefix -> String
 toString = TID.toString . toTypeID
 {-# INLINE toString #-}
 
 -- | Pretty-print a 'KindID' to strict 'Text'. It is 'id2Text' with concrete
 -- type.
-toText :: forall prefix. (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+toText :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
        => KindID prefix -> Text
 toText = TID.toText . toTypeID
 {-# INLINE toText #-}
 
 -- | Pretty-print a 'KindID' to lazy 'ByteString'. It is 'id2ByteString' with
 -- concrete type.
-toByteString :: forall prefix
-              . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+toByteString :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
              => KindID prefix -> ByteString
 toByteString = TID.toByteString . toTypeID
 {-# INLINE toByteString #-}
@@ -226,8 +239,7 @@ parseString str = do
 --
 -- More specifically, if the prefix does not match, it will not complain and
 -- produce the wrong 'KindID'. If there are other parse errors, it will crash.
-unsafeParseString :: forall prefix
-                   . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+unsafeParseString :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                   => String -> KindID prefix
 unsafeParseString = unsafeFromTypeID . TID.unsafeParseString
 {-# INLINE unsafeParseString #-}
@@ -250,8 +262,7 @@ parseText str = do
 --
 -- More specifically, if the prefix does not match, it will not complain and
 -- produce the wrong 'KindID'. If there are other parse errors, it will crash.
-unsafeParseText :: forall prefix
-                 . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+unsafeParseText :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                 => Text -> KindID prefix
 unsafeParseText = unsafeFromTypeID . TID.unsafeParseText
 
@@ -274,8 +285,7 @@ parseByteString str = do
 --
 -- More specifically, if the prefix does not match, it will not complain and
 -- produce the wrong 'KindID'. If there are other parse errors, it will crash.
-unsafeParseByteString :: forall prefix
-                       . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+unsafeParseByteString :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                       => ByteString -> KindID prefix
 unsafeParseByteString = unsafeFromTypeID . TID.unsafeParseByteString
 {-# INLINE unsafeParseByteString #-}

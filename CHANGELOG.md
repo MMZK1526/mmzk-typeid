@@ -45,6 +45,13 @@
   * The original concrete functions remain, and the class is provided as an
     alternative.
 
+* Make the generation functions work with any `MonadIO` than just `IO`.
+
+* Introduct `IDGen` class to unify the generation functions for `TypeID` and
+  `KindID`.
+  * The original concrete functions remain, and the class is provided as an
+    alternative.
+
 * Deprecate `unUUID`, `parseStringWithPrefix`, `parseTextWithPrefix`,
   `parseByteStringWithPrefix`, `nil`, and `decorate`. They are either replaced
   by functions of other names or are no longer necessary.

@@ -28,6 +28,7 @@ module Data.UUID.V7
   ) where
 
 import           Control.Monad
+import           Control.Monad.IO.Class
 import           Data.Binary
 import           Data.Binary.Get
 import           Data.Binary.Put
@@ -40,7 +41,7 @@ import           System.Entropy
 import           System.IO.Unsafe (unsafePerformIO)
 
 -- | Generate a 'UUID'v7.
-genUUID :: IO UUID
+genUUID :: MonadIO m => m UUID
 genUUID = head <$> genUUIDs 1
 {-# INLINE genUUID #-}
 
@@ -51,7 +52,7 @@ genUUID = head <$> genUUIDs 1
 --
 -- In use cases where the ordering is not important, this function is could be
 -- preferred.
-genUUID' :: IO UUID
+genUUID' :: MonadIO m => m UUID
 genUUID' = do
   timestamp <- getEpochMilli
   entropy16 <- getEntropyWord16
@@ -69,9 +70,9 @@ genUUID' = do
 --
 -- It is guaranteed that the first 32768 'UUID's are generated at the same
 -- timestamp.
-genUUIDs :: Word16 -> IO [UUID]
+genUUIDs :: MonadIO m => Word16 -> m [UUID]
 genUUIDs 0 = pure []
-genUUIDs n = do
+genUUIDs n = liftIO do
   timestamp <- getEpochMilli
   -- We set the first bit of the entropy to 0 to ensure that there's enough
   -- room for incrementing the sequence number.
@@ -106,8 +107,8 @@ genUUIDs n = do
         else (uuids ++) <$> genUUIDs (n - n')
 
 -- | Get the current time in milliseconds since the Unix epoch.
-getEpochMilli :: IO Word64
-getEpochMilli = do
+getEpochMilli :: MonadIO m => m Word64
+getEpochMilli = liftIO do
   t <- getPOSIXTime
   pure . round $ t * 1000
 {-# INLINE getEpochMilli #-}
@@ -170,14 +171,14 @@ splitWord64ToWord16s n =
   in (b3, b2, b1, b0)
 {-# INLINE splitWord64ToWord16s #-}
 
-getEntropyWord16 :: IO Word16
-getEntropyWord16 = do
+getEntropyWord16 :: MonadIO m => m Word16
+getEntropyWord16 = liftIO do
   bs <- BSL.fromStrict <$> getEntropy 2
   pure $ runGet getWord16host bs
 {-# INLINE getEntropyWord16 #-}
 
-getEntropyWord64 :: IO Word64
-getEntropyWord64 = do
+getEntropyWord64 :: MonadIO m => m Word64
+getEntropyWord64 = liftIO do
   bs <- BSL.fromStrict <$> getEntropy 8
   pure $ runGet getWord64host bs
 {-# INLINE getEntropyWord64 #-}

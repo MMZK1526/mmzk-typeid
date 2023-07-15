@@ -86,7 +86,7 @@ main :: IO ()
 main = do
 
   -- Make a KindID with prefix 'mmzk':
-  kindID <- TID.genKindID @"mmzk" -- Has type `KindID "mmzk"`
+  kindID <- KID.genKindID @"mmzk" -- Has type `KindID "mmzk"`
   putStrLn $ KID.toString kindID
 
   -- Get components from the KindID:
@@ -116,6 +116,7 @@ For a full list of functions on `KindID`, see [Data.KindID](src/Data/KindID.hs).
 ```Haskell
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplication #-}
 
 import           Control.Exception
 import           Data.KindID
@@ -123,10 +124,19 @@ import           Data.TypeID
 
 main :: IO ()
 main = do
+  -- Make a TypeID with prefix 'mmzk':
+  typeID <- genID @TypeID "mmzk"
+  putStrLn $ id2String typeID
+
+  -- Make a KindID with prefix 'mmzk':
+  kindID <- genID @(KindID "mmzk")
+  putStrLn $ id2String kindID
+
   -- Parse a TypeID from string:
   case string2ID "mmzk_01h455vb4pex5vsknk084sn02q" :: Maybe TypeID of
     Left err     -> throwIO err
     Right typeID -> putStrLn $ id2String typeID
+
   -- Parse a KindID from string:
   case string2ID "mmzk_01h455vb4pex5vsknk084sn02q" :: Maybe (KindID "mmzk") of
     Left err     -> throwIO err

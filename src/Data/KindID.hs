@@ -41,7 +41,11 @@ module Data.KindID
   , getPrefix
   , getUUID
   , getTime
-  -- * 'KindID' generation
+  -- * 'KindID' generation (class methods)
+  , genID
+  , genIDs
+  , decorate
+  -- * 'KindID' generation ('KindID'-specific)
   , nilKindID
   , genKindID
   , genKindIDs

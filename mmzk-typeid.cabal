@@ -62,6 +62,7 @@ library
         MultiWayIf
         OverloadedStrings
         PolyKinds
+        ScopedTypeVariables
         TupleSections
         TypeApplications
         TypeFamilies
@@ -102,6 +103,7 @@ test-suite test
         MultiWayIf
         OverloadedStrings
         PolyKinds
+        ScopedTypeVariables
         TupleSections
         TypeApplications
         TypeFamilies
