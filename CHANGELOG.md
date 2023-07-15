@@ -7,6 +7,8 @@
   * `Data.UUID.V7` only retains the generation functions.
   * Other modules are not affected by this change.
 
+* Add `Read` instances for `TypeID` and `KindID`.
+
 * Move `ValidPrefix` and `ToPrefix` to `Data.KindID.Class` module.
   * They are no longer exported from `Data.KindID`.
 

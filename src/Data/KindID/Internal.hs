@@ -40,6 +40,16 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
     {-# INLINE show #-}
 
 instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+  => Read (KindID prefix) where
+    readsPrec :: Int -> String -> [(KindID prefix, String)]
+    readsPrec _ str = case TID.parseStringS str of
+      Left _           -> []
+      Right (tid, rem) -> case fromTypeID tid of
+        Nothing  -> []
+        Just kid -> [(kid, rem)]
+    {-# INLINE readsPrec #-}
+
+instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
   => ToJSON (KindID prefix) where
     toJSON :: KindID prefix -> Value
     toJSON = toJSON . toText

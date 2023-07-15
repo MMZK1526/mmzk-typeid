@@ -47,6 +47,13 @@ instance Show TypeID where
   show = toString
   {-# INLINE show #-}
 
+instance Read TypeID where
+  readsPrec :: Int -> String -> [(TypeID, String)]
+  readsPrec _ str = case parseStringS str of
+    Left _      -> []
+    Right (x,y) -> [(x, y)]
+  {-# INLINE readsPrec #-}
+
 instance ToJSON TypeID where
   toJSON :: TypeID -> Value
   toJSON = toJSON . toText
@@ -195,17 +202,26 @@ toByteString = fromString . toString
 -- | Parse a 'TypeID' from its 'String' representation. It is 'string2ID' with
 -- concrete type.
 parseString :: String -> Either TypeIDError TypeID
-parseString str = case span (/= '_') str of
+parseString str = case parseStringS str of
+  Left err        -> Left err
+  Right (tid, "") -> Right tid
+  _               -> Left TypeIDErrorUUIDError
+{-# INLINE parseString #-}
+
+parseStringS :: String -> Either TypeIDError (TypeID, String)
+parseStringS str = case span (/= '_') str of
   ("", _)              -> Left TypeIDExtraSeparator
-  (_, "")              -> TypeID "" <$> decodeUUID bs
+  (_, "")              -> do
+    let (uuid, rem) = splitAt 26 str
+        bs          = fromString uuid
+    (, rem) . TypeID "" <$> decodeUUID bs
   (prefix, _ : suffix) -> do
-    let prefix' = T.pack prefix
-    let bs      = fromString suffix
+    let prefix'     = T.pack prefix
+        (uuid, rem) = splitAt 26 suffix
+        bs          = fromString uuid
     case checkPrefix prefix' of
-      Nothing  -> TypeID prefix' <$> decodeUUID bs
+      Nothing  -> (, rem) . TypeID prefix' <$> decodeUUID bs
       Just err -> Left err
-  where
-    bs = fromString str
 
 -- | Parse a 'TypeID' from its 'String' representation, but crashes when
 -- parsing fails.
@@ -224,9 +240,9 @@ parseText text = case second T.uncons $ T.span (/= '_') text of
   ("", _)                    -> Left TypeIDExtraSeparator
   (_, Nothing)               -> TypeID "" <$> decodeUUID bs
   (prefix, Just (_, suffix)) -> do
-    let bs = BSL.fromStrict $ encodeUtf8 suffix
     case checkPrefix prefix of
-      Nothing  -> TypeID prefix <$> decodeUUID bs
+      Nothing  -> TypeID prefix
+              <$> decodeUUID (BSL.fromStrict $ encodeUtf8 suffix)
       Just err -> Left err
   where
     bs = BSL.fromStrict $ encodeUtf8 text
