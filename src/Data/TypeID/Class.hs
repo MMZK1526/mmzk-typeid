@@ -12,9 +12,6 @@
 -- For example, if one wishes to remove the constraints on prefix, or use a
 -- different UUID version for the suffix.
 --
--- It is not completed as many of the functions are still implemented
--- individually in the "Data.TypeID" and "Data.KindID" modules.
---
 module Data.TypeID.Class
   (
   -- * Type classes
