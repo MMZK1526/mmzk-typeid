@@ -24,6 +24,8 @@
 
 * Fix typos in the documentation.
 
+* More tests.
+
 
 ## 0.2.0.0 -- 2023-07-14
 

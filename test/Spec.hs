@@ -56,23 +56,32 @@ main = do
   hspec do
     describe "Generate TypeID" do
       it "can generate TypeID with prefix" do
-        tid <- TID.genTypeID "mmzk"
+        start <- V7.getEpochMilli
+        tid   <- TID.genTypeID "mmzk"
+        end   <- V7.getEpochMilli
         getPrefix tid `shouldBe` "mmzk"
+        getTime tid `shouldSatisfy` \t -> t >= start && t <= end
       it "can generate TypeID without prefix" do
-        tid <- TID.genTypeID ""
+        start <- V7.getEpochMilli
+        tid   <- TID.genTypeID ""
+        end   <- V7.getEpochMilli
         getPrefix tid `shouldBe` ""
+        getTime tid `shouldSatisfy` \t -> t >= start && t <= end
+      it "can generate in batch with same timestamp and in ascending order" do
+        start <- V7.getEpochMilli
+        tids  <- TID.genTypeIDs "mmzk" 1526
+        end   <- V7.getEpochMilli
+        all ((== "mmzk") . getPrefix) tids `shouldBe` True
+        let timestamp = getTime $ head tids
+        all ((== timestamp) . getTime) tids `shouldBe` True
+        all (uncurry (<)) (zip tids $ tail tids) `shouldBe` True
+        timestamp `shouldSatisfy` \t -> t >= start && t <= end
       it "can parse TypeID from String" do
         case string2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
           Right tid -> getPrefix tid `shouldBe` "mmzk"
       it "has the correct nil" do
         Right TID.nilTypeID `shouldBe` string2ID "00000000000000000000000000"
-      it "can generate in batch with same timestamp and in ascending order" do
-        tids <- TID.genTypeIDs "mmzk" 1526
-        all ((== "mmzk") . getPrefix) tids `shouldBe` True
-        let timestamp = getTime $ head tids
-        all ((== timestamp) . getTime) tids `shouldBe` True
-        all (uncurry (<)) (zip tids $ tail tids) `shouldBe` True
 
     describe "Parse TypeID" do
       let invalidPrefixes = [ ("caps", "PREFIX")
@@ -167,29 +176,38 @@ main = do
         getPrefix tid `shouldBe` prefix
         KID.getUUID tid `shouldBe` uuid
 
-    describe "Generate type-level TypeID with 'Symbol' prefixes" do
-      it "can generate TypeID with prefix" do
-        kid <- KID.genKindID @"mmzk"
+    describe "Generate type-level TypeID (KindID) with 'Symbol' prefixes" do
+      it "can generate KindID with prefix" do
+        start <- V7.getEpochMilli
+        kid   <- KID.genKindID @"mmzk"
+        end   <- V7.getEpochMilli
         getPrefix kid `shouldBe` "mmzk"
-      it "can generate TypeID without prefix" do
-        kid <- KID.genKindID @""
+        getTime kid `shouldSatisfy` \t -> start <= t && t <= end
+      it "can generate KindID without prefix" do
+        start <- V7.getEpochMilli
+        kid   <- KID.genKindID @""
+        end   <- V7.getEpochMilli
         getPrefix kid `shouldBe` ""
-      it "can parse TypeID from String" do
+        getTime kid `shouldSatisfy` \t -> start <= t && t <= end
+      it "can generate in batch with same timestamp and in ascending order" do
+        start <- V7.getEpochMilli
+        kids  <- KID.genKindIDs @"mmzk" 1526
+        end   <- V7.getEpochMilli
+        all ((== "mmzk") . getPrefix) kids `shouldBe` True
+        let timestamp = getTime $ head kids
+        all ((== timestamp) . getTime) kids `shouldBe` True
+        all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
+        timestamp `shouldSatisfy` \t -> start <= t && t <= end
+      it "can parse KindID from String" do
         case string2ID @(KindID "mmzk") "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
           Right kid -> getPrefix kid `shouldBe` "mmzk"
-      it "cannot parse TypeID into wrong prefix" do
+      it "cannot parse KindID into wrong prefix" do
         case string2ID @(KindID "foo") "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> pure ()
           Right kid -> expectationFailure $ "Parsed TypeID: " ++ show kid
       it "has the correct nil" do
         Right KID.nilKindID `shouldBe` string2ID "00000000000000000000000000"
-      it "can generate in batch with same timestamp and in ascending order" do
-        kids <- KID.genKindIDs @"mmzk" 1526
-        all ((== "mmzk") . getPrefix) kids `shouldBe` True
-        let timestamp = getTime $ head kids
-        all ((== timestamp) . getTime) kids `shouldBe` True
-        all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
 
     describe "Generate type-level TypeID with custom data kind prefixes" do
       it "can generate TypeID with prefix" do
