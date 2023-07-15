@@ -20,6 +20,7 @@ import           Data.Bits
 import           Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Lazy as BSL
 import           Data.Char
+import           Data.Hashable
 import           Data.String
 import           Data.Text (Text)
 import qualified Data.Text as T
@@ -79,6 +80,12 @@ instance FromJSONKey TypeID where
     Left err  -> fail $ show err
     Right tid -> pure tid
   {-# INLINE fromJSONKey #-}
+
+instance Hashable TypeID where
+  hashWithSalt :: Int -> TypeID -> Int
+  hashWithSalt salt (TypeID prefix uuid)
+    = salt `hashWithSalt` prefix `hashWithSalt` uuid
+  {-# INLINE hashWithSalt #-}
 
 -- | Get the prefix, 'UUID', and timestamp of a 'TypeID'.
 instance IDType TypeID where

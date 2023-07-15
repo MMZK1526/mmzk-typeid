@@ -13,10 +13,11 @@ module Data.KindID.Internal where
 import           Control.Monad
 import           Data.Aeson.Types hiding (String)
 import           Data.ByteString.Lazy (ByteString)
+import           Data.Hashable
 import           Data.Proxy
+import           Data.KindID.Class
 import           Data.Text (Text)
 import qualified Data.Text as T
-import           Data.KindID.Class
 import           Data.TypeID.Class
 import           Data.TypeID.Error
 import           Data.TypeID.Internal (TypeID)
@@ -78,6 +79,12 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
       Left err  -> fail $ show err
       Right kid -> pure kid
     {-# INLINE fromJSONKey #-}
+
+instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+  => Hashable (KindID prefix) where
+    hashWithSalt :: Int -> KindID prefix -> Int
+    hashWithSalt salt = hashWithSalt salt . toTypeID
+    {-# INLINE hashWithSalt #-}
 
 -- | Get the prefix, 'UUID', and timestamp of a 'KindID'.
 instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
