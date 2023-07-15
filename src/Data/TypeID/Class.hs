@@ -87,8 +87,7 @@ genID' = genID_' @_ @m (Proxy @a)
 {-# INLINE genID' #-}
 
 -- | Generate a list of identifiers with the given prefix.
-genIDs :: forall a m
-        . (IDGen a, MonadIO m)
+genIDs :: forall a m. (IDGen a, MonadIO m)
        => GenFunc (IDGenPrefix a) (Word16 -> m [a])
 genIDs = genIDs_ @_ @m (Proxy @a)
 {-# INLINE genIDs #-}
