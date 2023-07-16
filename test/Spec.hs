@@ -13,6 +13,7 @@ import           Data.String
 import           Data.Text (Text)
 import qualified Data.Text as T
 import           Data.TypeID
+import           Data.TypeID.Class
 import           Data.TypeID.Error
 import           Data.UUID.V7 (UUID)
 import qualified Data.UUID.V7 as V7
@@ -45,6 +46,24 @@ instance ToPrefix 'Comment where
 anyTypeIDError :: Selector TypeIDError
 anyTypeIDError = const True
 
+withCheck :: HasCallStack => (IDConv a, IDGen a) => IO a -> IO a
+withCheck action = do
+  tid         <- action
+  checkResult <- checkIDWithEnv tid
+  case checkResult of
+    Just _  -> do
+      expectationFailure $ concat ["The ID ", id2String tid, " does not pass validity check"]
+      undefined
+    Nothing -> pure tid
+
+withChecks :: HasCallStack => IDGen a => IO [a] -> IO [a]
+withChecks action = do
+  tids        <- action
+  checkResult <- msum <$> mapM checkIDWithEnv tids
+  case checkResult of
+    Just _  -> expectationFailure "The IDs do not pass validity check" >> undefined
+    Nothing -> pure tids
+
 main :: IO ()
 main = do
   invalid   <- BSL.readFile "test/invalid.json" >>= throwDecode :: IO [TestData]
@@ -55,25 +74,25 @@ main = do
     describe "Generate TypeID" do
       it "can generate TypeID with prefix" do
         start <- V7.getEpochMilli
-        tid   <- genID @TypeID "mmzk"
+        tid   <- withCheck $ genID @TypeID "mmzk"
         end   <- V7.getEpochMilli
         getPrefix tid `shouldBe` "mmzk"
         getTime tid `shouldSatisfy` \t -> t >= start && t <= end
       it "can generate TypeID without prefix" do
         start <- V7.getEpochMilli
-        tid   <- genID @TypeID ""
+        tid   <- withCheck $ genID @TypeID ""
         end   <- V7.getEpochMilli
         getPrefix tid `shouldBe` ""
         getTime tid `shouldSatisfy` \t -> t >= start && t <= end
       it "can generate TypeID with stateless UUIDv7" do
         start <- V7.getEpochMilli
-        tid   <- genID' @TypeID "mmzk"
+        tid   <- withCheck $ genID' @TypeID "mmzk"
         end   <- V7.getEpochMilli
         getPrefix tid `shouldBe` "mmzk"
         getTime tid `shouldSatisfy` \t -> t >= start && t <= end
       it "can generate in batch with same timestamp and in ascending order" do
         start <- V7.getEpochMilli
-        tids  <- genIDs @TypeID "mmzk" 1526
+        tids  <- withChecks $ genIDs @TypeID "mmzk" 1526
         end   <- V7.getEpochMilli
         all ((== "mmzk") . getPrefix) tids `shouldBe` True
         let timestamp = getTime $ head tids
@@ -141,11 +160,11 @@ main = do
       describe "Valid JSON key" do
         forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
           case decode @(Map TypeID Int) (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") of
-            Nothing  -> expectationFailure "Parse JSON failed!"
-            Just tid -> do
-              let (tid', _) = M.elemAt 0 tid
-              getPrefix tid' `shouldBe` prefix
-              show (getUUID tid') `shouldBe` uuid
+            Nothing      -> expectationFailure "Parse JSON failed!"
+            Just mapping -> do
+              let (tid, _) = M.elemAt 0 mapping
+              getPrefix tid `shouldBe` prefix
+              show (getUUID tid) `shouldBe` uuid
 
     describe "TypeID invalid JSON instances" do
       describe "Invalid JSON value" do
@@ -181,24 +200,24 @@ main = do
     describe "Generate type-level TypeID (KindID) with 'Symbol' prefixes" do
       it "can generate KindID with prefix" do
         start <- V7.getEpochMilli
-        kid   <- genID @(KindID "mmzk")
+        kid   <- withCheck $ genID @(KindID "mmzk")
         end   <- V7.getEpochMilli
         getPrefix kid `shouldBe` "mmzk"
         getTime kid `shouldSatisfy` \t -> start <= t && t <= end
       it "can generate KindID without prefix" do
         start <- V7.getEpochMilli
-        kid   <- genID @(KindID "")
+        kid   <- withCheck $ genID @(KindID "")
         end   <- V7.getEpochMilli
         getPrefix kid `shouldBe` ""
         getTime kid `shouldSatisfy` \t -> start <= t && t <= end
       it "can generate KindID with stateless UUID v7" do
         start <- V7.getEpochMilli
-        kid   <- genID' @(KindID "mmzk")
+        kid   <- withCheck $ genID' @(KindID "mmzk")
         end   <- V7.getEpochMilli
         getPrefix kid `shouldBe` "mmzk"
       it "can generate in batch with same timestamp and in ascending order" do
         start <- V7.getEpochMilli
-        kids  <- genIDs @(KindID "mmzk") 1526
+        kids  <- withChecks $ genIDs @(KindID "mmzk") 1526
         end   <- V7.getEpochMilli
         all ((== "mmzk") . getPrefix) kids `shouldBe` True
         let timestamp = getTime $ head kids
@@ -216,7 +235,7 @@ main = do
 
     describe "Generate type-level TypeID with custom data kind prefixes" do
       it "can generate TypeID with prefix" do
-          kid <- genID @(KindID 'Post)
+          kid <- withCheck $ genID @(KindID 'Post)
           getPrefix kid `shouldBe` "post"
       it "can parse TypeID from String" do
         case string2ID @(KindID User) "user_00041061050r3gg28a1c60t3gf" of
@@ -227,7 +246,7 @@ main = do
           Left err  -> pure ()
           Right kid -> expectationFailure $ "Parsed TypeID: " ++ show kid
       it "can generate in batch with same timestamp and in ascending order" do
-        kids <- genIDs @(KindID 'Comment) 1526
+        kids <- withChecks $ genIDs @(KindID 'Comment) 1526
         all ((== "comment") . getPrefix) kids `shouldBe` True
         let timestamp = getTime $ head kids
         all ((== timestamp) . getTime) kids `shouldBe` True
