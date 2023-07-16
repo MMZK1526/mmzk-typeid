@@ -1,7 +1,7 @@
 # Revision history for mmzk-typeid
 
 
-## 0.3.0.0 -- 2023-MM-DD
+## 0.3.0.0 -- 2023-07-17
 
 * Use 'uuid-types' package's `UUID` instead of a custom type.
   * `Data.UUID.V7` only retains the generation functions.
