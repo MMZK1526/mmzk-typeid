@@ -60,6 +60,7 @@ library
         Data.TypeID.Internal
     default-extensions:
         BlockArguments
+        ConstraintKinds
         DataKinds
         InstanceSigs
         MultiWayIf
@@ -102,6 +103,7 @@ test-suite test
         Data.UUID.V7
     default-extensions:
         BlockArguments
+        ConstraintKinds
         DataKinds
         InstanceSigs
         MultiWayIf

@@ -15,7 +15,8 @@
 module Data.TypeID.Class
   (
   -- * Type classes
-    IDType(..)
+    TypeIDLike
+  , IDType(..)
   , IDConv(..)
   , IDGen(..)
   , decorate
@@ -36,6 +37,10 @@ import           Data.Text (Text)
 import           Data.TypeID.Error
 import           Data.UUID.V7 (UUID)
 import           Data.Word
+
+-- | A constraint synonym for a TypeID-ish identifier type that supports ID
+-- generation and string conversion.
+type TypeIDLike a = (IDType a, IDConv a, IDGen a)
 
 -- | A type class for a TypeID-ish identifier type, which has a 'Text' prefix
 -- and a 'UUID' suffix.
