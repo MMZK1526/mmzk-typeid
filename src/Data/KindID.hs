@@ -54,6 +54,12 @@ module Data.KindID
   , genID'
   , genIDs
   , decorate
+  -- * Validation ('KindID'-specific)
+  , checkKindID
+  , checkKindIDWithEnv
+  -- * Validation (class methods)
+  , checkID
+  , checkIDWithEnv
   -- * Encoding & decoding ('KindID'-specific)
   , toString
   , toText

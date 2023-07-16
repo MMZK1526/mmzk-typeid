@@ -27,10 +27,13 @@ module Data.TypeID
   , genID'
   , genIDs
   , decorate
-  -- * Validation
+  -- * Validation ('TypeID'-specific)
   , checkPrefix
   , checkTypeID
   , checkTypeIDWithEnv
+  -- * Validation (class methods)
+  , checkID
+  , checkIDWithEnv
   -- * Encoding & decoding ('TypeID'-specific)
   , toString
   , toText

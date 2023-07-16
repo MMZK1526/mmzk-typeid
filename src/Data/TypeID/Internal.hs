@@ -149,6 +149,15 @@ instance IDGen TypeID where
   decorate_ _ = decorateTypeID
   {-# INLINE decorate_ #-}
 
+  checkID_ :: Proxy TypeID -> TypeID -> Maybe TypeIDError
+  checkID_ _ = checkTypeID
+  {-# INLINE checkID_ #-}
+
+  checkIDWithEnv_ :: MonadIO m
+                  => Proxy TypeID -> TypeID -> m (Maybe TypeIDError)
+  checkIDWithEnv_ _ = checkTypeIDWithEnv
+  {-# INLINE checkIDWithEnv_ #-}
+
 -- | Generate a new 'TypeID' from a prefix.
 --
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
@@ -266,17 +275,6 @@ parseStringS str = case span (/= '_') str of
       Nothing  -> (, rem) . TypeID prefix' <$> decodeUUID bs
       Just err -> Left err
 
--- | Parse a 'TypeID' from its 'String' representation, but crashes when
--- parsing fails.
-unsafeParseString :: String -> TypeID
-unsafeParseString str = case span (/= '_') str of
-  (_, "")              -> TypeID "" $ unsafeDecodeUUID bs
-  (prefix, _ : suffix) -> TypeID (T.pack prefix)
-                        . unsafeDecodeUUID $ fromString suffix
-  where
-    bs = fromString str
-{-# INLINE unsafeParseString #-}
-
 -- | Parse a 'TypeID' from its string representation as a strict 'Text'. It is
 -- 'text2ID' with concrete type.
 parseText :: Text -> Either TypeIDError TypeID
@@ -290,17 +288,6 @@ parseText text = case second T.uncons $ T.span (/= '_') text of
       Just err -> Left err
   where
     bs = BSL.fromStrict $ encodeUtf8 text
-
--- | Parse a 'TypeID' from its string representation as a strict 'Text', but
--- crashes when parsing fails.
-unsafeParseText :: Text -> TypeID
-unsafeParseText text = case second T.uncons $ T.span (/= '_') text of
-  (_, Nothing)               -> TypeID "" $ unsafeDecodeUUID bs
-  (prefix, Just (_, suffix)) -> TypeID prefix . unsafeDecodeUUID
-                              . BSL.fromStrict . encodeUtf8 $ suffix
-  where
-    bs = BSL.fromStrict $ encodeUtf8 text
-{-# INLINE unsafeParseText #-}
 
 -- | Parse a 'TypeID' from its string representation as a lazy 'ByteString'. It
 -- is 'byteString2ID' with concrete type.
@@ -321,7 +308,6 @@ unsafeParseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
   (_, Nothing)               -> TypeID "" $ unsafeDecodeUUID bs
   (prefix, Just (_, suffix)) -> TypeID (decodeUtf8 $ BSL.toStrict prefix)
                               . unsafeDecodeUUID $ suffix
-
 
 -- | Check if the given prefix is a valid TypeID prefix.
 checkPrefix :: Text -> Maybe TypeIDError
@@ -348,6 +334,28 @@ checkTypeIDWithEnv tid@(TypeID _ uuid)
   = fmap (checkTypeID tid `mplus`)
          (pure TypeIDErrorUUIDError <$ V7.validateWithTime uuid)
 {-# INLINE checkTypeIDWithEnv #-}
+
+-- | Parse a 'TypeID' from its 'String' representation, but crashes when
+-- parsing fails.
+unsafeParseString :: String -> TypeID
+unsafeParseString str = case span (/= '_') str of
+  (_, "")              -> TypeID "" $ unsafeDecodeUUID bs
+  (prefix, _ : suffix) -> TypeID (T.pack prefix)
+                        . unsafeDecodeUUID $ fromString suffix
+  where
+    bs = fromString str
+{-# INLINE unsafeParseString #-}
+
+-- | Parse a 'TypeID' from its string representation as a strict 'Text', but
+-- crashes when parsing fails.
+unsafeParseText :: Text -> TypeID
+unsafeParseText text = case second T.uncons $ T.span (/= '_') text of
+  (_, Nothing)               -> TypeID "" $ unsafeDecodeUUID bs
+  (prefix, Just (_, suffix)) -> TypeID prefix . unsafeDecodeUUID
+                              . BSL.fromStrict . encodeUtf8 $ suffix
+  where
+    bs = BSL.fromStrict $ encodeUtf8 text
+{-# INLINE unsafeParseText #-}
 
 -- The helpers below are verbatim translations from the official highly magical
 -- Go implementation.

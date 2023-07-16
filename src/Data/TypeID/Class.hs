@@ -22,6 +22,8 @@ module Data.TypeID.Class
   , genID
   , genID'
   , genIDs
+  , checkID
+  , checkIDWithEnv
   , GenFunc(..)
   , ResWithErr(..)
   ) where
@@ -71,7 +73,7 @@ class IDConv a where
 
 -- | Generate a new identifier with the given prefix.
 genID :: forall a m. (IDGen a, MonadIO m) => GenFunc (IDGenPrefix a) (m a)
-genID = genID_ @_ @m (Proxy @a)
+genID = genID_ @a @m Proxy
 {-# INLINE genID #-}
 
 -- | Similar to 'genID', but stateless. It can be a faster implementation than
@@ -80,20 +82,30 @@ genID = genID_ @_ @m (Proxy @a)
 --
 -- The default implementation is the same as 'genID'.
 genID' :: forall a m. (IDGen a, MonadIO m) => GenFunc (IDGenPrefix a) (m a)
-genID' = genID'_ @_ @m (Proxy @a)
+genID' = genID'_ @a @m Proxy
 {-# INLINE genID' #-}
 
 -- | Generate a list of identifiers with the given prefix.
 genIDs :: forall a m. (IDGen a, MonadIO m)
        => GenFunc (IDGenPrefix a) (Word16 -> m [a])
-genIDs = genIDs_ @_ @m (Proxy @a)
+genIDs = genIDs_ @a @m Proxy
 {-# INLINE genIDs #-}
 
 -- | Generate a new identifier with the given prefix and 'UUID' suffix.
 decorate :: forall a. IDGen a
          => GenFunc (IDGenPrefix a) (UUID -> ResWithErr (IDGenPrefix a) a)
-decorate = decorate_ (Proxy @a)
+decorate = decorate_ @a Proxy
 {-# INLINE decorate #-}
+
+-- | Check the validity of the identifier.
+checkID :: forall a. IDGen a => a -> Maybe TypeIDError
+checkID = checkID_ @a Proxy
+{-# INLINE checkID #-}
+
+-- | Check the validity of the identifier, potentially with impure criteria.
+checkIDWithEnv :: forall a m. (IDGen a, MonadIO m) => a -> m (Maybe TypeIDError)
+checkIDWithEnv = checkIDWithEnv_ @a @m Proxy
+{-# INLINE checkIDWithEnv #-}
 
 -- | A type class for generating TypeID-ish identifiers.
 --
@@ -124,6 +136,14 @@ class IDGen a where
   -- | Generate a new identifier with the given prefix and 'UUID' suffix.
   decorate_ :: Proxy a
             -> GenFunc (IDGenPrefix a) (UUID -> ResWithErr (IDGenPrefix a) a)
+
+  -- | Check the validity of the identifier.
+  checkID_ :: Proxy a -> a -> Maybe TypeIDError
+
+  -- | Check the validity of the identifier, potentially with impure criteria.
+  checkIDWithEnv_ :: MonadIO m => Proxy a -> a -> m (Maybe TypeIDError)
+  checkIDWithEnv_ _ = pure . checkID_ (Proxy @a)
+  {-# INLINE checkIDWithEnv_ #-}
 
 -- | A function generator based on the 'IDGenPrefix' type family.
 type family GenFunc prefix res where
