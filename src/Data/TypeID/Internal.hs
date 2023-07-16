@@ -8,7 +8,6 @@ module Data.TypeID.Internal where
 
 import           Control.Exception
 import           Control.Monad
-
 import           Control.Monad.IO.Class
 import           Control.Monad.ST
 import           Data.Aeson.Types hiding (Array, String)
@@ -333,6 +332,22 @@ checkPrefix prefix
         Nothing     -> Nothing
         Just (c, _) -> Just $ TypeIDErrorPrefixInvalidChar c
 {-# INLINE checkPrefix #-}
+
+-- | Check if the prefix is valid and the suffix 'UUID' has the correct v7
+-- version and variant.
+checkTypeID :: TypeID -> Maybe TypeIDError
+checkTypeID (TypeID prefix uuid)
+  = msum [ checkPrefix prefix
+         , TypeIDErrorUUIDError <$ guard (V7.validate uuid) ]
+{-# INLINE checkTypeID #-}
+
+-- | Similar to 'checkTypeID', but also check if the suffix 'UUID' is
+-- generated in the past.
+checkTypeIDWithEnv :: MonadIO m => TypeID -> m (Maybe TypeIDError)
+checkTypeIDWithEnv tid@(TypeID _ uuid)
+  = fmap (checkTypeID tid `mplus`)
+         (pure TypeIDErrorUUIDError <$ V7.validateWithTime uuid)
+{-# INLINE checkTypeIDWithEnv #-}
 
 -- The helpers below are verbatim translations from the official highly magical
 -- Go implementation.

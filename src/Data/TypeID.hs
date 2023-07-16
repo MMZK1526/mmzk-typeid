@@ -29,6 +29,8 @@ module Data.TypeID
   , decorateTypeID
   -- * Validation
   , checkPrefix
+  , checkTypeID
+  , checkTypeIDWithEnv
   -- * Encoding & decoding (class methods)
   , id2String
   , id2Text
