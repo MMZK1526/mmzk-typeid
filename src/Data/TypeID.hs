@@ -14,8 +14,6 @@ module Data.TypeID
   , getPrefix
   , getUUID
   , getTime
-  , Word16
-  , Word64
   -- * 'TypeID' generation ('TypeID'-specific)
   , nilTypeID
   , genTypeID
@@ -52,4 +50,3 @@ module Data.TypeID
 
 import           Data.TypeID.Class
 import           Data.TypeID.Internal
-import           Data.Word

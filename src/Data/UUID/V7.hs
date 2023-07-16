@@ -19,8 +19,6 @@ module Data.UUID.V7
   (
   -- * Data type
     UUID
-  , Word16
-  , Word64
   -- * UUID generation
   , nil
   , genUUID

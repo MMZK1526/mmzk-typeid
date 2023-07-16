@@ -41,8 +41,6 @@ module Data.KindID
   , getPrefix
   , getUUID
   , getTime
-  , Word16
-  , Word64
   -- * 'KindID' generation ('KindID'-specific)
   , nilKindID
   , genKindID
@@ -82,4 +80,3 @@ module Data.KindID
 import           Data.KindID.Internal
 import           Data.TypeID.Class
 import           Data.TypeID.Internal (TypeID)
-import           Data.Word
