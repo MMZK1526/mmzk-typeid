@@ -200,6 +200,7 @@ nilKindID = KindID V7.nil
 decorateKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                => UUID -> KindID prefix
 decorateKindID = KindID
+{-# INLINE decorateKindID #-}
 
 -- | Convert a 'KindID' to a 'TypeID'.
 toTypeID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
@@ -300,6 +301,7 @@ checkKindIDWithEnv = TID.checkTypeIDWithEnv . toTypeID
 unsafeFromTypeID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                  => TypeID -> KindID prefix
 unsafeFromTypeID tid = KindID (getUUID tid)
+{-# INLINE unsafeFromTypeID #-}
 
 -- | Parse a 'KindID' from its 'String' representation, but does not behave
 -- correctly when parsing fails.
@@ -319,6 +321,7 @@ unsafeParseString = unsafeFromTypeID . TID.unsafeParseString
 unsafeParseText :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                 => Text -> KindID prefix
 unsafeParseText = unsafeFromTypeID . TID.unsafeParseText
+{-# INLINE unsafeParseText #-}
 
 -- | Parse a 'KindID' from its string representation as a lazy 'ByteString', but
 -- does not behave correctly when parsing fails.

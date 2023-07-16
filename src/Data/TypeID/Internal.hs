@@ -301,14 +301,6 @@ parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
       Nothing  -> TypeID prefix' <$> decodeUUID suffix
       Just err -> Left err
 
--- | Parse a 'TypeID' from its string representation as a lazy 'ByteString',
--- but crashes when parsing fails.
-unsafeParseByteString :: ByteString -> TypeID
-unsafeParseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
-  (_, Nothing)               -> TypeID "" $ unsafeDecodeUUID bs
-  (prefix, Just (_, suffix)) -> TypeID (decodeUtf8 $ BSL.toStrict prefix)
-                              . unsafeDecodeUUID $ suffix
-
 -- | Check if the given prefix is a valid TypeID prefix.
 checkPrefix :: Text -> Maybe TypeIDError
 checkPrefix prefix
@@ -356,6 +348,15 @@ unsafeParseText text = case second T.uncons $ T.span (/= '_') text of
   where
     bs = BSL.fromStrict $ encodeUtf8 text
 {-# INLINE unsafeParseText #-}
+
+-- | Parse a 'TypeID' from its string representation as a lazy 'ByteString',
+-- but crashes when parsing fails.
+unsafeParseByteString :: ByteString -> TypeID
+unsafeParseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
+  (_, Nothing)               -> TypeID "" $ unsafeDecodeUUID bs
+  (prefix, Just (_, suffix)) -> TypeID (decodeUtf8 $ BSL.toStrict prefix)
+                              . unsafeDecodeUUID $ suffix
+{-# INLINE unsafeParseByteString #-}
 
 -- The helpers below are verbatim translations from the official highly magical
 -- Go implementation.
