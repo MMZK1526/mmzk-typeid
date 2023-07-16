@@ -24,6 +24,8 @@
 
 * Deprecate `nilTypeID` and `nilKindID` since they are not useful.
 
+* Re-export `Word16` and `Word64` for convenience.
+
 * Fix typos in the documentation.
 
 * More tests.
