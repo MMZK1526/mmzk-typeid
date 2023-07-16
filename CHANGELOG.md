@@ -26,6 +26,10 @@
   They do not check the validity of the input and only behave well when the
   input is guaranteed to be valid.
 
+* Add validity check on `TypeID` and `KindID` generation.
+  * `checkID` checks the prefix and the `UUID`'s version and variant.
+  * `checkIDWithEnv` also checks that the `UUID` is generated in the past.
+
 * Deprecate `nilTypeID` and `nilKindID` since they are not useful.
 
 * Re-export `Word16` and `Word64` for convenience.
