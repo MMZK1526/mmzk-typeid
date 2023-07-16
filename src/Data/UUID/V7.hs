@@ -26,6 +26,9 @@ module Data.UUID.V7
   , genUUID
   , genUUID'
   , genUUIDs
+  -- Validation
+  , validate
+  , validateWithTime
   -- * Miscellaneous helpers
   , getTime
   , getEpochMilli
@@ -108,6 +111,20 @@ genUUIDs n = liftIO do
         pure . uncurry UUID $ runGet (join (liftM2 (,)) getWord64be) bs
       if n' == n then pure uuids else (uuids ++) <$> genUUIDs (n - n')
 
+-- | Validate the version and variant of the 'UUID'v7.
+validate :: UUID -> Bool
+validate (UUID w1 w2)
+  = (w1 `shiftR` 12) .&. 0xF == 0x7 && (w2 `shiftR` 30) .&. 0x3 == 0x2
+{-# INLINE validate #-}
+
+-- | Validate the version and variant of the 'UUID'v7 as well as its timestamp
+-- is no greater than the current time.
+validateWithTime :: MonadIO m => UUID -> m Bool
+validateWithTime uuid = do
+  curTime <- getEpochMilli
+  pure $ validate uuid && (curTime <= getTime uuid)
+{-# INLINE validateWithTime #-}
+  
 -- | Get the current time in milliseconds since the Unix epoch.
 getEpochMilli :: MonadIO m => m Word64
 getEpochMilli = liftIO do

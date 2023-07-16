@@ -27,7 +27,7 @@ module Data.TypeID
   , genTypeID'
   , genTypeIDs
   , decorateTypeID
-  -- * Prefix validation
+  -- * Validation
   , checkPrefix
   -- * Encoding & decoding (class methods)
   , id2String
