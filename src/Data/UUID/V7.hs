@@ -19,7 +19,7 @@ module Data.UUID.V7
   (
   -- * Data type
     UUID
-  -- * UUID generation
+  -- * 'UUID'v7 generation
   , nil
   , genUUID
   , genUUID'
@@ -68,7 +68,7 @@ genUUID' = do
         fillVarAndRandB entropy16 entropy64
   pure . uncurry UUID $ runGet (join (liftM2 (,)) getWord64be) bs
 
--- | Generate n 'UUID'v7s.
+-- | Generate a list of 'UUID'v7s.
 --
 -- It tries its best to generate 'UUID's at the same timestamp, but it may not
 -- be possible if we are asking too many 'UUID's at the same time.
