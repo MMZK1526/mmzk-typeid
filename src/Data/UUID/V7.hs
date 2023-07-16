@@ -114,7 +114,7 @@ genUUIDs n = liftIO do
 -- | Validate the version and variant of the 'UUID'v7.
 validate :: UUID -> Bool
 validate (UUID w1 w2)
-  = (w1 `shiftR` 12) .&. 0xF == 0x7 && (w2 `shiftR` 30) .&. 0x3 == 0x2
+  = (w1 `shiftR` 12) .&. 0xF == 0x7 && (w2 `shiftR` 62) .&. 0x3 == 0x2
 {-# INLINE validate #-}
 
 -- | Validate the version and variant of the 'UUID'v7 as well as its timestamp
@@ -122,7 +122,7 @@ validate (UUID w1 w2)
 validateWithTime :: MonadIO m => UUID -> m Bool
 validateWithTime uuid = do
   curTime <- getEpochMilli
-  pure $ validate uuid && (curTime <= getTime uuid)
+  pure $ validate uuid && (getTime uuid <= curTime)
 {-# INLINE validateWithTime #-}
   
 -- | Get the current time in milliseconds since the Unix epoch.
