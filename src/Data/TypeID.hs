@@ -16,28 +16,21 @@ module Data.TypeID
   , getTime
   , Word16
   , Word64
-  -- * 'TypeID' generation (class methods)
-  , genID
-  , genID'
-  , genIDs
-  , decorate
   -- * 'TypeID' generation ('TypeID'-specific)
   , nilTypeID
   , genTypeID
   , genTypeID'
   , genTypeIDs
   , decorateTypeID
+  -- * 'TypeID' generation (class methods)
+  , genID
+  , genID'
+  , genIDs
+  , decorate
   -- * Validation
   , checkPrefix
   , checkTypeID
   , checkTypeIDWithEnv
-  -- * Encoding & decoding (class methods)
-  , id2String
-  , id2Text
-  , id2ByteString
-  , string2ID
-  , text2ID
-  , byteString2ID
   -- * Encoding & decoding ('TypeID'-specific)
   , toString
   , toText
@@ -45,6 +38,13 @@ module Data.TypeID
   , parseString
   , parseText
   , parseByteString
+  -- * Encoding & decoding (class methods)
+  , id2String
+  , id2Text
+  , id2ByteString
+  , string2ID
+  , text2ID
+  , byteString2ID
   ) where
 
 import           Data.TypeID.Class

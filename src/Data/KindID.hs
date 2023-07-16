@@ -43,24 +43,17 @@ module Data.KindID
   , getTime
   , Word16
   , Word64
-  -- * 'KindID' generation (class methods)
-  , genID
-  , genID'
-  , genIDs
-  , decorate
   -- * 'KindID' generation ('KindID'-specific)
   , nilKindID
   , genKindID
   , genKindID'
   , genKindIDs
   , decorateKindID
-  -- * Encoding & decoding (class methods)
-  , id2String
-  , id2Text
-  , id2ByteString
-  , string2ID
-  , text2ID
-  , byteString2ID
+  -- * 'KindID' generation (class methods)
+  , genID
+  , genID'
+  , genIDs
+  , decorate
   -- * Encoding & decoding ('KindID'-specific)
   , toString
   , toText
@@ -68,6 +61,13 @@ module Data.KindID
   , parseString
   , parseText
   , parseByteString
+  -- * Encoding & decoding (class methods)
+  , id2String
+  , id2Text
+  , id2ByteString
+  , string2ID
+  , text2ID
+  , byteString2ID
   -- * Type-level & term-level conversion
   , toTypeID
   , fromTypeID
