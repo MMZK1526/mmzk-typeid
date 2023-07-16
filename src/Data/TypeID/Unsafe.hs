@@ -10,6 +10,7 @@ module Data.TypeID.Unsafe
   (
   -- * Unsafe 'TypeID' generation
     unsafeGenTypeID
+  , unsafeGenTypeID'
   , unsafeGenTypeIDs
   -- * Unsafe decoding
   , unsafeParseString

@@ -18,6 +18,10 @@
 * Re-implement `Show` instances for `TypeID` and `KindID` using pretty-print
   `toString`.
 
+* Implement `TypeID` generation based on stateless `UUID`v7.
+  * It is faster but does not guarantee monotonicity if multiple processes are
+    generating `TypeID`s at the same time.
+
 * Introduce unsafe `TypeID` and `KindID` functions for parsing and generating.
   They do not check the validity of the input and only behave well when the
   input is guaranteed to be valid.

@@ -65,6 +65,12 @@ main = do
         end   <- V7.getEpochMilli
         getPrefix tid `shouldBe` ""
         getTime tid `shouldSatisfy` \t -> t >= start && t <= end
+      it "can generate TypeID with stateless UUIDv7" do
+        start <- V7.getEpochMilli
+        tid   <- genID' @TypeID "mmzk"
+        end   <- V7.getEpochMilli
+        getPrefix tid `shouldBe` "mmzk"
+        getTime tid `shouldSatisfy` \t -> t >= start && t <= end
       it "can generate in batch with same timestamp and in ascending order" do
         start <- V7.getEpochMilli
         tids  <- genIDs @TypeID "mmzk" 1526
@@ -185,6 +191,11 @@ main = do
         end   <- V7.getEpochMilli
         getPrefix kid `shouldBe` ""
         getTime kid `shouldSatisfy` \t -> start <= t && t <= end
+      it "can generate KindID with stateless UUID v7" do
+        start <- V7.getEpochMilli
+        kid   <- genID' @(KindID "mmzk")
+        end   <- V7.getEpochMilli
+        getPrefix kid `shouldBe` "mmzk"
       it "can generate in batch with same timestamp and in ascending order" do
         start <- V7.getEpochMilli
         kids  <- genIDs @(KindID "mmzk") 1526

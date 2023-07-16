@@ -45,11 +45,13 @@ module Data.KindID
   , Word64
   -- * 'KindID' generation (class methods)
   , genID
+  , genID'
   , genIDs
   , decorate
   -- * 'KindID' generation ('KindID'-specific)
   , nilKindID
   , genKindID
+  , genKindID'
   , genKindIDs
   , decorateKindID
   -- * Encoding & decoding (class methods)

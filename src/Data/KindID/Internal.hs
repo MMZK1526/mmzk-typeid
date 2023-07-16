@@ -137,6 +137,10 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
     genID_ _ = genKindID
     {-# INLINE genID_ #-}
 
+    genID'_ :: MonadIO m => Proxy (KindID prefix) -> m (KindID prefix)
+    genID'_ _ = genKindID'
+    {-# INLINE genID'_ #-}
+
     genIDs_ :: MonadIO m => Proxy (KindID prefix) -> Word16 -> m [KindID prefix]
     genIDs_ _ = genKindIDs
     {-# INLINE genIDs_ #-}
@@ -154,6 +158,14 @@ genKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
           => m (KindID prefix)
 genKindID = KindID <$> V7.genUUID
 {-# INLINE genKindID #-}
+
+-- | Generate a new 'KindID' from a prefix based on statelesss 'UUID'v7.
+--
+-- See the documentation of 'V7.genUUID'' for more information.
+genKindID' :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+           => m (KindID prefix)
+genKindID' = KindID <$> V7.genUUID'
+{-# INLINE genKindID' #-}
 
 -- | Generate a list of 'KindID's from a prefix.
 --

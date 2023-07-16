@@ -18,11 +18,13 @@ module Data.TypeID
   , Word64
   -- * 'TypeID' generation (class methods)
   , genID
+  , genID'
   , genIDs
   , decorate
   -- * 'TypeID' generation ('TypeID'-specific)
   , nilTypeID
   , genTypeID
+  , genTypeID'
   , genTypeIDs
   , decorateTypeID
   -- * Prefix validation

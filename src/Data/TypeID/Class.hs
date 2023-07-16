@@ -80,7 +80,7 @@ genID = genID_ @_ @m (Proxy @a)
 --
 -- The default implementation is the same as 'genID'.
 genID' :: forall a m. (IDGen a, MonadIO m) => GenFunc (IDGenPrefix a) (m a)
-genID' = genID_' @_ @m (Proxy @a)
+genID' = genID'_ @_ @m (Proxy @a)
 {-# INLINE genID' #-}
 
 -- | Generate a list of identifiers with the given prefix.
@@ -109,14 +109,14 @@ class IDGen a where
   -- | Generate an identifier with the given prefix.
   genID_ :: MonadIO m => Proxy a -> GenFunc (IDGenPrefix a) (m a)
 
-  -- | Similar to 'genID_', but stateless. It can be a faster implementation
-  -- than 'genID_', but it does not guarantee any stateful property, such as
+  -- | Similar to 'genID'_, but stateless. It can be a faster implementation
+  -- than 'genID'_, but it does not guarantee any stateful property, such as
   -- monotonically increasing for 'UUID'v7-based identifiers.
   --
-  -- The default implementation is the same as 'genID_'.
-  genID_' :: forall m. MonadIO m => Proxy a -> GenFunc (IDGenPrefix a) (m a)
-  genID_' = genID_ @_ @m
-  {-# INLINE genID_' #-}
+  -- The default implementation is the same as 'genID'_.
+  genID'_ :: forall m. MonadIO m => Proxy a -> GenFunc (IDGenPrefix a) (m a)
+  genID'_ = genID_ @_ @m
+  {-# INLINE genID'_ #-}
 
   -- | Generate a list of identifiers with the given prefix.
   genIDs_ :: MonadIO m => Proxy a -> GenFunc (IDGenPrefix a) (Word16 -> m [a])

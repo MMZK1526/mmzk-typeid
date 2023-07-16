@@ -32,7 +32,7 @@ import           Data.TypeID.Class
 import           Data.TypeID.Error
 import           Data.UUID.Types.Internal (UUID(..))
 import qualified Data.UUID.Types.Internal as UUID
-import qualified Data.UUID.V7 as UUID
+import qualified Data.UUID.V7 as V7
 import           Data.Word
 
 -- | The constructor is not exposed to the public API to prevent generating
@@ -101,7 +101,7 @@ instance IDType TypeID where
   {-# INLINE getUUID #-}
 
   getTime :: TypeID -> Word64
-  getTime = UUID.getTime . getUUID
+  getTime = V7.getTime . getUUID
   {-# INLINE getTime #-}
 
 -- | Conversion between 'TypeID' and 'String'/'Text'/'ByteString'.
@@ -138,6 +138,10 @@ instance IDGen TypeID where
   genID_ _ = genTypeID
   {-# INLINE genID_ #-}
 
+  genID'_ :: MonadIO m => Proxy TypeID -> Text -> m TypeID
+  genID'_ _ = genTypeID'
+  {-# INLINE genID'_ #-}
+
   genIDs_ :: MonadIO m => Proxy TypeID -> Text -> Word16 -> m [TypeID]
   genIDs_ _ = genTypeIDs
   {-# INLINE genIDs_ #-}
@@ -155,11 +159,14 @@ genTypeID :: MonadIO m => Text -> m TypeID
 genTypeID = fmap head . (`genTypeIDs` 1)
 {-# INLINE genTypeID #-}
 
--- | Generate a new 'TypeID' from a prefix, but without checking if the prefix
--- is valid.
-unsafeGenTypeID :: MonadIO m => Text -> m TypeID
-unsafeGenTypeID = fmap head . (`unsafeGenTypeIDs` 1)
-{-# INLINE unsafeGenTypeID #-}
+-- | Generate a new 'TypeID' from a prefix based on statelesss 'UUID'v7.
+--
+-- See the documentation of 'V7.genUUID'' for more information.
+genTypeID' :: MonadIO m => Text -> m TypeID
+genTypeID' prefix = case checkPrefix prefix of
+  Nothing  -> unsafeGenTypeID' prefix
+  Just err -> liftIO $ throwIO err
+{-# INLINE genTypeID' #-}
 
 -- | Generate a list of 'TypeID's from a prefix.
 --
@@ -174,6 +181,18 @@ genTypeIDs prefix n = case checkPrefix prefix of
   Just err -> liftIO $ throwIO err
 {-# INLINE genTypeIDs #-}
 
+-- | Generate a new 'TypeID' from a prefix, but without checking if the prefix
+-- is valid.
+unsafeGenTypeID :: MonadIO m => Text -> m TypeID
+unsafeGenTypeID = fmap head . (`unsafeGenTypeIDs` 1)
+{-# INLINE unsafeGenTypeID #-}
+
+-- | Generate a new 'TypeID' from a prefix based on statelesss 'UUID'v7, but
+-- without checking if the prefix is valid.
+unsafeGenTypeID' :: MonadIO m => Text -> m TypeID
+unsafeGenTypeID' prefix = TypeID prefix <$> V7.genUUID'
+{-# INLINE unsafeGenTypeID' #-}
+
 -- | Generate n 'TypeID's from a prefix, but without checking if the prefix is
 -- valid.
 --
@@ -183,7 +202,7 @@ genTypeIDs prefix n = case checkPrefix prefix of
 -- It is guaranteed that the first 32768 'TypeID's are generated at the same
 -- timestamp.
 unsafeGenTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID]
-unsafeGenTypeIDs prefix n = map (TypeID prefix) <$> UUID.genUUIDs n
+unsafeGenTypeIDs prefix n = map (TypeID prefix) <$> V7.genUUIDs n
 {-# INLINE unsafeGenTypeIDs #-}
 
 -- | The nil 'TypeID'.
