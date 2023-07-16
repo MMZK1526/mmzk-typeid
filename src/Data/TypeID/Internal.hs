@@ -327,7 +327,7 @@ checkTypeID (TypeID prefix uuid)
          , TypeIDErrorUUIDError <$ guard (not $ V7.validate uuid) ]
 {-# INLINE checkTypeID #-}
 
--- | Similar to 'checkTypeID', but also check if the suffix 'UUID' is
+-- | Similar to 'checkTypeID', but also checks if the suffix 'UUID' is
 -- generated in the past.
 checkTypeIDWithEnv :: MonadIO m => TypeID -> m (Maybe TypeIDError)
 checkTypeIDWithEnv tid@(TypeID _ uuid)

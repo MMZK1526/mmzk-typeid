@@ -285,7 +285,7 @@ checkKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
 checkKindID = TID.checkTypeID . toTypeID
 {-# INLINE checkKindID #-}
 
--- | Similar to 'checkKindID', but also check if the suffix 'UUID' is
+-- | Similar to 'checkKindID', but also checks if the suffix 'UUID' is
 -- generated in the past.
 checkKindIDWithEnv :: ( ToPrefix prefix
                       , ValidPrefix (PrefixSymbol prefix)
