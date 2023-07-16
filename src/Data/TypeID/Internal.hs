@@ -324,7 +324,7 @@ checkPrefix prefix
 checkTypeID :: TypeID -> Maybe TypeIDError
 checkTypeID (TypeID prefix uuid)
   = msum [ checkPrefix prefix
-         , TypeIDErrorUUIDError <$ guard (V7.validate uuid) ]
+         , TypeIDErrorUUIDError <$ guard (not $ V7.validate uuid) ]
 {-# INLINE checkTypeID #-}
 
 -- | Similar to 'checkTypeID', but also check if the suffix 'UUID' is
@@ -332,7 +332,7 @@ checkTypeID (TypeID prefix uuid)
 checkTypeIDWithEnv :: MonadIO m => TypeID -> m (Maybe TypeIDError)
 checkTypeIDWithEnv tid@(TypeID _ uuid)
   = fmap (checkTypeID tid `mplus`)
-         (pure TypeIDErrorUUIDError <$ V7.validateWithTime uuid)
+         ((TypeIDErrorUUIDError <$) . guard . not <$> V7.validateWithTime uuid)
 {-# INLINE checkTypeIDWithEnv #-}
 
 -- | Parse a 'TypeID' from its 'String' representation, but crashes when
