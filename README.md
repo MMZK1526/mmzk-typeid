@@ -46,16 +46,16 @@ main = do
 
   -- Make a TypeID without prefix:
   typeID' <- TID.genTypeID ""
-  putStrLn $ TID.toString typeID'
+  print typeID'
 
   -- Make 10 TypeIDs in a batch. They are guaranteed to have the same timestamp and of ascending order:
   typeIDs <- TID.genTypeIDs "mmzk" 10
-  mapM_ (putStrLn . TID.toString) typeIDs
+  mapM_ print typeIDs
 
   -- Parse a TypeID from string:
   case TID.parseString "mmzk_01h455vb4pex5vsknk084sn02q" of
     Left err     -> throwIO err
-    Right typeID -> putStrLn $ TID.toString typeID
+    Right typeID -> print typeID
 ```
 
 For a full list of functions on `TypeID`, see [Data.TypeID](src/Data/TypeID.hs).
@@ -67,7 +67,7 @@ When using `TypeID`, if we want to check if the type matches, we usually need to
 
 Of course, that would require the desired prefix to be known at compile time. This is actually quite common, especially when we are using one prefix for one table in the database.
 
-For example, suppose we have a function that takes a KindID with the prefix "user", it may have a signature like this: `f :: KindID "user" -> IO ()`
+For example, suppose we have a function that takes a KindID with the prefix "user", it may have a signature like this: `f :: KindID "user" -> IO ()`.
 
 Then if we try to pass in a KindID with the prefix "post", the compiler will complain, thus removing the runtime check and the associated overhead.
 
@@ -96,16 +96,16 @@ main = do
 
   -- Make a KindID without prefix:
   kindID' <- KID.genKindID @"" -- Has type `KindID ""`
-  putStrLn $ KID.toString kindID'
+  print kindID'
 
   -- Make 10 KindIDs in a batch. They are guaranteed to have the same timestamp and of ascending order:
   kindIDs <- KID.genKindIDs @"mmzk" 10
-  mapM_ (putStrLn . KID.toString) kindIDs
+  mapM_ print kindIDs
 
   -- Parse a KindID from string:
   case KID.parseString @"mmzk" "mmzk_01h455vb4pex5vsknk084sn02q" of
     Left err     -> throwIO err
-    Right kindID -> putStrLn $ KID.toString kindID
+    Right kindID -> print kindID
 ```
 
 For a full list of functions on `KindID`, see [Data.KindID](src/Data/KindID.hs).
@@ -126,21 +126,21 @@ main :: IO ()
 main = do
   -- Make a TypeID with prefix 'mmzk':
   typeID <- genID @TypeID "mmzk"
-  putStrLn $ id2String typeID
+  print typeID
 
   -- Make a KindID with prefix 'mmzk':
   kindID <- genID @(KindID "mmzk")
-  putStrLn $ id2String kindID
+  print kindID
 
   -- Parse a TypeID from string:
   case string2ID "mmzk_01h455vb4pex5vsknk084sn02q" :: Maybe TypeID of
     Left err     -> throwIO err
-    Right typeID -> putStrLn $ id2String typeID
+    Right typeID -> print typeID
 
   -- Parse a KindID from string:
   case string2ID "mmzk_01h455vb4pex5vsknk084sn02q" :: Maybe (KindID "mmzk") of
     Left err     -> throwIO err
-    Right kindID -> putStrLn $ id2String kindID
+    Right kindID -> print kindID
 ```
 
 We no longer need to use qualified imports, but on the down side, we need to add explicit type annotations. Therefore it is a matter of preference.
