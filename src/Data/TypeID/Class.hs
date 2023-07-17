@@ -51,7 +51,8 @@ class IDType a where
   -- | Get the UUID suffix of the identifier.
   getUUID :: a -> UUID
 
-  -- | Get the timestamp of the identifier.
+  -- | Get the timestamp of the identifier. Returns 0 if the identifier is not
+  -- timestamp-based.
   getTime :: a -> Word64
 
 -- | A type class for converting between a TypeID-ish identifier type and some

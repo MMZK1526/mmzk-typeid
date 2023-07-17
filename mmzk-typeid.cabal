@@ -80,7 +80,6 @@ library
         entropy ^>=0.4,
         hashable ^>=1.4,
         text ^>=2.0,
-        transformers ^>=0.6,
         time >=1.11 && <1.13,
         uuid-types >=1.0,
     hs-source-dirs:   src
@@ -125,7 +124,6 @@ test-suite test
         hashable,
         hspec ^>=2.11,
         text,
-        transformers,
         time,
         uuid-types,
     hs-source-dirs:

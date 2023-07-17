@@ -32,6 +32,8 @@
 
 * Deprecate `nilTypeID` and `nilKindID` since they are not useful.
 
+* Remove dependency on 'transformers'.
+
 * Fix typos in the documentation.
 
 * More tests.
