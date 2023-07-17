@@ -24,7 +24,7 @@ module Data.UUID.V7
   , genUUID
   , genUUID'
   , genUUIDs
-  -- Validation
+  -- * Validation
   , validate
   , validateWithTime
   -- * Miscellaneous helpers

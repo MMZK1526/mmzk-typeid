@@ -31,7 +31,7 @@
 -- These functions are usually used with a type application, e.g.
 --
 -- > do
--- >   tid <- genKindID @"user"
+-- >   kindID <- genKindID @"user"
 -- >   ...
 --
 module Data.KindID
