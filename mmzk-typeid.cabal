@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               mmzk-typeid
-version:            0.3.0.0
+version:            0.3.0.1
 
 synopsis:           A TypeID implementation for Haskell
 description:
@@ -10,7 +10,7 @@ description:
   .
   This library supports generating and parsing speç-conforming TypeIDs, with the following additional features:
   .
-    - Batch generating TypeIDs with the same 'UUID'v7 timestamp
+    - Batch generating 'TypeID's with the same UUIDv7 timestamp
   .
     - Encode prefixes at type-level for better type-safety
   .
