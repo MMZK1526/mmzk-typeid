@@ -16,11 +16,18 @@ import           Control.Exception
 import           Data.Text (Text)
 
 -- | Errors from parsing TypeIDs.
-data TypeIDError = TypeIDErrorPrefixTooLong Int
-                 | TypeIDExtraSeparator
-                 | TypeIDErrorPrefixInvalidChar Char
-                 | TypeIDErrorPrefixMismatch Text Text
-                 | TypeIDErrorUUIDError
+data TypeIDError
+  = -- | The prefix longer than 63 characters.
+    TypeIDErrorPrefixTooLong Int
+    -- | The ID contains an extra underscore separator.
+  | TypeIDExtraSeparator
+    -- | The prefix contains an invalid character, namely not lowercase Latin.
+  | TypeIDErrorPrefixInvalidChar Char
+    -- | From a `Data.KindID.KindID` conversion. The prefix doesn't match with
+    -- the expected.
+  | TypeIDErrorPrefixMismatch Text Text
+    -- | The 'Data.UUID.V7.UUID' suffix has errors.
+  | TypeIDErrorUUIDError
   deriving (Eq, Ord)
 
 instance Show TypeIDError where

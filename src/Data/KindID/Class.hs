@@ -8,7 +8,7 @@
 -- Portability : GHC
 --
 -- This module contains the type-level mechanisms that are used to define
--- custom 'Data.KindID'-ish identifier types.
+-- custom 'Data.KindID.KindID'-ish identifier types.
 --
 module Data.KindID.Class
   (
@@ -56,8 +56,8 @@ type family ILSUH (uncons :: Maybe (Char, Symbol)) :: Bool where
   ILSUH ('Just '(c, s)) = IsLowerChar c && IsLowerSymbol s
 
 -- | A class that translates any kind to a 'Symbol'. It is used to translate
--- custom data kinds to a 'Symbol' so that they can be used as 'Data.KindID'
--- prefixes.
+-- custom data kinds to a 'Symbol' so that they can be used as
+-- 'Data.KindID.KindID' prefixes.
 --
 -- For example, suppose we have the following data structure that represents the
 -- prefixes we are going to use:
@@ -75,7 +75,7 @@ type family ILSUH (uncons :: Maybe (Char, Symbol)) :: Bool where
 -- > instance ToPrefix 'Comment where
 -- >   type PrefixSymbol 'Comment = "comment"
 --
--- Now we can use Prefix as a prefix for 'Data.KindID's, e.g.
+-- Now we can use Prefix as a prefix for 'Data.KindID.KindID's, e.g.
 --
 -- > do
 -- >   userID <- genKindID @'User -- Same as genKindID @"user"
