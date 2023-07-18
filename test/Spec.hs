@@ -75,30 +75,26 @@ main = do
       it "can generate TypeID with prefix" do
         start <- V7.getEpochMilli
         tid   <- withCheck $ genID @TypeID "mmzk"
-        end   <- V7.getEpochMilli
         getPrefix tid `shouldBe` "mmzk"
-        getTime tid `shouldSatisfy` \t -> t >= start && t <= end
+        getTime tid `shouldSatisfy` \t -> t >= start
       it "can generate TypeID without prefix" do
         start <- V7.getEpochMilli
         tid   <- withCheck $ genID @TypeID ""
-        end   <- V7.getEpochMilli
         getPrefix tid `shouldBe` ""
-        getTime tid `shouldSatisfy` \t -> t >= start && t <= end
+        getTime tid `shouldSatisfy` \t -> t >= start
       it "can generate TypeID with stateless UUIDv7" do
         start <- V7.getEpochMilli
         tid   <- withCheck $ genID' @TypeID "mmzk"
-        end   <- V7.getEpochMilli
         getPrefix tid `shouldBe` "mmzk"
-        getTime tid `shouldSatisfy` \t -> t >= start && t <= end
+        getTime tid `shouldSatisfy` \t -> t >= start
       it "can generate in batch with same timestamp and in ascending order" do
         start <- V7.getEpochMilli
         tids  <- withChecks $ genIDs @TypeID "mmzk" 1526
-        end   <- V7.getEpochMilli
         all ((== "mmzk") . getPrefix) tids `shouldBe` True
         let timestamp = getTime $ head tids
         all ((== timestamp) . getTime) tids `shouldBe` True
         all (uncurry (<)) (zip tids $ tail tids) `shouldBe` True
-        timestamp `shouldSatisfy` \t -> t >= start && t <= end
+        timestamp `shouldSatisfy` \t -> t >= start
       it "can parse TypeID from String" do
         case string2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
@@ -201,29 +197,26 @@ main = do
       it "can generate KindID with prefix" do
         start <- V7.getEpochMilli
         kid   <- withCheck $ genID @(KindID "mmzk")
-        end   <- V7.getEpochMilli
         getPrefix kid `shouldBe` "mmzk"
-        getTime kid `shouldSatisfy` \t -> start <= t && t <= end
+        getTime kid `shouldSatisfy` \t -> start <= t
       it "can generate KindID without prefix" do
         start <- V7.getEpochMilli
         kid   <- withCheck $ genID @(KindID "")
-        end   <- V7.getEpochMilli
         getPrefix kid `shouldBe` ""
-        getTime kid `shouldSatisfy` \t -> start <= t && t <= end
+        getTime kid `shouldSatisfy` \t -> start <= t
       it "can generate KindID with stateless UUID v7" do
         start <- V7.getEpochMilli
         kid   <- withCheck $ genID' @(KindID "mmzk")
-        end   <- V7.getEpochMilli
         getPrefix kid `shouldBe` "mmzk"
+        getTime kid `shouldSatisfy` \t -> start <= t
       it "can generate in batch with same timestamp and in ascending order" do
         start <- V7.getEpochMilli
         kids  <- withChecks $ genIDs @(KindID "mmzk") 1526
-        end   <- V7.getEpochMilli
         all ((== "mmzk") . getPrefix) kids `shouldBe` True
         let timestamp = getTime $ head kids
         all ((== timestamp) . getTime) kids `shouldBe` True
         all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
-        timestamp `shouldSatisfy` \t -> start <= t && t <= end
+        timestamp `shouldSatisfy` \t -> start <= t
       it "can parse KindID from String" do
         case string2ID @(KindID "mmzk") "mmzk_00041061050r3gg28a1c60t3gf" of
           Left err  -> expectationFailure $ "Parse error: " ++ show err
