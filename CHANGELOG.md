@@ -1,6 +1,11 @@
 # Revision history for mmzk-typeid
 
 
+## 0.3.1.0 -- Unreleased
+
+* Add unsafe methods to `IDConv`.
+
+
 ## 0.3.0.1 -- 2023-07-18
 
 * Add a version upper-bound for 'uuid-types'.

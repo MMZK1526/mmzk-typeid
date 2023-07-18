@@ -77,6 +77,18 @@ class IDConv a where
   -- | Pretty-print the identifier to a lazy 'ByteString'.
   id2ByteString :: a -> ByteString
 
+  -- | Parse the identifier from its 'String' representation, but crashes when
+  -- the parsing fails.
+  unsafeString2ID :: String -> a
+
+  -- | Parse the identifier from its string representation as a strict 'Text',
+  -- but crashes when the parsing fails.
+  unsafeText2ID :: Text -> a
+
+  -- | Parse the identifier from its string representation as a lazy
+  -- 'ByteString', but crashes when the parsing fails.
+  unsafeByteString2ID :: ByteString -> a
+
 -- | Generate a new identifier with the given prefix.
 genID :: forall a m. (IDGen a, MonadIO m) => GenFunc (IDGenPrefix a) (m a)
 genID = genID_ @a @m Proxy

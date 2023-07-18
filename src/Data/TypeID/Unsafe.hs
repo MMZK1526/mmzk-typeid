@@ -12,10 +12,15 @@ module Data.TypeID.Unsafe
     unsafeGenTypeID
   , unsafeGenTypeID'
   , unsafeGenTypeIDs
-  -- * Unsafe decoding
+  -- * Unsafe decoding ('TypeID'-specific)
   , unsafeParseString
   , unsafeParseText
   , unsafeParseByteString
+  -- * Unsafe decoding (class methods)
+  , unsafeString2ID
+  , unsafeText2ID
+  , unsafeByteString2ID
   ) where
 
+import           Data.TypeID.Class
 import           Data.TypeID.Internal

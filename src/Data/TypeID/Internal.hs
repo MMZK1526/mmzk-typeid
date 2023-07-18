@@ -124,6 +124,18 @@ instance IDConv TypeID where
   id2ByteString = toByteString
   {-# INLINE id2ByteString #-}
 
+  unsafeString2ID :: String -> TypeID
+  unsafeString2ID = unsafeParseString
+  {-# INLINE unsafeString2ID #-}
+
+  unsafeText2ID :: Text -> TypeID
+  unsafeText2ID = unsafeParseText
+  {-# INLINE unsafeText2ID #-}
+
+  unsafeByteString2ID :: ByteString -> TypeID
+  unsafeByteString2ID = unsafeParseByteString
+  {-# INLINE unsafeByteString2ID #-}
+
 -- | Generate 'TypeID's.
 instance IDGen TypeID where
   type IDGenPrefix TypeID = 'Just Text

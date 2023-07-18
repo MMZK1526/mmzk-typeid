@@ -128,6 +128,18 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
     id2ByteString = toByteString
     {-# INLINE id2ByteString #-}
 
+    unsafeString2ID :: String -> KindID prefix
+    unsafeString2ID = unsafeParseString
+    {-# INLINE unsafeString2ID #-}
+
+    unsafeText2ID :: Text -> KindID prefix
+    unsafeText2ID = unsafeParseText
+    {-# INLINE unsafeText2ID #-}
+
+    unsafeByteString2ID :: ByteString -> KindID prefix
+    unsafeByteString2ID = unsafeParseByteString
+    {-# INLINE unsafeByteString2ID #-}
+
 -- | Generate 'KindID's.
 instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
   => IDGen (KindID prefix) where
