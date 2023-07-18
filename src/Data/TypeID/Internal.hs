@@ -358,22 +358,19 @@ checkTypeIDWithEnv tid@(TypeID _ uuid)
 -- parsing fails.
 unsafeParseString :: String -> TypeID
 unsafeParseString str = case span (/= '_') str of
-  (_, "")              -> TypeID "" $ unsafeDecodeUUID bs
+  (_, "")              -> TypeID "" . unsafeDecodeUUID $ fromString str
   (prefix, _ : suffix) -> TypeID (T.pack prefix)
                         . unsafeDecodeUUID $ fromString suffix
-  where
-    bs = fromString str
 {-# INLINE unsafeParseString #-}
 
 -- | Parse a 'TypeID' from its string representation as a strict 'Text', but
 -- crashes when parsing fails.
 unsafeParseText :: Text -> TypeID
 unsafeParseText text = case second T.uncons $ T.span (/= '_') text of
-  (_, Nothing)               -> TypeID "" $ unsafeDecodeUUID bs
+  (_, Nothing)               -> TypeID "" . unsafeDecodeUUID
+                              . BSL.fromStrict $ encodeUtf8 text
   (prefix, Just (_, suffix)) -> TypeID prefix . unsafeDecodeUUID
                               . BSL.fromStrict . encodeUtf8 $ suffix
-  where
-    bs = BSL.fromStrict $ encodeUtf8 text
 {-# INLINE unsafeParseText #-}
 
 -- | Parse a 'TypeID' from its string representation as a lazy 'ByteString',
