@@ -3,6 +3,10 @@
 
 ## 0.3.1.0 -- Unreleased
 
+* Add `parseStringM`, `parseTextM`, and `parseByteStringM` to `IDConv`.
+  * Instead of returning an `Either`, they throw an exception when the input is
+    invalid.
+
 * Add unsafe methods to `IDConv`.
 
 

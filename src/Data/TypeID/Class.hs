@@ -29,6 +29,7 @@ module Data.TypeID.Class
   , ResWithErr(..)
   ) where
 
+import           Control.Exception
 import           Control.Monad.IO.Class
 import           Data.ByteString.Lazy (ByteString)
 import           Data.Kind (Type)
@@ -76,6 +77,24 @@ class IDConv a where
 
   -- | Pretty-print the identifier to a lazy 'ByteString'.
   id2ByteString :: a -> ByteString
+
+  -- | Parse the identifier from its 'String' representation, throwing an error
+  -- when the parsing fails.
+  string2IDM :: MonadIO m => String -> m a
+  string2IDM = either (liftIO . throwIO) pure . string2ID
+  {-# INLINE string2IDM #-}
+
+  -- | Parse the identifier from its string representation as a strict 'Text',
+  -- throwing an error when the parsing fails.
+  text2IDM :: MonadIO m => Text -> m a
+  text2IDM = either (liftIO . throwIO) pure . text2ID
+  {-# INLINE text2IDM #-}
+
+  -- | Parse the identifier from its string representation as a lazy
+  -- 'ByteString', throwing an error when the parsing fails.
+  byteString2IDM :: MonadIO m => ByteString -> m a
+  byteString2IDM = either (liftIO . throwIO) pure . byteString2ID
+  {-# INLINE byteString2IDM #-}
 
   -- | Parse the identifier from its 'String' representation, but crashes when
   -- the parsing fails.

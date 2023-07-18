@@ -291,6 +291,32 @@ parseByteString str = do
     Just kid -> pure kid
 {-# INLINE parseByteString #-}
 
+-- | Parse a 'KindID' from its 'String' representation, throwing an error when
+-- the parsing fails. It is 'string2IDM' with concrete type.
+parseStringM :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+             => String -> m (KindID prefix)
+parseStringM = string2IDM
+{-# INLINE parseStringM #-}
+
+-- | Parse a 'KindID' from its string representation as a strict 'Text',
+-- throwing an error when the parsing fails. It is 'text2IDM' with concrete
+-- type.
+parseTextM :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+           => Text -> m (KindID prefix)
+parseTextM = text2IDM
+{-# INLINE parseTextM #-}
+
+-- | Parse a 'KindID' from its string representation as a lazy 'ByteString',
+-- throwing an error when the parsing fails. It is 'byteString2IDM' with
+-- concrete type.
+parseByteStringM :: ( ToPrefix prefix
+                    , ValidPrefix (PrefixSymbol prefix)
+                    , MonadIO m )
+                 => ByteString 
+                 -> m (KindID prefix)
+parseByteStringM = byteString2IDM
+{-# INLINE parseByteStringM #-}
+
 -- | Check if the prefix is valid and the suffix 'UUID' has the correct v7
 -- version and variant.
 checkKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))

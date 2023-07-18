@@ -39,6 +39,9 @@ module Data.TypeID
   , parseString
   , parseText
   , parseByteString
+  , parseStringM
+  , parseTextM
+  , parseByteStringM
   -- * Encoding & decoding (class methods)
   , id2String
   , id2Text
@@ -46,6 +49,9 @@ module Data.TypeID
   , string2ID
   , text2ID
   , byteString2ID
+  , string2IDM
+  , text2IDM
+  , byteString2IDM
   ) where
 
 import           Data.TypeID.Class

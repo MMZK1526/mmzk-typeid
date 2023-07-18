@@ -65,6 +65,9 @@ module Data.KindID
   , parseString
   , parseText
   , parseByteString
+  , parseStringM
+  , parseTextM
+  , parseByteStringM
   -- * Encoding & decoding (class methods)
   , id2String
   , id2Text
@@ -72,6 +75,9 @@ module Data.KindID
   , string2ID
   , text2ID
   , byteString2ID
+  , string2IDM
+  , text2IDM
+  , byteString2IDM
   -- * Type-level & term-level conversion
   , toTypeID
   , fromTypeID

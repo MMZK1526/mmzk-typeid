@@ -308,6 +308,26 @@ parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
       Nothing  -> TypeID prefix' <$> decodeUUID suffix
       Just err -> Left err
 
+-- | Parse a 'TypeID' from its 'String' representation, throwing an error when
+-- the parsing fails. It is 'string2IDM' with concrete type.
+parseStringM :: MonadIO m => String -> m TypeID
+parseStringM = string2IDM
+{-# INLINE parseStringM #-}
+
+-- | Parse a 'TypeID' from its string representation as a strict 'Text',
+-- throwing an error when the parsing fails. It is 'text2IDM' with concrete
+-- type.
+parseTextM :: MonadIO m => Text -> m TypeID
+parseTextM = text2IDM
+{-# INLINE parseTextM #-}
+
+-- | Parse a 'TypeID' from its string representation as a lazy 'ByteString',
+-- throwing an error when the parsing fails. It is 'byteString2IDM' with
+-- concrete type.
+parseByteStringM :: MonadIO m => ByteString -> m TypeID
+parseByteStringM = byteString2IDM
+{-# INLINE parseByteStringM #-}
+
 -- | Check if the given prefix is a valid TypeID prefix.
 checkPrefix :: Text -> Maybe TypeIDError
 checkPrefix prefix
