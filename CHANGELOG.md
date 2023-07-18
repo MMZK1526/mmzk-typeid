@@ -1,6 +1,13 @@
 # Revision history for mmzk-typeid
 
 
+## 0.3.0.1 -- 2023-07-18
+
+* Add a version upper-bound for 'uuid-types'.
+
+* Fix documentation typos. 
+
+
 ## 0.3.0.0 -- 2023-07-17
 
 * Use 'uuid-types' package's `UUID` instead of a custom type.
