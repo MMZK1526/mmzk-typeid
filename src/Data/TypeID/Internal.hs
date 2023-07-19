@@ -448,8 +448,8 @@ decodeUUID bs = do
 {-# INLINE decodeUUID #-}
 
 unsafeDecodeUUID :: ByteString -> UUID
-unsafeDecodeUUID bs
-  = uncurry UUID . runGet (join (liftM2 (,)) getWord64be) $ suffixDecode bs
+unsafeDecodeUUID
+  = uncurry UUID . runGet (join (liftM2 (,)) getWord64be) . suffixDecode
 {-# INLINE unsafeDecodeUUID #-}
 
 table :: Array Word8 Word8

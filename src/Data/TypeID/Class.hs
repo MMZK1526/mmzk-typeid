@@ -25,6 +25,7 @@ module Data.TypeID.Class
   , genIDs
   , checkID
   , checkIDWithEnv
+  -- * Helper types
   , GenFunc(..)
   , ResWithErr(..)
   ) where
@@ -39,12 +40,12 @@ import           Data.TypeID.Error
 import           Data.UUID.V7 (UUID)
 import           Data.Word
 
--- | A constraint synonym for a TypeID-ish identifier type that supports ID
--- generation and string conversion.
+-- | A constraint synonym for a 'Data.TypeID.TypeID'-ish identifier type that
+-- supports ID generation and string conversion.
 type TypeIDLike a = (IDType a, IDConv a, IDGen a)
 
--- | A type class for a TypeID-ish identifier type, which has a 'Text' prefix
--- and a 'UUID' suffix.
+-- | A type class for a 'Data.TypeID.TypeID'-ish identifier type, which has a
+-- 'Text' prefix and a 'UUID' suffix.
 class IDType a where
   -- | Get the prefix of the identifier.
   getPrefix :: a -> Text
@@ -56,8 +57,8 @@ class IDType a where
   -- timestamp-based.
   getTime :: a -> Word64
 
--- | A type class for converting between a TypeID-ish identifier type and some
--- string representations.
+-- | A type class for converting between a 'Data.TypeID.TypeID'-ish identifier
+-- type and some string representations.
 class IDConv a where
   -- | Parse the identifier from its 'String' representation.
   string2ID :: String -> Either TypeIDError a
@@ -99,14 +100,20 @@ class IDConv a where
   -- | Parse the identifier from its 'String' representation, but crashes when
   -- the parsing fails.
   unsafeString2ID :: String -> a
+  unsafeString2ID = either (error . show) id . string2ID
+  {-# INLINE unsafeString2ID #-}
 
   -- | Parse the identifier from its string representation as a strict 'Text',
   -- but crashes when the parsing fails.
   unsafeText2ID :: Text -> a
+  unsafeText2ID = either (error . show) id . text2ID
+  {-# INLINE unsafeText2ID #-}
 
   -- | Parse the identifier from its string representation as a lazy
   -- 'ByteString', but crashes when the parsing fails.
   unsafeByteString2ID :: ByteString -> a
+  unsafeByteString2ID = either (error . show) id . byteString2ID
+  {-# INLINE unsafeByteString2ID #-}
 
 -- | Generate a new identifier with the given prefix.
 genID :: forall a m. (IDGen a, MonadIO m) => GenFunc (IDGenPrefix a) (m a)
@@ -144,7 +151,7 @@ checkIDWithEnv :: forall a m. (IDGen a, MonadIO m) => a -> m (Maybe TypeIDError)
 checkIDWithEnv = checkIDWithEnv_ @a @m Proxy
 {-# INLINE checkIDWithEnv #-}
 
--- | A type class for generating TypeID-ish identifiers.
+-- | A type class for generating 'Data.TypeID.TypeID'-ish identifiers.
 --
 -- The methods in this type class are not directly used since each of them has
 -- a dummy 'Proxy' in order to compile. We implement the methods here and use
@@ -191,7 +198,7 @@ type family GenFunc prefix res where
 --
 -- In other words, if the prefix type is already encoded in the type level,
 -- we are certain that the prefix is valid, so the result type does not need the
--- "Either TypeIDError" part.
+-- @Either TypeIDError@ part.
 type family ResWithErr prefix res where
   ResWithErr ('Just prefix) res = Either TypeIDError res
   ResWithErr 'Nothing res       = res
