@@ -67,6 +67,7 @@ genUUID' = do
         fillVerAndRandA entropy16
         fillVarAndRandB entropy16 entropy64
   pure . uncurry UUID $ runGet (join (liftM2 (,)) getWord64be) bs
+{-# INLINE genUUID' #-}
 
 -- | Generate a list of 'UUID'v7s.
 --
