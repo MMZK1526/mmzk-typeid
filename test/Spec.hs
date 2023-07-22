@@ -4,6 +4,9 @@
 
 import           Control.Monad
 import           Data.Aeson
+import           Data.Binary (get, put)
+import           Data.Binary.Get
+import           Data.Binary.Put
 import qualified Data.ByteString.Lazy as BSL
 import           Data.KindID
 import           Data.KindID.Class
@@ -244,3 +247,17 @@ main = do
         let timestamp = getTime $ head kids
         all ((== timestamp) . getTime) kids `shouldBe` True
         all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
+
+    describe "Binary instance for TypeID and KindID" do
+      it "has correct binary instance for TypeID" do
+        tids <- withChecks $ genIDs @TypeID "abcdefghijklmnopqrstuvwxyz" 114
+        forM_ tids \tid -> do
+          let bytes = runPut (put tid)
+          let tid'  = runGet get bytes
+          tid' `shouldBe` tid
+      it "has correct binary instance for KindID" do
+        kids <- withChecks $ genIDs @(KindID "abcdefghijklmnopqrstuvwxyz") 114
+        forM_ kids \kid -> do
+          let bytes = runPut (put kid)
+          let kid'  = runGet get bytes
+          kid' `shouldBe` kid
