@@ -99,7 +99,7 @@ instance Binary TypeID where
     put uuid
     let encodedPrefix = concat5BitInts . fmap (subtract 96) . BS.unpack
                       $ encodeUtf8 prefix
-    putWord8 $ fromIntegral $ length encodedPrefix
+    putWord8 . fromIntegral $ length encodedPrefix
     forM_ encodedPrefix putWord8
   {-# INLINE put #-}
 

@@ -4,11 +4,11 @@ version:            0.3.1.0
 
 synopsis:           A TypeID implementation for Haskell
 description:
-  TypeID is a type-safe, K-sortable, globally unique identifier inspired by Stripe IDs.
+  'TypeID' is a type-safe, K-sortable, globally unique identifier inspired by Stripe IDs.
   .
   The specification is available at https://github.com/jetpack-io/typeid.
   .
-  This library supports generating and parsing speç-conforming TypeIDs, with the following additional features:
+  This library supports generating and parsing speç-conforming 'TypeID's, with the following additional features:
   .
     - Batch generating 'TypeID's with the same UUIDv7 timestamp
   .
