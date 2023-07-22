@@ -79,6 +79,19 @@ instance FromJSONKey TypeID where
     Right tid -> pure tid
   {-# INLINE fromJSONKey #-}
 
+-- | Since the specification does not formulate a concrete binary format, this
+-- instance is based on the following custom format:
+--
+-- * The first 16 bytes are the suffix 'UUID' encoded in base32.
+-- * The next byte is the length of the prefix encoded in a byte.
+-- * The next bytes are the prefix, each letter taking 5 bits, mapping \'a\' to
+--   1 and \'z\' to 26.
+--
+-- Note that the prefix and the 'UUID' is swapped compared to the string
+-- representation, this is for the convenience of the use case where only the
+-- suffix 'UUID' is required. Because of this, the sorting order may be
+-- different from the string representation, but they are guaranteed to be the
+-- same if the same prefix is used.
 instance Binary TypeID where
   put :: TypeID -> Put
   put (TypeID prefix uuid) = do

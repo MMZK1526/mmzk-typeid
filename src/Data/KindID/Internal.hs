@@ -80,6 +80,7 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
       Right kid -> pure kid
     {-# INLINE fromJSONKey #-}
 
+-- | See The 'Binary' instance of 'TypeID'.
 instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
   => Binary (KindID prefix) where
     put :: KindID prefix -> Put
