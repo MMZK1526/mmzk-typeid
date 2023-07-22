@@ -382,6 +382,22 @@ unsafeParseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
                               . unsafeDecodeUUID $ suffix
 {-# INLINE unsafeParseByteString #-}
 
+concat5BitInts :: [Word8] -> [Word8]
+concat5BitInts
+  = reverse . toBytes
+  . foldl (\(acc :: Integer) w -> acc `shiftL` 5 + fromIntegral w) 0
+  where
+    toBytes 0 = []
+    toBytes x = fromIntegral (x .&. 0xFF) : toBytes (x `shiftR` 8)
+
+separate5BitInts :: [Word8] -> [Word8]
+separate5BitInts
+  = reverse . toBytes
+  . foldl (\(acc :: Integer) w -> acc `shiftL` 8 + fromIntegral w) 0
+  where
+    toBytes 0 = []
+    toBytes x = fromIntegral (x .&. 0x1F) : toBytes (x `shiftR` 5)
+
 -- The helpers below are verbatim translations from the official highly magical
 -- Go implementation.
 
