@@ -14,10 +14,12 @@ import           Data.Aeson.Types hiding (Array, String)
 import           Data.Array
 import           Data.Array.ST
 import           Data.Array.Unsafe (unsafeFreeze)
+import           Data.Binary
 import           Data.Binary.Get
 import           Data.Binary.Put
 import           Data.Bifunctor
 import           Data.Bits
+import qualified Data.ByteString as BS
 import           Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Lazy as BSL
 import           Data.Char
@@ -77,6 +79,27 @@ instance FromJSONKey TypeID where
     Left err  -> fail $ show err
     Right tid -> pure tid
   {-# INLINE fromJSONKey #-}
+
+instance Binary TypeID where
+  put :: TypeID -> Put
+  put (TypeID prefix uuid) = do
+    put uuid
+    let encodedPrefix = concat5BitInts . fmap (subtract 96) . BS.unpack
+                      $ encodeUtf8 prefix
+    putWord8 $ fromIntegral $ length encodedPrefix
+    forM_ encodedPrefix putWord8
+  {-# INLINE put #-}
+
+  get :: Get TypeID
+  get = do
+    uuid          <- get
+    len           <- getWord8
+    encodedPrefix <- separate5BitInts <$> replicateM (fromIntegral len) getWord8
+    when (length encodedPrefix > 63) $ fail "Binary: Prefix too long"
+    when (any (liftM2 (&&) (< 1) (> 25)) encodedPrefix)
+         (fail "Binary: Invalid prefix")
+    pure $ TypeID (decodeUtf8 . BS.pack $ fmap (+ 96) encodedPrefix) uuid
+  {-# INLINE get #-}
 
 instance Hashable TypeID where
   hashWithSalt :: Int -> TypeID -> Int
@@ -437,29 +460,29 @@ suffixEncode bs = (alphabet !) <$> runST do
 suffixDecode :: ByteString -> ByteString
 suffixDecode bs = BSL.pack $ runST do
   dest <- newArray_ (0, 15) :: ST s (STUArray s Int Word8)
-  writeArray dest 0 $ ((table ! (bs `BSL.index` 0)) `shiftL` 5) .|. (table ! (bs `BSL.index` 1))
-  writeArray dest 1 $ ((table ! (bs `BSL.index` 2)) `shiftL` 3) .|. ((table ! (bs `BSL.index` 3)) `shiftR` 2)
-  writeArray dest 2 $ ((table ! (bs `BSL.index` 3)) `shiftL` 6) .|. ((table ! (bs `BSL.index` 4)) `shiftL` 1) .|. ((table ! (bs `BSL.index` 5)) `shiftR` 4)
-  writeArray dest 3 $ ((table ! (bs `BSL.index` 5)) `shiftL` 4) .|. ((table ! (bs `BSL.index` 6)) `shiftR` 1)
-  writeArray dest 4 $ ((table ! (bs `BSL.index` 6)) `shiftL` 7) .|. ((table ! (bs `BSL.index` 7)) `shiftL` 2) .|. ((table ! (bs `BSL.index` 8)) `shiftR` 3)
-  writeArray dest 5 $ ((table ! (bs `BSL.index` 8)) `shiftL` 5) .|. (table ! (bs `BSL.index` 9))
-  writeArray dest 6 $ ((table ! (bs `BSL.index` 10)) `shiftL` 3) .|. ((table ! (bs `BSL.index` 11)) `shiftR` 2)
-  writeArray dest 7 $ ((table ! (bs `BSL.index` 11)) `shiftL` 6) .|. ((table ! (bs `BSL.index` 12)) `shiftL` 1) .|. ((table ! (bs `BSL.index` 13)) `shiftR` 4)
-  writeArray dest 8 $ ((table ! (bs `BSL.index` 13)) `shiftL` 4) .|. ((table ! (bs `BSL.index` 14)) `shiftR` 1)
-  writeArray dest 9 $ ((table ! (bs `BSL.index` 14)) `shiftL` 7) .|. ((table ! (bs `BSL.index` 15)) `shiftL` 2) .|. ((table ! (bs `BSL.index` 16)) `shiftR` 3)
-  writeArray dest 10 $ ((table ! (bs `BSL.index` 16)) `shiftL` 5) .|. (table ! (bs `BSL.index` 17))
-  writeArray dest 11 $ ((table ! (bs `BSL.index` 18)) `shiftL` 3) .|. (table ! (bs `BSL.index` 19)) `shiftR` 2
-  writeArray dest 12 $ ((table ! (bs `BSL.index` 19)) `shiftL` 6) .|. ((table ! (bs `BSL.index` 20)) `shiftL` 1) .|. ((table ! (bs `BSL.index` 21)) `shiftR` 4)
-  writeArray dest 13 $ ((table ! (bs `BSL.index` 21)) `shiftL` 4) .|. ((table ! (bs `BSL.index` 22)) `shiftR` 1)
-  writeArray dest 14 $ ((table ! (bs `BSL.index` 22)) `shiftL` 7) .|. ((table ! (bs `BSL.index` 23)) `shiftL` 2) .|. ((table ! (bs `BSL.index` 24)) `shiftR` 3)
-  writeArray dest 15 $ ((table ! (bs `BSL.index` 24)) `shiftL` 5) .|. (table ! (bs `BSL.index` 25))
+  writeArray dest 0 $ ((base32Table ! (bs `BSL.index` 0)) `shiftL` 5) .|. (base32Table ! (bs `BSL.index` 1))
+  writeArray dest 1 $ ((base32Table ! (bs `BSL.index` 2)) `shiftL` 3) .|. ((base32Table ! (bs `BSL.index` 3)) `shiftR` 2)
+  writeArray dest 2 $ ((base32Table ! (bs `BSL.index` 3)) `shiftL` 6) .|. ((base32Table ! (bs `BSL.index` 4)) `shiftL` 1) .|. ((base32Table ! (bs `BSL.index` 5)) `shiftR` 4)
+  writeArray dest 3 $ ((base32Table ! (bs `BSL.index` 5)) `shiftL` 4) .|. ((base32Table ! (bs `BSL.index` 6)) `shiftR` 1)
+  writeArray dest 4 $ ((base32Table ! (bs `BSL.index` 6)) `shiftL` 7) .|. ((base32Table ! (bs `BSL.index` 7)) `shiftL` 2) .|. ((base32Table ! (bs `BSL.index` 8)) `shiftR` 3)
+  writeArray dest 5 $ ((base32Table ! (bs `BSL.index` 8)) `shiftL` 5) .|. (base32Table ! (bs `BSL.index` 9))
+  writeArray dest 6 $ ((base32Table ! (bs `BSL.index` 10)) `shiftL` 3) .|. ((base32Table ! (bs `BSL.index` 11)) `shiftR` 2)
+  writeArray dest 7 $ ((base32Table ! (bs `BSL.index` 11)) `shiftL` 6) .|. ((base32Table ! (bs `BSL.index` 12)) `shiftL` 1) .|. ((base32Table ! (bs `BSL.index` 13)) `shiftR` 4)
+  writeArray dest 8 $ ((base32Table ! (bs `BSL.index` 13)) `shiftL` 4) .|. ((base32Table ! (bs `BSL.index` 14)) `shiftR` 1)
+  writeArray dest 9 $ ((base32Table ! (bs `BSL.index` 14)) `shiftL` 7) .|. ((base32Table ! (bs `BSL.index` 15)) `shiftL` 2) .|. ((base32Table ! (bs `BSL.index` 16)) `shiftR` 3)
+  writeArray dest 10 $ ((base32Table ! (bs `BSL.index` 16)) `shiftL` 5) .|. (base32Table ! (bs `BSL.index` 17))
+  writeArray dest 11 $ ((base32Table ! (bs `BSL.index` 18)) `shiftL` 3) .|. (base32Table ! (bs `BSL.index` 19)) `shiftR` 2
+  writeArray dest 12 $ ((base32Table ! (bs `BSL.index` 19)) `shiftL` 6) .|. ((base32Table ! (bs `BSL.index` 20)) `shiftL` 1) .|. ((base32Table ! (bs `BSL.index` 21)) `shiftR` 4)
+  writeArray dest 13 $ ((base32Table ! (bs `BSL.index` 21)) `shiftL` 4) .|. ((base32Table ! (bs `BSL.index` 22)) `shiftR` 1)
+  writeArray dest 14 $ ((base32Table ! (bs `BSL.index` 22)) `shiftL` 7) .|. ((base32Table ! (bs `BSL.index` 23)) `shiftL` 2) .|. ((base32Table ! (bs `BSL.index` 24)) `shiftR` 3)
+  writeArray dest 15 $ ((base32Table ! (bs `BSL.index` 24)) `shiftL` 5) .|. (base32Table ! (bs `BSL.index` 25))
   elems <$> unsafeFreeze dest
 
 decodeUUID :: ByteString -> Either TypeIDError UUID
 decodeUUID bs = do
   unless (BSL.length bs == 26) $ Left TypeIDErrorUUIDError
   unless (bs `BSL.index` 0 <= 55) $ Left TypeIDErrorUUIDError
-  when (any ((== 0xFF) . (table !)) $ BSL.unpack bs) $ Left TypeIDErrorUUIDError
+  when (any ((== 0xFF) . (base32Table !)) $ BSL.unpack bs) $ Left TypeIDErrorUUIDError
   pure $ unsafeDecodeUUID bs
 {-# INLINE decodeUUID #-}
 
@@ -468,8 +491,8 @@ unsafeDecodeUUID
   = uncurry UUID . runGet (join (liftM2 (,)) getWord64be) . suffixDecode
 {-# INLINE unsafeDecodeUUID #-}
 
-table :: Array Word8 Word8
-table = listArray (0, 255)
+base32Table :: Array Word8 Word8
+base32Table = listArray (0, 255)
   [ 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
   , 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
   , 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
