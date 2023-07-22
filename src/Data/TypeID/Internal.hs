@@ -34,7 +34,6 @@ import           Data.TypeID.Error
 import           Data.UUID.Types.Internal (UUID(..))
 import qualified Data.UUID.Types.Internal as UUID
 import qualified Data.UUID.V7 as V7
-import           Data.Word
 
 -- | The constructor is not exposed to the public API to prevent generating
 -- invalid @TypeID@s.

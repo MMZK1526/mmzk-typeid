@@ -12,6 +12,7 @@ module Data.KindID.Internal where
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Aeson.Types hiding (String)
+import           Data.Binary
 import           Data.ByteString.Lazy (ByteString)
 import           Data.Hashable
 import           Data.Proxy
@@ -24,7 +25,6 @@ import           Data.TypeID.Internal (TypeID)
 import qualified Data.TypeID.Internal as TID
 import           Data.UUID.Types.Internal (UUID(..))
 import qualified Data.UUID.V7 as V7
-import           Data.Word
 import           GHC.TypeLits (symbolVal)
 
 -- | A TypeID with the prefix encoded at type level.
@@ -79,6 +79,20 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
       Left err  -> fail $ show err
       Right kid -> pure kid
     {-# INLINE fromJSONKey #-}
+
+instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+  => Binary (KindID prefix) where
+    put :: KindID prefix -> Put
+    put = put . toTypeID
+    {-# INLINE put #-}
+
+    get :: Get (KindID prefix)
+    get = do
+      tid <- get :: Get TypeID
+      case fromTypeID tid of
+        Nothing  -> fail "Binary: Prefix mismatch"
+        Just kid -> pure kid
+    {-# INLINE get #-}
 
 instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
   => Hashable (KindID prefix) where
