@@ -1,13 +1,17 @@
 # Revision history for mmzk-typeid
 
 
-## 0.3.1.0 -- Unreleased
+## 0.3.1.0 -- 2023-07-23
 
 * Add `parseStringM`, `parseTextM`, and `parseByteStringM` to `IDConv`.
   * Instead of returning an `Either`, they throw an exception when the input is
     invalid.
 
 * Add unsafe methods to `IDConv`.
+
+* Implement `Storable` and `Binary` instances for `TypeID` and `KindID`.
+  * These instances are experimental since the specification does not propose
+    any serialisation format.
 
 
 ## 0.3.0.1 -- 2023-07-18
