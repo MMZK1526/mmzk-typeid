@@ -117,11 +117,11 @@ instance Binary TypeID where
 -- | Similar to the 'Binary' instance, but the 'UUID' is stored in host endian.
 instance Storable TypeID where
   sizeOf :: TypeID -> Int
-  sizeOf _ = 58
+  sizeOf _ = 60
   {-# INLINE sizeOf #-}
 
   alignment :: TypeID -> Int
-  alignment _ = 8
+  alignment _ = 4
   {-# INLINE alignment #-}
 
   peek :: Ptr TypeID -> IO TypeID
@@ -129,7 +129,7 @@ instance Storable TypeID where
     uuid          <- peek (castPtr ptr :: Ptr UUID)
     len           <- fromIntegral <$> (peekByteOff ptr 16 :: IO Word8)
     encodedPrefix <- separate5BitInts
-                 <$> forM [1..len] \ix -> peekByteOff ptr (16 + ix) :: IO Word8
+                 <$> forM [1..len] \ix -> peekByteOff @Word8 ptr (16 + ix)
     when (length encodedPrefix > 63) $ fail "Storable: Prefix too long"
     when (any (liftM2 (&&) (< 1) (> 25)) encodedPrefix)
          (fail "Storable: Invalid prefix")
