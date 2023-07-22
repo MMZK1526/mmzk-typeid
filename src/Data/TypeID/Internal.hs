@@ -34,6 +34,7 @@ import           Data.TypeID.Error
 import           Data.UUID.Types.Internal (UUID(..))
 import qualified Data.UUID.Types.Internal as UUID
 import qualified Data.UUID.V7 as V7
+import           Foreign
 
 -- | The constructor is not exposed to the public API to prevent generating
 -- invalid @TypeID@s.
@@ -112,6 +113,37 @@ instance Binary TypeID where
          (fail "Binary: Invalid prefix")
     pure $ TypeID (decodeUtf8 . BS.pack $ fmap (+ 96) encodedPrefix) uuid
   {-# INLINE get #-}
+
+-- | Similar to the 'Binary' instance, but the 'UUID' is stored in host endian.
+instance Storable TypeID where
+  sizeOf :: TypeID -> Int
+  sizeOf _ = 58
+  {-# INLINE sizeOf #-}
+
+  alignment :: TypeID -> Int
+  alignment _ = 8
+  {-# INLINE alignment #-}
+
+  peek :: Ptr TypeID -> IO TypeID
+  peek ptr = do
+    uuid          <- peek (castPtr ptr :: Ptr UUID)
+    len           <- fromIntegral <$> (peekByteOff ptr 16 :: IO Word8)
+    encodedPrefix <- separate5BitInts
+                 <$> forM [1..len] \ix -> peekByteOff ptr (16 + ix) :: IO Word8
+    when (length encodedPrefix > 63) $ fail "Storable: Prefix too long"
+    when (any (liftM2 (&&) (< 1) (> 25)) encodedPrefix)
+         (fail "Storable: Invalid prefix")
+    pure $ TypeID (decodeUtf8 . BS.pack $ fmap (+ 96) encodedPrefix) uuid
+  {-# INLINE peek #-}
+
+  poke :: Ptr TypeID -> TypeID -> IO ()
+  poke ptr (TypeID prefix uuid) = do
+    poke (castPtr ptr) uuid
+    let encodedPrefix = concat5BitInts . fmap (subtract 96) . BS.unpack
+                      $ encodeUtf8 prefix
+    pokeByteOff @Word8 ptr 16 (fromIntegral $ length encodedPrefix)
+    zipWithM_ (pokeByteOff ptr . (+ 16)) [1..] encodedPrefix
+  {-# INLINE poke #-}
 
 instance Hashable TypeID where
   hashWithSalt :: Int -> TypeID -> Int
@@ -424,6 +456,7 @@ concat5BitInts
   where
     toBytes 0 = []
     toBytes x = fromIntegral (x .&. 0xFF) : toBytes (x `shiftR` 8)
+{-# INLINE concat5BitInts #-}
 
 separate5BitInts :: [Word8] -> [Word8]
 separate5BitInts
@@ -432,6 +465,7 @@ separate5BitInts
   where
     toBytes 0 = []
     toBytes x = fromIntegral (x .&. 0x1F) : toBytes (x `shiftR` 5)
+{-# INLINE separate5BitInts #-}
 
 -- The helpers below are verbatim translations from the official highly magical
 -- Go implementation.

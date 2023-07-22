@@ -25,6 +25,7 @@ import           Data.TypeID.Internal (TypeID)
 import qualified Data.TypeID.Internal as TID
 import           Data.UUID.Types.Internal (UUID(..))
 import qualified Data.UUID.V7 as V7
+import           Foreign
 import           GHC.TypeLits (symbolVal)
 
 -- | A TypeID with the prefix encoded at type level.
@@ -94,6 +95,29 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
         Nothing  -> fail "Binary: Prefix mismatch"
         Just kid -> pure kid
     {-# INLINE get #-}
+
+-- | Similar to the 'Binary' instance, but the 'UUID' is stored in host endian.
+instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+  => Storable (KindID prefix) where
+    sizeOf :: KindID prefix -> Int
+    sizeOf = sizeOf . toTypeID
+    {-# INLINE sizeOf #-}
+
+    alignment :: KindID prefix -> Int
+    alignment = alignment . toTypeID
+    {-# INLINE alignment #-}
+
+    peek :: Ptr (KindID prefix) -> IO (KindID prefix)
+    peek ptr = do
+      tid <- peek $ castPtr ptr :: IO TypeID
+      case fromTypeID tid of
+        Nothing  -> fail "Storable: Prefix mismatch"
+        Just kid -> pure kid
+    {-# INLINE peek #-}
+
+    poke :: Ptr (KindID prefix) -> KindID prefix -> IO ()
+    poke ptr = poke (castPtr ptr) . toTypeID
+    {-# INLINE poke #-}
 
 instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
   => Hashable (KindID prefix) where

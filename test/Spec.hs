@@ -20,6 +20,7 @@ import           Data.TypeID.Class
 import           Data.TypeID.Error
 import           Data.UUID.V7 (UUID)
 import qualified Data.UUID.V7 as V7
+import           Foreign
 import           GHC.Generics (Generic)
 import           Test.Hspec
 
@@ -261,3 +262,25 @@ main = do
           let bytes = runPut (put kid)
           let kid'  = runGet get bytes
           kid' `shouldBe` kid
+
+    describe "Storable instance for TypeID and KindID" do
+      it "has correct Storable instance for TypeID" do
+        tids <- withChecks $ genIDs @TypeID "abcdefghijklmnopqrstuvwxyz" 114
+        forM_ tids \tid -> do
+          ptr   <- new tid
+          tid'  <- peek ptr
+          tid' `shouldBe` tid
+          poke ptr tid'
+          tid'' <- peek ptr
+          tid'' `shouldBe` tid'
+          free ptr
+      it "has correct Storable instance for KindID" do
+        kids <- withChecks $ genIDs @(KindID "abcdefghijklmnopqrstuvwxyz") 114
+        forM_ kids \kid -> do
+          ptr   <- new kid
+          kid'  <- peek ptr
+          kid' `shouldBe` kid
+          poke ptr kid'
+          kid'' <- peek ptr
+          kid'' `shouldBe` kid'
+          free ptr
