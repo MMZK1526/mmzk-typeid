@@ -204,7 +204,7 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
     checkID_ _ = checkKindID
     {-# INLINE checkID_ #-}
 
-    checkIDWithEnv_ :: MonadIO m 
+    checkIDWithEnv_ :: MonadIO m
                     => Proxy (KindID prefix)
                     -> KindID prefix
                     -> m (Maybe TypeIDError)
@@ -351,7 +351,7 @@ parseTextM = text2IDM
 parseByteStringM :: ( ToPrefix prefix
                     , ValidPrefix (PrefixSymbol prefix)
                     , MonadIO m )
-                 => ByteString 
+                 => ByteString
                  -> m (KindID prefix)
 parseByteStringM = byteString2IDM
 {-# INLINE parseByteStringM #-}
