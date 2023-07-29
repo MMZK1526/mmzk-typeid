@@ -354,14 +354,13 @@ parseStringS str = case span (/= '_') str of
 parseText :: Text -> Either TypeIDError TypeID
 parseText text = case second T.uncons $ T.span (/= '_') text of
   ("", _)                    -> Left TypeIDExtraSeparator
-  (_, Nothing)               -> TypeID "" <$> decodeUUID bs
+  (_, Nothing)               -> TypeID ""
+                            <$> decodeUUID (BSL.fromStrict $ encodeUtf8 text)
   (prefix, Just (_, suffix)) -> do
     case checkPrefix prefix of
       Nothing  -> TypeID prefix
               <$> decodeUUID (BSL.fromStrict $ encodeUtf8 suffix)
       Just err -> Left err
-  where
-    bs = BSL.fromStrict $ encodeUtf8 text
 
 -- | Parse a 'TypeID' from its string representation as a lazy 'ByteString'. It
 -- is 'byteString2ID' with concrete type.
