@@ -33,9 +33,12 @@ module Data.TypeID.Class
 import           Control.Exception
 import           Control.Monad.IO.Class
 import           Data.ByteString.Lazy (ByteString)
+import qualified Data.ByteString.Lazy as BSL
 import           Data.Kind (Type)
 import           Data.Proxy
 import           Data.Text (Text)
+import qualified Data.Text as T
+import           Data.Text.Encoding
 import           Data.TypeID.Error
 import           Data.UUID.V7 (UUID)
 import           Data.Word
@@ -62,22 +65,34 @@ class IDType a where
 class IDConv a where
   -- | Parse the identifier from its 'String' representation.
   string2ID :: String -> Either TypeIDError a
+  string2ID = text2ID . T.pack
+  {-# INLINE string2ID #-}
 
   -- | Parse the identifier from its string representation as a strict 'Text'.
   text2ID :: Text -> Either TypeIDError a
+  text2ID = byteString2ID . BSL.fromStrict . encodeUtf8
+  {-# INLINE text2ID #-}
 
   -- | Parse the identifier from its string representation as a lazy
   -- 'ByteString'.
   byteString2ID :: ByteString -> Either TypeIDError a
+  byteString2ID = string2ID . T.unpack . decodeUtf8 . BSL.toStrict
+  {-# INLINE byteString2ID #-}
 
   -- | Pretty-print the identifier to a 'String'.
   id2String :: a -> String
+  id2String = T.unpack . id2Text
+  {-# INLINE id2String #-}
 
   -- | Pretty-print the identifier to a strict 'Text'.
   id2Text :: a -> Text
+  id2Text = decodeUtf8 . BSL.toStrict . id2ByteString
+  {-# INLINE id2Text #-}
 
   -- | Pretty-print the identifier to a lazy 'ByteString'.
   id2ByteString :: a -> ByteString
+  id2ByteString = BSL.fromStrict . encodeUtf8 . T.pack . id2String
+  {-# INLINE id2ByteString #-}
 
   -- | Parse the identifier from its 'String' representation, throwing an error
   -- when the parsing fails.
@@ -114,6 +129,15 @@ class IDConv a where
   unsafeByteString2ID :: ByteString -> a
   unsafeByteString2ID = either (error . show) id . byteString2ID
   {-# INLINE unsafeByteString2ID #-}
+  {-# MINIMAL string2ID, id2String
+            | string2ID, id2Text
+            | string2ID, id2ByteString
+            | text2ID, id2String
+            | text2ID, id2Text
+            | text2ID, id2ByteString
+            | byteString2ID, id2String
+            | byteString2ID, id2Text
+            | byteString2ID, id2ByteString #-}
 
 -- | Generate a new identifier with the given prefix.
 genID :: forall a m. (IDGen a, MonadIO m) => GenFunc (IDGenPrefix a) (m a)

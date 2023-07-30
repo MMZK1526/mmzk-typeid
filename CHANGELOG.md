@@ -1,6 +1,11 @@
 # Revision history for mmzk-typeid
 
 
+## UNLRELEASED CHANGES
+
+* Provide some default implementations for methods of `IDConv`.
+
+
 ## 0.3.1.0 -- 2023-07-23
 
 * Add `parseStringM`, `parseTextM`, and `parseByteStringM` to `IDConv`.
