@@ -1,11 +1,19 @@
 # Revision history for mmzk-typeid
 
 
-## UNLRELEASED CHANGES
+## 0.4.0.0
+
+
+* Support `TypeID` and `KindID` with other versions of `UUID` suffixes.
+  * By default, `TypeID` and `KindID` has a `UUID` suffix of version 7.
+  * The default `TypeID` and `KindID` is also exported via `Data.TypeID.V7` and
+    `Data.KindID.V7`.
+  * The constructor shapes have been changed, but it should not cause any
+    problems since they are not exported.
+
+* Remove deprecated `nil` functions.
 
 * Provide some default implementations for methods of `IDConv`.
-  
-* Remove deprecated `nil` functions.
 
 * Fix typoes in the Haddock.
 
