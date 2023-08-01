@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances #-}
 -- |
 -- Module      : Data.TypeID.Internal
 -- License     : MIT
@@ -34,33 +35,35 @@ import           Data.TypeID.Error
 import           Data.UUID.Types.Internal (UUID(..))
 import qualified Data.UUID.Types.Internal as UUID
 import qualified Data.UUID.V7 as V7
+import           Data.UUID.Versions
 import           Foreign
 
 -- | The constructor is not exposed to the public API to prevent generating
 -- invalid @TypeID@s.
-data TypeID = TypeID { _getPrefix :: Text
-                     , _getUUID   :: UUID }
+type TypeID = TypeID' 'V7
+
+data TypeID' (version :: UUIDVersion) = TypeID' Text UUID
   deriving (Eq, Ord)
 
-instance Show TypeID where
-  show :: TypeID -> String
+instance Show (TypeID' version) where
+  show :: TypeID' version -> String
   show = toString
   {-# INLINE show #-}
 
-instance Read TypeID where
-  readsPrec :: Int -> String -> [(TypeID, String)]
+instance Read (TypeID' version) where
+  readsPrec :: Int -> String -> [(TypeID' version, String)]
   readsPrec _ str = case parseStringS str of
-    Left _      -> []
-    Right (x,y) -> [(x, y)]
+    Left _       -> []
+    Right (x, y) -> [(x, y)]
   {-# INLINE readsPrec #-}
 
-instance ToJSON TypeID where
-  toJSON :: TypeID -> Value
+instance ToJSON (TypeID' version) where
+  toJSON :: TypeID' version -> Value
   toJSON = toJSON . toText
   {-# INLINE toJSON #-}
 
-instance FromJSON TypeID where
-  parseJSON :: Value -> Parser TypeID
+instance FromJSON (TypeID' version) where
+  parseJSON :: Value -> Parser (TypeID' version)
   parseJSON str = do
     s <- parseJSON str
     case parseText s of
@@ -68,13 +71,13 @@ instance FromJSON TypeID where
       Right tid -> pure tid
   {-# INLINE parseJSON #-}
 
-instance ToJSONKey TypeID where
-  toJSONKey :: ToJSONKeyFunction TypeID
+instance ToJSONKey (TypeID' version) where
+  toJSONKey :: ToJSONKeyFunction (TypeID' version)
   toJSONKey = toJSONKeyText toText
   {-# INLINE toJSONKey #-}
 
-instance FromJSONKey TypeID where
-  fromJSONKey :: FromJSONKeyFunction TypeID
+instance FromJSONKey (TypeID' version) where
+  fromJSONKey :: FromJSONKeyFunction (TypeID' version)
   fromJSONKey = FromJSONKeyTextParser \t -> case parseText t of
     Left err  -> fail $ show err
     Right tid -> pure tid
@@ -93,9 +96,9 @@ instance FromJSONKey TypeID where
 -- suffix 'UUID' is required. Because of this, the sorting order may be
 -- different from the string representation, but they are guaranteed to be the
 -- same if the same prefix is used.
-instance Binary TypeID where
-  put :: TypeID -> Put
-  put (TypeID prefix uuid) = do
+instance Binary (TypeID' version) where
+  put :: TypeID' version -> Put
+  put (TypeID' prefix uuid) = do
     put uuid
     let encodedPrefix = concat5BitInts . fmap (subtract 96) . BS.unpack
                       $ encodeUtf8 prefix
@@ -103,7 +106,7 @@ instance Binary TypeID where
     forM_ encodedPrefix putWord8
   {-# INLINE put #-}
 
-  get :: Get TypeID
+  get :: Get (TypeID' version)
   get = do
     uuid          <- get
     len           <- getWord8
@@ -111,20 +114,20 @@ instance Binary TypeID where
     when (length encodedPrefix > 63) $ fail "Binary: Prefix too long"
     when (any (liftM2 (&&) (< 1) (> 25)) encodedPrefix)
          (fail "Binary: Invalid prefix")
-    pure $ TypeID (decodeUtf8 . BS.pack $ fmap (+ 96) encodedPrefix) uuid
+    pure $ TypeID' (decodeUtf8 . BS.pack $ fmap (+ 96) encodedPrefix) uuid
   {-# INLINE get #-}
 
 -- | Similar to the 'Binary' instance, but the 'UUID' is stored in host endian.
-instance Storable TypeID where
-  sizeOf :: TypeID -> Int
+instance Storable (TypeID' version) where
+  sizeOf :: TypeID' version -> Int
   sizeOf _ = 60
   {-# INLINE sizeOf #-}
 
-  alignment :: TypeID -> Int
+  alignment :: TypeID' version -> Int
   alignment _ = 4
   {-# INLINE alignment #-}
 
-  peek :: Ptr TypeID -> IO TypeID
+  peek :: Ptr (TypeID' version) -> IO (TypeID' version)
   peek ptr = do
     uuid          <- peek (castPtr ptr :: Ptr UUID)
     len           <- fromIntegral <$> (peekByteOff ptr 16 :: IO Word8)
@@ -133,11 +136,11 @@ instance Storable TypeID where
     when (length encodedPrefix > 63) $ fail "Storable: Prefix too long"
     when (any (liftM2 (&&) (< 1) (> 25)) encodedPrefix)
          (fail "Storable: Invalid prefix")
-    pure $ TypeID (decodeUtf8 . BS.pack $ fmap (+ 96) encodedPrefix) uuid
+    pure $ TypeID' (decodeUtf8 . BS.pack $ fmap (+ 96) encodedPrefix) uuid
   {-# INLINE peek #-}
 
-  poke :: Ptr TypeID -> TypeID -> IO ()
-  poke ptr (TypeID prefix uuid) = do
+  poke :: Ptr (TypeID' version) -> TypeID' version -> IO ()
+  poke ptr (TypeID' prefix uuid) = do
     poke (castPtr ptr) uuid
     let encodedPrefix = concat5BitInts . fmap (subtract 96) . BS.unpack
                       $ encodeUtf8 prefix
@@ -145,66 +148,66 @@ instance Storable TypeID where
     zipWithM_ (pokeByteOff ptr . (+ 16)) [1..] encodedPrefix
   {-# INLINE poke #-}
 
-instance Hashable TypeID where
-  hashWithSalt :: Int -> TypeID -> Int
-  hashWithSalt salt (TypeID prefix uuid)
+instance Hashable (TypeID' version) where
+  hashWithSalt :: Int -> TypeID' version -> Int
+  hashWithSalt salt (TypeID' prefix uuid)
     = salt `hashWithSalt` prefix `hashWithSalt` uuid
   {-# INLINE hashWithSalt #-}
 
 -- | Get the prefix, 'UUID', and timestamp of a 'TypeID'.
-instance IDType TypeID where
-  getPrefix :: TypeID -> Text
-  getPrefix = _getPrefix
+instance IDType (TypeID' version) where
+  getPrefix :: TypeID' version -> Text
+  getPrefix (TypeID' prefix _) = prefix
   {-# INLINE getPrefix #-}
 
-  getUUID :: TypeID -> UUID
-  getUUID = _getUUID
+  getUUID :: TypeID' version -> UUID
+  getUUID (TypeID' _ uuid) = uuid
   {-# INLINE getUUID #-}
 
-  getTime :: TypeID -> Word64
+  getTime :: TypeID' version -> Word64
   getTime = V7.getTime . getUUID
   {-# INLINE getTime #-}
 
 -- | Conversion between 'TypeID' and 'String'/'Text'/'ByteString'.
-instance IDConv TypeID where
-  string2ID :: String -> Either TypeIDError TypeID
+instance IDConv (TypeID' version) where
+  string2ID :: String -> Either TypeIDError (TypeID' version)
   string2ID = parseString
   {-# INLINE string2ID #-}
 
-  text2ID :: Text -> Either TypeIDError TypeID
+  text2ID :: Text -> Either TypeIDError (TypeID' version)
   text2ID = parseText
   {-# INLINE text2ID #-}
 
-  byteString2ID :: ByteString -> Either TypeIDError TypeID
+  byteString2ID :: ByteString -> Either TypeIDError (TypeID' version)
   byteString2ID = parseByteString
   {-# INLINE byteString2ID #-}
 
-  id2String :: TypeID -> String
+  id2String :: TypeID' version -> String
   id2String = toString
   {-# INLINE id2String #-}
 
-  id2Text :: TypeID -> Text
+  id2Text :: TypeID' version -> Text
   id2Text = toText
   {-# INLINE id2Text #-}
 
-  id2ByteString :: TypeID -> ByteString
+  id2ByteString :: TypeID' version -> ByteString
   id2ByteString = toByteString
   {-# INLINE id2ByteString #-}
 
-  unsafeString2ID :: String -> TypeID
+  unsafeString2ID :: String -> TypeID' version
   unsafeString2ID = unsafeParseString
   {-# INLINE unsafeString2ID #-}
 
-  unsafeText2ID :: Text -> TypeID
+  unsafeText2ID :: Text -> TypeID' version
   unsafeText2ID = unsafeParseText
   {-# INLINE unsafeText2ID #-}
 
-  unsafeByteString2ID :: ByteString -> TypeID
+  unsafeByteString2ID :: ByteString -> TypeID' version
   unsafeByteString2ID = unsafeParseByteString
   {-# INLINE unsafeByteString2ID #-}
 
 -- | Generate 'TypeID's.
-instance IDGen TypeID where
+instance IDGen (TypeID' 'V7) where
   type IDGenPrefix TypeID = 'Just Text
 
   genID_ :: MonadIO m => Proxy TypeID -> Text -> m TypeID
@@ -272,7 +275,7 @@ unsafeGenTypeID = fmap head . (`unsafeGenTypeIDs` 1)
 -- | Generate a new 'TypeID' from a prefix based on statelesss 'UUID'v7, but
 -- without checking if the prefix is valid.
 unsafeGenTypeID' :: MonadIO m => Text -> m TypeID
-unsafeGenTypeID' prefix = TypeID prefix <$> V7.genUUID'
+unsafeGenTypeID' prefix = TypeID' prefix <$> V7.genUUID'
 {-# INLINE unsafeGenTypeID' #-}
 
 -- | Generate n 'TypeID's from a prefix, but without checking if the prefix is
@@ -284,25 +287,25 @@ unsafeGenTypeID' prefix = TypeID prefix <$> V7.genUUID'
 -- It is guaranteed that the first 32768 'TypeID's are generated at the same
 -- timestamp.
 unsafeGenTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID]
-unsafeGenTypeIDs prefix n = map (TypeID prefix) <$> V7.genUUIDs n
+unsafeGenTypeIDs prefix n = map (TypeID' prefix) <$> V7.genUUIDs n
 {-# INLINE unsafeGenTypeIDs #-}
 
 -- | The nil 'TypeID'.
 nilTypeID :: TypeID
-nilTypeID = TypeID "" UUID.nil
+nilTypeID = TypeID' "" UUID.nil
 {-# INLINE nilTypeID #-}
 {-# DEPRECATED nilTypeID "Will be removed in the next major release." #-}
 
 -- | Obtain a 'TypeID' from a prefix and a 'UUID'.
-decorateTypeID :: Text -> UUID -> Either TypeIDError TypeID
+decorateTypeID :: Text -> UUID -> Either TypeIDError (TypeID' version)
 decorateTypeID prefix uuid = case checkPrefix prefix of
-  Nothing  -> Right $ TypeID prefix uuid
+  Nothing  -> Right $ TypeID' prefix uuid
   Just err -> Left err
 {-# INLINE decorateTypeID #-}
 
 -- | Pretty-print a 'TypeID'. It is 'id2String' with concrete type.
-toString :: TypeID -> String
-toString (TypeID prefix (UUID w1 w2)) = if T.null prefix
+toString :: TypeID' version -> String
+toString (TypeID' prefix (UUID w1 w2)) = if T.null prefix
   then suffixEncode bs
   else T.unpack prefix ++ "_" ++ suffixEncode bs
   where
@@ -311,8 +314,8 @@ toString (TypeID prefix (UUID w1 w2)) = if T.null prefix
 
 -- | Pretty-print a 'TypeID' to strict 'Text'. It is 'id2Text' with concrete
 -- type.
-toText :: TypeID -> Text
-toText (TypeID prefix (UUID w1 w2)) = if T.null prefix
+toText :: TypeID' version -> Text
+toText (TypeID' prefix (UUID w1 w2)) = if T.null prefix
   then T.pack (suffixEncode bs)
   else prefix <> "_" <> T.pack (suffixEncode bs)
   where
@@ -321,57 +324,57 @@ toText (TypeID prefix (UUID w1 w2)) = if T.null prefix
 
 -- | Pretty-print a 'TypeID' to lazy 'ByteString'. It is 'id2ByteString' with
 -- concrete type.
-toByteString :: TypeID -> ByteString
+toByteString :: TypeID' version -> ByteString
 toByteString = fromString . toString
 {-# INLINE toByteString #-}
 
 -- | Parse a 'TypeID' from its 'String' representation. It is 'string2ID' with
 -- concrete type.
-parseString :: String -> Either TypeIDError TypeID
+parseString :: String -> Either TypeIDError (TypeID' version)
 parseString str = case parseStringS str of
   Left err        -> Left err
   Right (tid, "") -> Right tid
   _               -> Left TypeIDErrorUUIDError
 {-# INLINE parseString #-}
 
-parseStringS :: String -> Either TypeIDError (TypeID, String)
+parseStringS :: String -> Either TypeIDError (TypeID' version, String)
 parseStringS str = case span (/= '_') str of
   ("", _)              -> Left TypeIDExtraSeparator
   (_, "")              -> do
     let (uuid, rem) = splitAt 26 str
         bs          = fromString uuid
-    (, rem) . TypeID "" <$> decodeUUID bs
+    (, rem) . TypeID' "" <$> decodeUUID bs
   (prefix, _ : suffix) -> do
     let prefix'     = T.pack prefix
         (uuid, rem) = splitAt 26 suffix
         bs          = fromString uuid
     case checkPrefix prefix' of
-      Nothing  -> (, rem) . TypeID prefix' <$> decodeUUID bs
+      Nothing  -> (, rem) . TypeID' prefix' <$> decodeUUID bs
       Just err -> Left err
 
 -- | Parse a 'TypeID' from its string representation as a strict 'Text'. It is
 -- 'text2ID' with concrete type.
-parseText :: Text -> Either TypeIDError TypeID
+parseText :: Text -> Either TypeIDError (TypeID' version)
 parseText text = case second T.uncons $ T.span (/= '_') text of
   ("", _)                    -> Left TypeIDExtraSeparator
-  (_, Nothing)               -> TypeID ""
+  (_, Nothing)               -> TypeID' ""
                             <$> decodeUUID (BSL.fromStrict $ encodeUtf8 text)
   (prefix, Just (_, suffix)) -> do
     case checkPrefix prefix of
-      Nothing  -> TypeID prefix
+      Nothing  -> TypeID' prefix
               <$> decodeUUID (BSL.fromStrict $ encodeUtf8 suffix)
       Just err -> Left err
 
 -- | Parse a 'TypeID' from its string representation as a lazy 'ByteString'. It
 -- is 'byteString2ID' with concrete type.
-parseByteString :: ByteString -> Either TypeIDError TypeID
+parseByteString :: ByteString -> Either TypeIDError (TypeID' version)
 parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
   ("", _)                    -> Left TypeIDExtraSeparator
-  (_, Nothing)               -> TypeID "" <$> decodeUUID bs
+  (_, Nothing)               -> TypeID' "" <$> decodeUUID bs
   (prefix, Just (_, suffix)) -> do
     let prefix' = decodeUtf8 $ BSL.toStrict prefix
     case checkPrefix prefix' of
-      Nothing  -> TypeID prefix' <$> decodeUUID suffix
+      Nothing  -> TypeID' prefix' <$> decodeUUID suffix
       Just err -> Left err
 
 -- | Parse a 'TypeID' from its 'String' representation, throwing an error when
@@ -407,7 +410,7 @@ checkPrefix prefix
 -- | Check if the prefix is valid and the suffix 'UUID' has the correct v7
 -- version and variant.
 checkTypeID :: TypeID -> Maybe TypeIDError
-checkTypeID (TypeID prefix uuid)
+checkTypeID (TypeID' prefix uuid)
   = msum [ checkPrefix prefix
          , TypeIDErrorUUIDError <$ guard (not $ V7.validate uuid) ]
 {-# INLINE checkTypeID #-}
@@ -415,36 +418,36 @@ checkTypeID (TypeID prefix uuid)
 -- | Similar to 'checkTypeID', but also checks if the suffix 'UUID' is
 -- generated in the past.
 checkTypeIDWithEnv :: MonadIO m => TypeID -> m (Maybe TypeIDError)
-checkTypeIDWithEnv tid@(TypeID _ uuid)
+checkTypeIDWithEnv tid@(TypeID' _ uuid)
   = fmap (checkTypeID tid `mplus`)
          ((TypeIDErrorUUIDError <$) . guard . not <$> V7.validateWithTime uuid)
 {-# INLINE checkTypeIDWithEnv #-}
 
 -- | Parse a 'TypeID' from its 'String' representation, but crashes when
 -- parsing fails.
-unsafeParseString :: String -> TypeID
+unsafeParseString :: String -> TypeID' version
 unsafeParseString str = case span (/= '_') str of
-  (_, "")              -> TypeID "" . unsafeDecodeUUID $ fromString str
-  (prefix, _ : suffix) -> TypeID (T.pack prefix)
+  (_, "")              -> TypeID' "" . unsafeDecodeUUID $ fromString str
+  (prefix, _ : suffix) -> TypeID' (T.pack prefix)
                         . unsafeDecodeUUID $ fromString suffix
 {-# INLINE unsafeParseString #-}
 
 -- | Parse a 'TypeID' from its string representation as a strict 'Text', but
 -- crashes when parsing fails.
-unsafeParseText :: Text -> TypeID
+unsafeParseText :: Text -> TypeID' version
 unsafeParseText text = case second T.uncons $ T.span (/= '_') text of
-  (_, Nothing)               -> TypeID "" . unsafeDecodeUUID
+  (_, Nothing)               -> TypeID' "" . unsafeDecodeUUID
                               . BSL.fromStrict $ encodeUtf8 text
-  (prefix, Just (_, suffix)) -> TypeID prefix . unsafeDecodeUUID
+  (prefix, Just (_, suffix)) -> TypeID' prefix . unsafeDecodeUUID
                               . BSL.fromStrict . encodeUtf8 $ suffix
 {-# INLINE unsafeParseText #-}
 
 -- | Parse a 'TypeID' from its string representation as a lazy 'ByteString',
 -- but crashes when parsing fails.
-unsafeParseByteString :: ByteString -> TypeID
+unsafeParseByteString :: ByteString -> TypeID' version
 unsafeParseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
-  (_, Nothing)               -> TypeID "" $ unsafeDecodeUUID bs
-  (prefix, Just (_, suffix)) -> TypeID (decodeUtf8 $ BSL.toStrict prefix)
+  (_, Nothing)               -> TypeID' "" $ unsafeDecodeUUID bs
+  (prefix, Just (_, suffix)) -> TypeID' (decodeUtf8 $ BSL.toStrict prefix)
                               . unsafeDecodeUUID $ suffix
 {-# INLINE unsafeParseByteString #-}
 

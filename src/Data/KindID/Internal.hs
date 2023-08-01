@@ -256,7 +256,7 @@ decorateKindID = KindID
 -- | Convert a 'KindID' to a 'TypeID'.
 toTypeID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
          => KindID prefix -> TypeID
-toTypeID kid = TID.TypeID (getPrefix kid) (getUUID kid)
+toTypeID kid = TID.TypeID' (getPrefix kid) (getUUID kid)
 {-# INLINE toTypeID #-}
 
 -- | Convert a 'TypeID' to a 'KindID'. If the actual prefix does not match
