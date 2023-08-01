@@ -390,7 +390,7 @@ checkPrefix prefix
 
 -- | Check if the prefix is valid and the suffix 'UUID' has the correct v7
 -- version and variant.
-checkTypeID :: TypeID' version -> Maybe TypeIDError
+checkTypeID :: TypeID' 'V7 -> Maybe TypeIDError
 checkTypeID (TypeID' prefix uuid)
   = msum [ checkPrefix prefix
          , TypeIDErrorUUIDError <$ guard (not $ V7.validate uuid) ]
@@ -398,7 +398,7 @@ checkTypeID (TypeID' prefix uuid)
 
 -- | Similar to 'checkTypeID', but also checks if the suffix 'UUID' is
 -- generated in the past.
-checkTypeIDWithEnv :: MonadIO m => TypeID' version -> m (Maybe TypeIDError)
+checkTypeIDWithEnv :: MonadIO m => TypeID' 'V7 -> m (Maybe TypeIDError)
 checkTypeIDWithEnv tid@(TypeID' _ uuid)
   = fmap (checkTypeID tid `mplus`)
          ((TypeIDErrorUUIDError <$) . guard . not <$> V7.validateWithTime uuid)

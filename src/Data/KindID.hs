@@ -34,10 +34,13 @@
 -- >   kindID <- genKindID @"user"
 -- >   ...
 --
+-- It is a re-export of "Data.KindID.V7".
+--
 module Data.KindID
   (
   -- * Data types
     KindID
+  , KindID'
   , getPrefix
   , getUUID
   , getTime
@@ -82,6 +85,7 @@ module Data.KindID
   , fromTypeID
   ) where
 
-import           Data.KindID.Internal
+import           Data.KindID.Internal (KindID')
+import           Data.KindID.V7
 import           Data.TypeID.Class
 import           Data.TypeID.V7 (TypeID)
