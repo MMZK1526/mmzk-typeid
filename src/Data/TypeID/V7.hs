@@ -1,3 +1,12 @@
+-- |
+-- Module      : Data.KindID
+-- License     : MIT
+-- Maintainer  : mmzk1526@outlook.com
+-- Portability : GHC
+--
+-- An implementation of the TypeID specification:
+-- https://github.com/jetpack-io/typeid.
+--
 module Data.TypeID.V7
   (
   -- * Data types
@@ -50,10 +59,13 @@ import           Data.ByteString.Lazy (ByteString)
 import           Data.Text (Text)
 import           Data.TypeID.Class
 import           Data.TypeID.Error
-import           Data.TypeID.Internal (TypeID)
 import qualified Data.TypeID.Internal as TID
 import           Data.UUID.Types (UUID)
+import           Data.UUID.Versions
 import           Data.Word
+
+-- | A type alias for the default 'TypeID' implementation with 'UUID'v7.
+type TypeID = TID.TypeID' 'V7
 
 -- | A type alias for 'TypeID'.
 type TypeIDV7 = TypeID

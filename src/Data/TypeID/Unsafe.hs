@@ -6,6 +6,8 @@
 --
 -- Unsafe 'TypeID' functions.
 --
+-- It is a re-export of "Data.TypeID.V7.Unsafe".
+--
 module Data.TypeID.Unsafe
   (
   -- * Unsafe 'TypeID' generation
@@ -23,4 +25,5 @@ module Data.TypeID.Unsafe
   ) where
 
 import           Data.TypeID.Class
+import           Data.TypeID.V7 (TypeID)
 import           Data.TypeID.V7.Unsafe

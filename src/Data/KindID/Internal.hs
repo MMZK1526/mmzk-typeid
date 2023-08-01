@@ -21,9 +21,9 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 import           Data.TypeID.Class
 import           Data.TypeID.Error
-import           Data.TypeID.Internal (TypeID)
 import qualified Data.TypeID.Internal as TID
 import           Data.UUID.Types.Internal (UUID(..))
+import           Data.TypeID.V7 (TypeID)
 import qualified Data.UUID.V7 as V7
 import           Foreign
 import           GHC.TypeLits (symbolVal)

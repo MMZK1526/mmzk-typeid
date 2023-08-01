@@ -1,3 +1,11 @@
+-- |
+-- Module      : Data.TypeID.Unsafe
+-- License     : MIT
+-- Maintainer  : mmzk1526@outlook.com
+-- Portability : GHC
+--
+-- Unsafe 'TypeID' functions.
+--
 module Data.TypeID.V7.Unsafe
   (
   -- * Unsafe 'TypeID' generation
@@ -18,8 +26,9 @@ import           Control.Monad.IO.Class
 import           Data.ByteString.Lazy (ByteString)
 import           Data.Text (Text)
 import           Data.TypeID.Class
-import           Data.TypeID.Internal (TypeID)
 import qualified Data.TypeID.Internal as TID
+import           Data.TypeID.V7 (TypeID)
+import           Data.UUID.Types.Internal (UUID)
 import           Data.Word
 
 -- | Generate a new 'TypeID' from a prefix, but without checking if the prefix

@@ -7,10 +7,13 @@
 -- An implementation of the TypeID specification:
 -- https://github.com/jetpack-io/typeid.
 --
+-- It is a re-export of "Data.TypeID.V7".
+--
 module Data.TypeID
   (
   -- * Data types
     TypeID
+  , TypeID'
   , getPrefix
   , getUUID
   , getTime
@@ -54,4 +57,5 @@ module Data.TypeID
   ) where
 
 import           Data.TypeID.Class
+import           Data.TypeID.Internal (TypeID')
 import           Data.TypeID.V7

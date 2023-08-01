@@ -26,7 +26,7 @@ data TypeIDError
     -- | From a `Data.KindID.KindID` conversion. The prefix doesn't match with
     -- the expected.
   | TypeIDErrorPrefixMismatch Text Text
-    -- | The 'Data.UUID.V7.UUID' suffix has errors.
+    -- | The 'Data.UUID.Types.Internal.UUID' suffix has errors.
   | TypeIDErrorUUIDError
   deriving (Eq, Ord)
 
