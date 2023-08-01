@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
-
 -- |
 -- Module      : Data.KindID
 -- License     : MIT
