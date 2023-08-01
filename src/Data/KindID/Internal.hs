@@ -31,8 +31,8 @@ import           GHC.TypeLits (symbolVal)
 
 -- | A TypeID with the prefix encoded at type level.
 --
--- It is dubbed 'KindID' because the prefix here is a data kind rather than a
--- type.
+-- It is dubbed 'Data.KindID.V7.KindID' because the prefix here is a data kind
+-- rather than a type.
 newtype KindID' (version :: UUIDVersion) prefix = KindID' UUID
   deriving (Eq, Ord)
 

@@ -21,4 +21,5 @@ module Data.KindID.Unsafe
   ) where
 
 import           Data.KindID.Internal
+import           Data.KindID.V7 (KindID)
 import           Data.TypeID.Class
