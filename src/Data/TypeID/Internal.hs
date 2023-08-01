@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
 -- |
 -- Module      : Data.TypeID.Internal
 -- License     : MIT
@@ -42,7 +41,7 @@ import           Foreign
 -- other than v7.
 -- 
 --  The constructor is not exposed to the public API to prevent generating
--- invalid @TypeID@s.
+-- invalid 'TypeID''s.
 data TypeID' (version :: UUIDVersion) = TypeID' Text UUID
   deriving (Eq, Ord)
 

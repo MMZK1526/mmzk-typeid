@@ -66,6 +66,7 @@ library
         BlockArguments
         ConstraintKinds
         DataKinds
+        FlexibleInstances
         InstanceSigs
         MultiWayIf
         OverloadedStrings
@@ -111,6 +112,7 @@ test-suite test
         BlockArguments
         ConstraintKinds
         DataKinds
+        FlexibleInstances
         InstanceSigs
         MultiWayIf
         OverloadedStrings
