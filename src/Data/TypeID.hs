@@ -15,7 +15,6 @@ module Data.TypeID
   , getUUID
   , getTime
   -- * 'TypeID' generation ('TypeID'-specific)
-  , nilTypeID
   , genTypeID
   , genTypeID'
   , genTypeIDs
@@ -55,4 +54,4 @@ module Data.TypeID
   ) where
 
 import           Data.TypeID.Class
-import           Data.TypeID.Internal
+import           Data.TypeID.V7

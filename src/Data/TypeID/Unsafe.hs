@@ -23,4 +23,4 @@ module Data.TypeID.Unsafe
   ) where
 
 import           Data.TypeID.Class
-import           Data.TypeID.Internal
+import           Data.TypeID.V7.Unsafe

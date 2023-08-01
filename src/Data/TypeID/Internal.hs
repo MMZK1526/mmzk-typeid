@@ -266,30 +266,6 @@ genTypeIDs prefix n = case checkPrefix prefix of
   Just err -> liftIO $ throwIO err
 {-# INLINE genTypeIDs #-}
 
--- | Generate a new 'TypeID' from a prefix, but without checking if the prefix
--- is valid.
-unsafeGenTypeID :: MonadIO m => Text -> m TypeID
-unsafeGenTypeID = fmap head . (`unsafeGenTypeIDs` 1)
-{-# INLINE unsafeGenTypeID #-}
-
--- | Generate a new 'TypeID' from a prefix based on statelesss 'UUID'v7, but
--- without checking if the prefix is valid.
-unsafeGenTypeID' :: MonadIO m => Text -> m TypeID
-unsafeGenTypeID' prefix = TypeID' prefix <$> V7.genUUID'
-{-# INLINE unsafeGenTypeID' #-}
-
--- | Generate n 'TypeID's from a prefix, but without checking if the prefix is
--- valid.
---
--- It tries its best to generate 'TypeID's at the same timestamp, but it may not
--- be possible if we are asking too many 'UUID's at the same time.
---
--- It is guaranteed that the first 32768 'TypeID's are generated at the same
--- timestamp.
-unsafeGenTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID]
-unsafeGenTypeIDs prefix n = map (TypeID' prefix) <$> V7.genUUIDs n
-{-# INLINE unsafeGenTypeIDs #-}
-
 -- | The nil 'TypeID'.
 nilTypeID :: TypeID
 nilTypeID = TypeID' "" UUID.nil
@@ -379,21 +355,21 @@ parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
 
 -- | Parse a 'TypeID' from its 'String' representation, throwing an error when
 -- the parsing fails. It is 'string2IDM' with concrete type.
-parseStringM :: MonadIO m => String -> m TypeID
+parseStringM :: MonadIO m => String -> m (TypeID' version)
 parseStringM = string2IDM
 {-# INLINE parseStringM #-}
 
 -- | Parse a 'TypeID' from its string representation as a strict 'Text',
 -- throwing an error when the parsing fails. It is 'text2IDM' with concrete
 -- type.
-parseTextM :: MonadIO m => Text -> m TypeID
+parseTextM :: MonadIO m => Text -> m (TypeID' version)
 parseTextM = text2IDM
 {-# INLINE parseTextM #-}
 
 -- | Parse a 'TypeID' from its string representation as a lazy 'ByteString',
 -- throwing an error when the parsing fails. It is 'byteString2IDM' with
 -- concrete type.
-parseByteStringM :: MonadIO m => ByteString -> m TypeID
+parseByteStringM :: MonadIO m => ByteString -> m (TypeID' version)
 parseByteStringM = byteString2IDM
 {-# INLINE parseByteStringM #-}
 
@@ -422,6 +398,30 @@ checkTypeIDWithEnv tid@(TypeID' _ uuid)
   = fmap (checkTypeID tid `mplus`)
          ((TypeIDErrorUUIDError <$) . guard . not <$> V7.validateWithTime uuid)
 {-# INLINE checkTypeIDWithEnv #-}
+
+-- | Generate a new 'TypeID' from a prefix, but without checking if the prefix
+-- is valid.
+unsafeGenTypeID :: MonadIO m => Text -> m TypeID
+unsafeGenTypeID = fmap head . (`unsafeGenTypeIDs` 1)
+{-# INLINE unsafeGenTypeID #-}
+
+-- | Generate a new 'TypeID' from a prefix based on statelesss 'UUID'v7, but
+-- without checking if the prefix is valid.
+unsafeGenTypeID' :: MonadIO m => Text -> m TypeID
+unsafeGenTypeID' prefix = TypeID' prefix <$> V7.genUUID'
+{-# INLINE unsafeGenTypeID' #-}
+
+-- | Generate n 'TypeID's from a prefix, but without checking if the prefix is
+-- valid.
+--
+-- It tries its best to generate 'TypeID's at the same timestamp, but it may not
+-- be possible if we are asking too many 'UUID's at the same time.
+--
+-- It is guaranteed that the first 32768 'TypeID's are generated at the same
+-- timestamp.
+unsafeGenTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID]
+unsafeGenTypeIDs prefix n = map (TypeID' prefix) <$> V7.genUUIDs n
+{-# INLINE unsafeGenTypeIDs #-}
 
 -- | Parse a 'TypeID' from its 'String' representation, but crashes when
 -- parsing fails.
