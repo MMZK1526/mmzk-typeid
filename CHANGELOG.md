@@ -4,6 +4,10 @@
 ## UNLRELEASED CHANGES
 
 * Provide some default implementations for methods of `IDConv`.
+  
+* Remove deprecated `nil` functions.
+
+* Fix typoes in the Haddock.
 
 
 ## 0.3.1.0 -- 2023-07-23

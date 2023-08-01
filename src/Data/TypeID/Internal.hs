@@ -38,7 +38,7 @@ import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
 import           Foreign
 
--- | This data type also supports 'Data.TypeID.TypeID's with 'UUID' versions
+-- | This data type also supports 'Data.TypeID.V7.TypeID's with 'UUID' versions
 -- other than v7.
 -- 
 --  The constructor is not exposed to the public API to prevent generating
@@ -254,7 +254,8 @@ genTypeID :: MonadIO m => Text -> m (TypeID' 'V7)
 genTypeID = fmap head . (`genTypeIDs` 1)
 {-# INLINE genTypeID #-}
 
--- | Generate a new 'TypeID'' from a prefix based on statelesss 'UUID'v7.
+-- | Generate a new 'Data.TypeID.V7.TypeID' from a prefix based on stateless
+-- 'UUID'v7.
 --
 -- See the documentation of 'V7.genUUID'' for more information.
 genTypeID' :: MonadIO m => Text -> m (TypeID' 'V7)
@@ -263,24 +264,19 @@ genTypeID' prefix = case checkPrefix prefix of
   Just err -> liftIO $ throwIO err
 {-# INLINE genTypeID' #-}
 
--- | Generate a list of 'TypeID's from a prefix.
+-- | Generate a list of 'Data.TypeID.V7.TypeID's from a prefix.
 --
--- It tries its best to generate 'TypeID's at the same timestamp, but it may not
--- be possible if we are asking too many 'UUID's at the same time.
+-- It tries its best to generate 'Data.TypeID.V7.TypeID's at the same timestamp,
+-- but it may not be possible if we are asking too many 'UUID's at the same
+-- time.
 --
--- It is guaranteed that the first 32768 'TypeID's are generated at the same
--- timestamp.
+-- It is guaranteed that the first 32768 'Data.TypeID.V7.TypeID's are generated
+-- at the same timestamp.
 genTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID' 'V7]
 genTypeIDs prefix n = case checkPrefix prefix of
   Nothing  -> unsafeGenTypeIDs prefix n
   Just err -> liftIO $ throwIO err
 {-# INLINE genTypeIDs #-}
-
--- | The nil 'TypeID'.
-nilTypeID :: (TypeID' 'V7)
-nilTypeID = TypeID' "" UUID.nil
-{-# INLINE nilTypeID #-}
-{-# DEPRECATED nilTypeID "Will be removed in the next major release." #-}
 
 -- | Obtain a 'TypeID'' from a prefix and a 'UUID'.
 decorateTypeID :: Text -> UUID -> Either TypeIDError (TypeID' version)
@@ -409,27 +405,27 @@ checkTypeIDWithEnv tid@(TypeID' _ uuid)
          ((TypeIDErrorUUIDError <$) . guard . not <$> V7.validateWithTime uuid)
 {-# INLINE checkTypeIDWithEnv #-}
 
--- | Generate a new 'Data.TypeID.TypeID' from a prefix, but without checking if
--- the prefix is valid.
+-- | Generate a new 'Data.TypeID.V7.TypeID' from a prefix, but without checking
+-- if the prefix is valid.
 unsafeGenTypeID :: MonadIO m => Text -> m (TypeID' 'V7)
 unsafeGenTypeID = fmap head . (`unsafeGenTypeIDs` 1)
 {-# INLINE unsafeGenTypeID #-}
 
--- | Generate a new 'Data.TypeID.TypeID' from a prefix based on stateless
+-- | Generate a new 'Data.TypeID.V7.TypeID' from a prefix based on stateless
 -- 'UUID'v7, but without checking if the prefix is valid.
 unsafeGenTypeID' :: MonadIO m => Text -> m (TypeID' V7)
 unsafeGenTypeID' prefix = TypeID' prefix <$> V7.genUUID'
 {-# INLINE unsafeGenTypeID' #-}
 
--- | Generate n 'Data.TypeID.TypeID's from a prefix, but without checking if the
--- prefix is valid.
+-- | Generate n 'Data.TypeID.V7.TypeID's from a prefix, but without checking if
+-- the prefix is valid.
 --
--- It tries its best to generate 'Data.TypeID.TypeID's at the same timestamp,
+-- It tries its best to generate 'Data.TypeID.V7.TypeID's at the same timestamp,
 -- but it may not be possible if we are asking too many 'UUID's at the same
 -- time.
 --
--- It is guaranteed that the first 32768 'Data.TypeID.TypeID's are generated at
--- the same timestamp.
+-- It is guaranteed that the first 32768 'Data.TypeID.V7.TypeID's are generated
+-- at the same timestamp.
 unsafeGenTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID' V7]
 unsafeGenTypeIDs prefix n = map (TypeID' prefix) <$> V7.genUUIDs n
 {-# INLINE unsafeGenTypeIDs #-}

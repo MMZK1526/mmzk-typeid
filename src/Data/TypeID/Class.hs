@@ -6,7 +6,7 @@
 -- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
--- A module with the APIs for any 'Data.TypeID.TypeID'-ish identifier type.
+-- A module with the APIs for any 'Data.TypeID.V7.TypeID'-ish identifier type.
 --
 -- These type classes are useful to define custom TypeID-ish identifier types.
 -- For example, if one wishes to remove the constraints on prefix, or use a
@@ -43,11 +43,11 @@ import           Data.TypeID.Error
 import           Data.UUID.V7 (UUID)
 import           Data.Word
 
--- | A constraint synonym for a 'Data.TypeID.TypeID'-ish identifier type that
+-- | A constraint synonym for a 'Data.TypeID.V7.TypeID'-ish identifier type that
 -- supports ID generation and string conversion.
 type TypeIDLike a = (IDType a, IDConv a, IDGen a)
 
--- | A type class for a 'Data.TypeID.TypeID'-ish identifier type, which has a
+-- | A type class for a 'Data.TypeID.V7.TypeID'-ish identifier type, which has a
 -- 'Text' prefix and a 'UUID' suffix.
 class IDType a where
   -- | Get the prefix of the identifier.
@@ -60,8 +60,8 @@ class IDType a where
   -- timestamp-based.
   getTime :: a -> Word64
 
--- | A type class for converting between a 'Data.TypeID.TypeID'-ish identifier
--- type and some string representations.
+-- | A type class for converting between a 'Data.TypeID.V7.TypeID'-ish
+-- identifier type and some string representations.
 class IDConv a where
   -- | Parse the identifier from its 'String' representation.
   string2ID :: String -> Either TypeIDError a
@@ -175,7 +175,7 @@ checkIDWithEnv :: forall a m. (IDGen a, MonadIO m) => a -> m (Maybe TypeIDError)
 checkIDWithEnv = checkIDWithEnv_ @a @m Proxy
 {-# INLINE checkIDWithEnv #-}
 
--- | A type class for generating 'Data.TypeID.TypeID'-ish identifiers.
+-- | A type class for generating 'Data.TypeID.V7.TypeID'-ish identifiers.
 --
 -- The methods in this type class are not directly used since each of them has
 -- a dummy 'Proxy' in order to compile. We implement the methods here and use

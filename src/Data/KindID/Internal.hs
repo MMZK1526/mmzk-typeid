@@ -241,12 +241,6 @@ genKindIDs :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
 genKindIDs n = fmap KindID <$> V7.genUUIDs n
 {-# INLINE genKindIDs #-}
 
--- | The nil 'KindID'.
-nilKindID :: KindID ""
-nilKindID = KindID V7.nil
-{-# INLINE nilKindID #-}
-{-# DEPRECATED nilKindID "Will be removed in the next major release." #-}
-
 -- | Obtain a 'KindID' from a prefix and a 'UUID'.
 decorateKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                => UUID -> KindID prefix

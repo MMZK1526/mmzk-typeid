@@ -18,6 +18,7 @@ import qualified Data.Text as T
 import           Data.TypeID
 import           Data.TypeID.Class
 import           Data.TypeID.Error
+import           Data.UUID.Types (nil)
 import           Data.UUID.V7 (UUID)
 import qualified Data.UUID.V7 as V7
 import           Foreign
@@ -114,7 +115,7 @@ main = do
       describe "can detect invalid prefix" do
         forM_ invalidPrefixes \(reason, prefix) -> it reason do
           genID @TypeID prefix `shouldThrow` anyTypeIDError
-          case decorate @TypeID prefix V7.nil of
+          case decorate @TypeID prefix nil of
             Left _  -> pure ()
             Right _ -> expectationFailure "Should not be able to decorate with invalid prefix"
       let invalidSuffixes = [ ("spaces", " ")

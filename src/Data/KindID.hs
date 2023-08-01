@@ -42,7 +42,6 @@ module Data.KindID
   , getUUID
   , getTime
   -- * 'KindID' generation ('KindID'-specific)
-  , nilKindID
   , genKindID
   , genKindID'
   , genKindIDs
