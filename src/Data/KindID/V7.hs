@@ -1,5 +1,5 @@
 -- |
--- Module      : Data.KindID
+-- Module      : Data.KindID.V7
 -- License     : MIT
 -- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC

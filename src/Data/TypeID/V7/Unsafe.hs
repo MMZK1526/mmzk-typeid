@@ -1,5 +1,5 @@
 -- |
--- Module      : Data.TypeID.Unsafe
+-- Module      : Data.TypeID.V7.Unsafe
 -- License     : MIT
 -- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
