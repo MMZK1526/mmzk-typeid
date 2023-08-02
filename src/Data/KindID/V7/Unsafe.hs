@@ -67,4 +67,3 @@ unsafeFromTypeID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                  => TypeID' version -> KindID' version prefix
 unsafeFromTypeID = KID.unsafeFromTypeID
 {-# INLINE unsafeFromTypeID #-}
-
