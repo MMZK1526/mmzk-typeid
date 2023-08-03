@@ -39,6 +39,8 @@ import qualified Data.ByteString.Lazy as BSL
 import           Data.IORef
 import           Data.Time.Clock.POSIX
 import           Data.UUID.Types.Internal
+
+import           Data.UUID.Versions
 import           System.Entropy
 import           System.IO.Unsafe (unsafePerformIO)
 
@@ -109,8 +111,7 @@ genUUIDs n = liftIO do
 
 -- | Validate the version and variant of the 'UUID'v7.
 validate :: UUID -> Bool
-validate (UUID w1 w2)
-  = (w1 `shiftR` 12) .&. 0xF == 0x7 && (w2 `shiftR` 62) .&. 0x3 == 0x2
+validate = flip validateWithVersion V7
 {-# INLINE validate #-}
 
 -- | Validate the version and variant of the 'UUID'v7 as well as its timestamp
