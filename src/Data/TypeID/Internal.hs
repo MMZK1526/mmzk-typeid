@@ -33,13 +33,15 @@ import           Data.TypeID.Class
 import           Data.TypeID.Error
 import           Data.UUID.Types.Internal (UUID(..))
 import qualified Data.UUID.Types.Internal as UUID
+import qualified Data.UUID.V4 as V4
 import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
+import           System.Random
 import           Foreign
 
 -- | This data type also supports 'Data.TypeID.V7.TypeID's with 'UUID' versions
 -- other than v7.
--- 
+--
 --  The constructor is not exposed to the public API to prevent generating
 -- invalid 'TypeID''s.
 data TypeID' (version :: UUIDVersion) = TypeID' Text UUID
@@ -244,7 +246,7 @@ instance IDGen (TypeID' 'V7) where
   checkIDWithEnv_ _ = checkTypeIDWithEnv
   {-# INLINE checkIDWithEnv_ #-}
 
--- | Generate a new 'TypeID'' from a prefix.
+-- | Generate a new 'Data.TypeID.V7.TypeID' from a prefix.
 --
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
 -- namely if it's longer than 63 characters or if it contains characters other
@@ -276,6 +278,30 @@ genTypeIDs prefix n = case checkPrefix prefix of
   Nothing  -> unsafeGenTypeIDs prefix n
   Just err -> liftIO $ throwIO err
 {-# INLINE genTypeIDs #-}
+
+-- | Generate a new 'TypeID'' ''V4' from a prefix.
+--
+-- It throws a 'TypeIDError' if the prefix does not match the specification,
+-- namely if it's longer than 63 characters or if it contains characters other
+-- than lowercase latin letters.
+genTypeIDV4 :: MonadIO m => Text -> m (TypeID' 'V4)
+genTypeIDV4 prefix = case checkPrefix prefix of
+  Nothing  -> unsafeGenTypeIDV4 prefix
+  Just err -> liftIO $ throwIO err
+{-# INLINE genTypeIDV4 #-}
+
+-- | Generate a new 'TypeID'' ''V4' from a prefix using insecure 'UUID'v4.
+genTypeIDV4' :: MonadIO m => Text -> m (TypeID' 'V4)
+genTypeIDV4' prefix = case checkPrefix prefix of
+  Nothing  -> unsafeGenTypeIDV4' prefix
+  Just err -> liftIO $ throwIO err
+{-# INLINE genTypeIDV4' #-}
+
+genTypeIDsV4 :: MonadIO m => Text -> Word16 -> m [TypeID' 'V4]
+genTypeIDsV4 prefix n = case checkPrefix prefix of
+  Nothing  -> unsafeGenTypeIDsV4 prefix n
+  Just err -> liftIO $ throwIO err
+{-# INLINE genTypeIDsV4 #-}
 
 -- | Obtain a 'TypeID'' from a prefix and a 'UUID'.
 decorateTypeID :: Text -> UUID -> Either TypeIDError (TypeID' version)
@@ -410,11 +436,23 @@ unsafeGenTypeID :: MonadIO m => Text -> m (TypeID' 'V7)
 unsafeGenTypeID = fmap head . (`unsafeGenTypeIDs` 1)
 {-# INLINE unsafeGenTypeID #-}
 
+-- | Generate a new 'TypeID'' ''V4' from a prefix, but without checking if the
+-- prefix is valid.
+unsafeGenTypeIDV4 :: MonadIO m => Text -> m (TypeID' 'V4)
+unsafeGenTypeIDV4 prefix = TypeID' prefix <$> liftIO V4.nextRandom
+{-# INLINE unsafeGenTypeIDV4 #-}
+
 -- | Generate a new 'Data.TypeID.V7.TypeID' from a prefix based on stateless
 -- 'UUID'v7, but without checking if the prefix is valid.
 unsafeGenTypeID' :: MonadIO m => Text -> m (TypeID' V7)
 unsafeGenTypeID' prefix = TypeID' prefix <$> V7.genUUID'
 {-# INLINE unsafeGenTypeID' #-}
+
+-- | Generate a new 'TypeID'' ''V4' from a prefix using insecure 'UUID'v4, but
+-- without checking if the prefix is valid.
+unsafeGenTypeIDV4' :: MonadIO m => Text -> m (TypeID' V4)
+unsafeGenTypeIDV4' prefix = TypeID' prefix <$> liftIO randomIO
+{-# INLINE unsafeGenTypeIDV4' #-}
 
 -- | Generate n 'Data.TypeID.V7.TypeID's from a prefix, but without checking if
 -- the prefix is valid.
@@ -428,6 +466,13 @@ unsafeGenTypeID' prefix = TypeID' prefix <$> V7.genUUID'
 unsafeGenTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID' V7]
 unsafeGenTypeIDs prefix n = map (TypeID' prefix) <$> V7.genUUIDs n
 {-# INLINE unsafeGenTypeIDs #-}
+
+-- | Generate n 'TypeID'' ''V4's from a prefix, but without checking if the
+-- prefix is valid.
+unsafeGenTypeIDsV4 :: MonadIO m => Text -> Word16 -> m [TypeID' V4]
+unsafeGenTypeIDsV4 prefix n
+  = map (TypeID' prefix) <$> replicateM (fromIntegral n) randomIO
+{-# INLINE unsafeGenTypeIDsV4 #-}
 
 -- | Parse a 'TypeID'' from its 'String' representation, but crashes when
 -- parsing fails.
