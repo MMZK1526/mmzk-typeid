@@ -27,6 +27,7 @@ toInt V1 = 1
 toInt V4 = 4
 toInt V5 = 5
 toInt V7 = 7
+{-# INLINE toInt #-}
 
 -- | Validate the given 'UUID' with the given 'UUIDVersion'.
 --

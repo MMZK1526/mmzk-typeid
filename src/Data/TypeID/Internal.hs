@@ -422,6 +422,14 @@ checkTypeID (TypeID' prefix uuid)
          , TypeIDErrorUUIDError <$ guard (not $ V7.validate uuid) ]
 {-# INLINE checkTypeID #-}
 
+-- | Check if the prefix is valid and the suffix 'UUID' has the correct v4
+-- version and variant.
+checkTypeIDV4 :: TypeID' 'V4 -> Maybe TypeIDError
+checkTypeIDV4 (TypeID' prefix uuid)
+  = msum [ checkPrefix prefix
+         , TypeIDErrorUUIDError <$ guard (not $ validateWithVersion uuid V4) ]
+{-# INLINE checkTypeIDV4 #-}
+
 -- | Similar to 'checkTypeID', but also checks if the suffix 'UUID' is
 -- generated in the past.
 checkTypeIDWithEnv :: MonadIO m => TypeID' 'V7 -> m (Maybe TypeIDError)
