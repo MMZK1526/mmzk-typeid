@@ -208,7 +208,7 @@ instance IDConv (TypeID' version) where
   unsafeByteString2ID = unsafeParseByteString
   {-# INLINE unsafeByteString2ID #-}
 
--- | Generate FOOs.
+-- | Generate 'Data.TypeIDs.V7.TypeIDs'.
 instance IDGen (TypeID' 'V7) where
   type IDGenPrefix (TypeID' 'V7) = 'Just Text
 
@@ -245,6 +245,36 @@ instance IDGen (TypeID' 'V7) where
                   -> m (Maybe TypeIDError)
   checkIDWithEnv_ _ = checkTypeIDWithEnv
   {-# INLINE checkIDWithEnv_ #-}
+
+instance IDGen (TypeID' 'V4) where
+  type IDGenPrefix (TypeID' 'V4) = 'Just Text
+
+  genID_ :: MonadIO m => Proxy (TypeID' 'V4) -> Text -> m (TypeID' 'V4)
+  genID_ _ = genTypeIDV4
+  {-# INLINE genID_ #-}
+
+  genID'_ :: MonadIO m => Proxy (TypeID' 'V4) -> Text -> m (TypeID' 'V4)
+  genID'_ _ = genTypeIDV4'
+  {-# INLINE genID'_ #-}
+
+  genIDs_ :: MonadIO m
+          => Proxy (TypeID' 'V4)
+          -> Text
+          -> Word16
+          -> m [TypeID' 'V4]
+  genIDs_ _ = genTypeIDsV4
+  {-# INLINE genIDs_ #-}
+
+  decorate_ :: Proxy (TypeID' 'V4)
+            -> Text
+            -> UUID
+            -> Either TypeIDError (TypeID' 'V4)
+  decorate_ _ = decorateTypeID
+  {-# INLINE decorate_ #-}
+
+  checkID_ :: Proxy (TypeID' 'V4) -> TypeID' 'V4 -> Maybe TypeIDError
+  checkID_ _ = checkTypeIDV4
+  {-# INLINE checkID_ #-}
 
 -- | Generate a new 'Data.TypeID.V7.TypeID' from a prefix.
 --
