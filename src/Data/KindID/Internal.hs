@@ -24,10 +24,12 @@ import           Data.TypeID.Internal (TypeID'(..))
 import qualified Data.TypeID.Internal as TID
 import           Data.UUID.Types.Internal (UUID(..))
 import           Data.TypeID.V7 (TypeID)
+import qualified Data.UUID.V4 as V4
 import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
 import           Foreign
 import           GHC.TypeLits (symbolVal)
+import           System.Random
 
 -- | A TypeID with the prefix encoded at type level.
 --
@@ -180,7 +182,7 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
     unsafeByteString2ID = unsafeParseByteString
     {-# INLINE unsafeByteString2ID #-}
 
--- | Generate 'KindID''s.
+-- | Generate 'Data.KindID.V7.KindID's.
 instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
   => IDGen (KindID' 'V7 prefix) where
     type IDGenPrefix (KindID' 'V7 prefix) = 'Nothing
@@ -193,7 +195,8 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
     genID'_ _ = genKindID'
     {-# INLINE genID'_ #-}
 
-    genIDs_ :: MonadIO m => Proxy (KindID' 'V7 prefix) -> Word16 -> m [KindID' 'V7 prefix]
+    genIDs_ :: MonadIO m
+            => Proxy (KindID' 'V7 prefix) -> Word16 -> m [KindID' 'V7 prefix]
     genIDs_ _ = genKindIDs
     {-# INLINE genIDs_ #-}
 
@@ -201,7 +204,9 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
     decorate_ _ = decorateKindID
     {-# INLINE decorate_ #-}
 
-    checkID_ :: Proxy (KindID' 'V7 prefix) -> KindID' 'V7 prefix -> Maybe TypeIDError
+    checkID_ :: Proxy (KindID' 'V7 prefix)
+             -> KindID' 'V7 prefix
+             -> Maybe TypeIDError
     checkID_ _ = checkKindID
     {-# INLINE checkID_ #-}
 
@@ -212,7 +217,35 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
     checkIDWithEnv_ _ = checkKindIDWithEnv
     {-# INLINE checkIDWithEnv_ #-}
 
--- | Generate a new 'KindID'' from a prefix.
+-- | Generate 'KindID'' ''V4's.
+instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+  => IDGen (KindID' 'V4 prefix) where
+    type IDGenPrefix (KindID' 'V4 prefix) = 'Nothing
+
+    genID_ :: MonadIO m => Proxy (KindID' 'V4 prefix) -> m (KindID' 'V4 prefix)
+    genID_ _ = genKindIDV4
+    {-# INLINE genID_ #-}
+
+    genID'_ :: MonadIO m => Proxy (KindID' 'V4 prefix) -> m (KindID' 'V4 prefix)
+    genID'_ _ = genKindIDV4'
+    {-# INLINE genID'_ #-}
+
+    genIDs_ :: MonadIO m
+            => Proxy (KindID' 'V4 prefix) -> Word16 -> m [KindID' 'V4 prefix]
+    genIDs_ _ = genKindIDsV4
+    {-# INLINE genIDs_ #-}
+
+    decorate_ :: Proxy (KindID' 'V4 prefix) -> UUID -> KindID' 'V4 prefix
+    decorate_ _ = decorateKindID
+    {-# INLINE decorate_ #-}
+
+    checkID_ :: Proxy (KindID' 'V4 prefix)
+             -> KindID' 'V4 prefix
+             -> Maybe TypeIDError
+    checkID_ _ = checkKindIDV4
+    {-# INLINE checkID_ #-}
+
+-- | Generate a new 'Data.KindID.V7.KindID' from a prefix.
 --
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
 -- namely if it's longer than 63 characters or if it contains characters other
@@ -243,6 +276,29 @@ genKindIDs :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
            => Word16 -> m [KindID' 'V7 prefix]
 genKindIDs n = fmap KindID' <$> V7.genUUIDs n
 {-# INLINE genKindIDs #-}
+
+-- | Generate a new 'KindID'' ''V4' from a prefix.
+--
+-- It throws a 'TypeIDError' if the prefix does not match the specification,
+-- namely if it's longer than 63 characters or if it contains characters other
+-- than lowercase latin letters.
+genKindIDV4 :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+            => m (KindID' 'V4 prefix)
+genKindIDV4 = KindID' <$> liftIO V4.nextRandom
+{-# INLINE genKindIDV4 #-}
+
+-- | Generate a new 'KindID'' ''V4' from a prefix with insecure 'UUID'v4.
+genKindIDV4' :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+             => m (KindID' 'V4 prefix)
+genKindIDV4' = KindID' <$> liftIO randomIO
+{-# INLINE genKindIDV4' #-}
+
+-- | Generate a list of 'Data.KindID.V4.KindID's from a prefix.
+genKindIDsV4 :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+             => Word16 -> m [KindID' 'V4 prefix]
+genKindIDsV4 n
+  = fmap KindID' <$> replicateM (fromIntegral n) (liftIO V4.nextRandom)
+{-# INLINE genKindIDsV4 #-}
 
 -- | Obtain a 'KindID'' from a prefix and a 'UUID'.
 decorateKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
@@ -369,6 +425,13 @@ checkKindIDWithEnv :: ( ToPrefix prefix
                    => KindID' 'V7 prefix -> m (Maybe TypeIDError)
 checkKindIDWithEnv = TID.checkTypeIDWithEnv . toTypeID
 {-# INLINE checkKindIDWithEnv #-}
+
+-- | Check if the prefix is valid and the suffix 'UUID' has the correct v4
+-- version and variant.
+checkKindIDV4 :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+              => KindID' 'V4 prefix -> Maybe TypeIDError
+checkKindIDV4 = TID.checkTypeIDV4 . toTypeID
+{-# INLINE checkKindIDV4 #-}
 
 -- | Convert a 'TypeID'' to a 'KindID''. If the actual prefix does not match
 -- with the expected one as defined by the type, it does not complain and
