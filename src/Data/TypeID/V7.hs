@@ -79,7 +79,7 @@ genTypeID :: MonadIO m => Text -> m TypeID
 genTypeID = TID.genTypeID
 {-# INLINE genTypeID #-}
 
--- | Generate a new 'TypeID' from a prefix based on statelesss 'UUID'v7.
+-- | Generate a new 'TypeID' from a prefix based on stateless 'UUID'v7.
 --
 -- See the documentation of 'V7.genUUID'' for more information.
 genTypeID' :: MonadIO m => Text -> m TypeID
@@ -102,7 +102,7 @@ decorateTypeID :: Text -> UUID -> Either TypeIDError TypeID
 decorateTypeID = TID.decorateTypeID
 {-# INLINE decorateTypeID #-}
 
--- | Check if the given prefix is a valid TypeID prefix.
+-- | Check if the given prefix is a valid 'TypeID' prefix.
 checkPrefix :: Text -> Maybe TypeIDError
 checkPrefix = TID.checkPrefix
 {-# INLINE checkPrefix #-}

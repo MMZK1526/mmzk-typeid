@@ -85,7 +85,7 @@ genKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
 genKindID = KID.genKindID
 {-# INLINE genKindID #-}
 
--- | Generate a new 'KindID' from a prefix based on statelesss 'UUID'v7.
+-- | Generate a new 'KindID' from a prefix based on stateless 'UUID'v7.
 --
 -- See the documentation of 'V7.genUUID'' for more information.
 genKindID' :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)

@@ -262,7 +262,7 @@ instance IDGen (TypeID' 'V4) where
           -> Text
           -> Word16
           -> m [TypeID' 'V4]
-  genIDs_ _ = genTypeIDsV4
+  genIDs_ _ = genTypeIDV4s
   {-# INLINE genIDs_ #-}
 
   decorate_ :: Proxy (TypeID' 'V4)
@@ -327,11 +327,11 @@ genTypeIDV4' prefix = case checkPrefix prefix of
   Just err -> liftIO $ throwIO err
 {-# INLINE genTypeIDV4' #-}
 
-genTypeIDsV4 :: MonadIO m => Text -> Word16 -> m [TypeID' 'V4]
-genTypeIDsV4 prefix n = case checkPrefix prefix of
-  Nothing  -> unsafeGenTypeIDsV4 prefix n
+genTypeIDV4s :: MonadIO m => Text -> Word16 -> m [TypeID' 'V4]
+genTypeIDV4s prefix n = case checkPrefix prefix of
+  Nothing  -> unsafeGenTypeIDV4s prefix n
   Just err -> liftIO $ throwIO err
-{-# INLINE genTypeIDsV4 #-}
+{-# INLINE genTypeIDV4s #-}
 
 -- | Obtain a 'TypeID'' from a prefix and a 'UUID'.
 decorateTypeID :: Text -> UUID -> Either TypeIDError (TypeID' version)
@@ -434,7 +434,7 @@ parseByteStringM :: MonadIO m => ByteString -> m (TypeID' version)
 parseByteStringM = byteString2IDM
 {-# INLINE parseByteStringM #-}
 
--- | Check if the given prefix is a valid TypeID prefix.
+-- | Check if the given prefix is a valid 'TypeID'' prefix.
 checkPrefix :: Text -> Maybe TypeIDError
 checkPrefix prefix
   | T.length prefix > 63 = Just $ TypeIDErrorPrefixTooLong (T.length prefix)
@@ -507,10 +507,10 @@ unsafeGenTypeIDs prefix n = map (TypeID' prefix) <$> V7.genUUIDs n
 
 -- | Generate n 'TypeID'' ''V4's from a prefix, but without checking if the
 -- prefix is valid.
-unsafeGenTypeIDsV4 :: MonadIO m => Text -> Word16 -> m [TypeID' V4]
-unsafeGenTypeIDsV4 prefix n
+unsafeGenTypeIDV4s :: MonadIO m => Text -> Word16 -> m [TypeID' V4]
+unsafeGenTypeIDV4s prefix n
   = map (TypeID' prefix) <$> replicateM (fromIntegral n) randomIO
-{-# INLINE unsafeGenTypeIDsV4 #-}
+{-# INLINE unsafeGenTypeIDV4s #-}
 
 -- | Parse a 'TypeID'' from its 'String' representation, but crashes when
 -- parsing fails.

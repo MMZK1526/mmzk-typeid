@@ -37,7 +37,7 @@ unsafeGenTypeID :: MonadIO m => Text -> m TypeID
 unsafeGenTypeID = TID.unsafeGenTypeID
 {-# INLINE unsafeGenTypeID #-}
 
--- | Generate a new 'TypeID' from a prefix based on statelesss 'UUID'v7, but
+-- | Generate a new 'TypeID' from a prefix based on stateless 'UUID'v7, but
 -- without checking if the prefix is valid.
 unsafeGenTypeID' :: MonadIO m => Text -> m TypeID
 unsafeGenTypeID' = TID.unsafeGenTypeID'
