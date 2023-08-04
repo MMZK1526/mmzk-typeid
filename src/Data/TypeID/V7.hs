@@ -4,7 +4,7 @@
 -- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
--- An implementation of the TypeID specification:
+-- An implementation of the 'TypeID' specification:
 -- https://github.com/jetpack-io/typeid.
 --
 module Data.TypeID.V7
@@ -148,7 +148,7 @@ parseText :: Text -> Either TypeIDError TypeID
 parseText = TID.parseText
 {-# INLINE parseText #-}
 
--- | Parse a 'TypeID' from its strict 'ByteString' representation. It is
+-- | Parse a 'TypeID' from its lazy 'ByteString' representation. It is
 -- 'byteString2ID' with concrete type.
 parseByteString :: ByteString -> Either TypeIDError TypeID
 parseByteString = TID.parseByteString
@@ -166,7 +166,7 @@ parseTextM :: MonadIO m => Text -> m TypeID
 parseTextM = TID.parseTextM
 {-# INLINE parseTextM #-}
 
--- | Parse a 'TypeID' from its strict 'ByteString' representation, throwing an
+-- | Parse a 'TypeID' from its lazy 'ByteString' representation, throwing an
 -- error when the parsing fails. It is 'byteString2IDM' with concrete type.
 parseByteStringM :: MonadIO m => ByteString -> m TypeID
 parseByteStringM = TID.parseByteStringM
