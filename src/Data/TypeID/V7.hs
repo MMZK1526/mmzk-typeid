@@ -130,7 +130,7 @@ toText :: TypeID -> Text
 toText = TID.toText
 {-# INLINE toText #-}
 
--- | Pretty-print a 'TypeID' to strict 'ByteString'. It is 'id2ByteString' with
+-- | Pretty-print a 'TypeID' to lazy 'ByteString'. It is 'id2ByteString' with
 -- concrete type.
 toByteString :: TypeID -> ByteString
 toByteString = TID.toByteString
@@ -142,14 +142,14 @@ parseString :: String -> Either TypeIDError TypeID
 parseString = TID.parseString
 {-# INLINE parseString #-}
 
--- | Parse a 'TypeID' from its strict 'Text' representation. It is 'text2ID'
--- with concrete type.
+-- | Parse a 'TypeID' from its string representation as a strict 'Text'. It is
+-- 'text2ID' with concrete type.
 parseText :: Text -> Either TypeIDError TypeID
 parseText = TID.parseText
 {-# INLINE parseText #-}
 
--- | Parse a 'TypeID' from its lazy 'ByteString' representation. It is
--- 'byteString2ID' with concrete type.
+-- | Parse a 'TypeID' from its string representation as a lazy 'ByteString'. It
+-- is 'byteString2ID' with concrete type.
 parseByteString :: ByteString -> Either TypeIDError TypeID
 parseByteString = TID.parseByteString
 {-# INLINE parseByteString #-}
@@ -160,14 +160,16 @@ parseStringM :: MonadIO m => String -> m TypeID
 parseStringM = TID.parseStringM
 {-# INLINE parseStringM #-}
 
--- | Parse a 'TypeID' from its strict 'Text' representation, throwing an error
--- when the parsing fails. It is 'text2IDM' with concrete type.
+-- | Parse a 'TypeID' from its string representation as a strict 'Text',
+-- throwing an error when the parsing fails. It is 'text2IDM' with concrete
+-- type.
 parseTextM :: MonadIO m => Text -> m TypeID
 parseTextM = TID.parseTextM
 {-# INLINE parseTextM #-}
 
--- | Parse a 'TypeID' from its lazy 'ByteString' representation, throwing an
--- error when the parsing fails. It is 'byteString2IDM' with concrete type.
+-- | Parse a 'TypeID' from its string representation as a lazy 'ByteString',
+-- throwing an error when the parsing fails. It is 'byteString2IDM' with
+-- concrete type.
 parseByteStringM :: MonadIO m => ByteString -> m TypeID
 parseByteStringM = TID.parseByteStringM
 {-# INLINE parseByteStringM #-}
