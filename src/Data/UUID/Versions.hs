@@ -19,6 +19,8 @@ import           Data.UUID.Types.Internal
 
 -- | The supported 'UUID' versions. These constructors are used as type-level
 -- tags for 'Data.TypeID.TypeID''.
+--
+-- 'V1' and 'V5' are not supported yet.
 data UUIDVersion = V1 | V4 | V5 | V7
   deriving (Eq, Ord, Bounded, Enum, Show)
 
