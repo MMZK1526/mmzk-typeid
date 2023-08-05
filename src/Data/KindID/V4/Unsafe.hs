@@ -8,11 +8,11 @@
 --
 module Data.KindID.V4.Unsafe
   (
-  -- * Unsafe 'KindID' decoding ('KindID'-specific)
+  -- * Unsafe 'KindIDV4' decoding ('KindIDV4'-specific)
     unsafeParseString
   , unsafeParseText
   , unsafeParseByteString
-  -- * Unsafe 'KindID' decoding (class methods)
+  -- * Unsafe 'KindIDV4' decoding (class methods)
   , unsafeString2ID
   , unsafeText2ID
   , unsafeByteString2ID
@@ -30,39 +30,39 @@ import           Data.TypeID.V4 (TypeIDV4)
 import           Data.Text (Text)
 import           Data.TypeID.Class
 
--- | Parse a 'KindID' from its 'String' representation, but does not behave
+-- | Parse a 'KindIDV4' from its 'String' representation, but does not behave
 -- correctly when parsing fails.
 --
 -- More specifically, if the prefix does not match, it will not complain and
--- produce the wrong 'KindID'. If there are other parse errors, it will crash.
+-- produce the wrong 'KindIDV4'. If there are other parse errors, it will crash.
 unsafeParseString :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                   => String -> KindIDV4 prefix
 unsafeParseString = KID.unsafeParseString
 {-# INLINE unsafeParseString #-}
 
--- | Parse a 'KindID' from its string representation as a strict 'Text', but
+-- | Parse a 'KindIDV4' from its string representation as a strict 'Text', but
 -- does not behave correctly when parsing fails.
 --
 -- More specifically, if the prefix does not match, it will not complain and
--- produce the wrong 'KindID'. If there are other parse errors, it will crash.
+-- produce the wrong 'KindIDV4'. If there are other parse errors, it will crash.
 unsafeParseText :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                 => Text -> KindIDV4 prefix
 unsafeParseText = KID.unsafeParseText
 {-# INLINE unsafeParseText #-}
 
--- | Parse a 'KindID' from its string representation as a lazy 'ByteString', but
--- does not behave correctly when parsing fails.
+-- | Parse a 'KindIDV4' from its string representation as a lazy 'ByteString',
+-- but does not behave correctly when parsing fails.
 --
 -- More specifically, if the prefix does not match, it will not complain and
--- produce the wrong 'KindID'. If there are other parse errors, it will crash.
+-- produce the wrong 'KindIDV4'. If there are other parse errors, it will crash.
 unsafeParseByteString :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                       => ByteString -> KindIDV4 prefix
 unsafeParseByteString = KID.unsafeParseByteString
 {-# INLINE unsafeParseByteString #-}
 
--- | Convert a 'TypeID'' to a 'KindID''. If the actual prefix does not match
+-- | Convert a 'TypeIDV4' to a 'KindIDV4'. If the actual prefix does not match
 -- with the expected one as defined by the type, it does not complain and
--- produces a wrong 'KindID''.
+-- produces a wrong 'KindIDV4'.
 unsafeFromTypeID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                  => TypeIDV4 -> KindIDV4 prefix
 unsafeFromTypeID = KID.unsafeFromTypeID

@@ -13,12 +13,11 @@ module Data.KindID.V4
   , getPrefix
   , getUUID
   , getTime
-  -- * 'KindID' generation ('KindIDV4'-specific)
+  -- * 'KindIDV4' generation ('KindIDV4'-specific)
   , genKindID
   , genKindID'
-  , genKindIDs
   , decorateKindID
-  -- * 'KindID' generation (class methods)
+  -- * 'KindIDV4' generation (class methods)
   , genID
   , genID'
   , genIDs
@@ -85,12 +84,6 @@ genKindID' :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
            => m (KindIDV4 prefix)
 genKindID' = KID.genKindIDV4'
 {-# INLINE genKindID' #-}
-
--- | Generate a list of 'KindIDV4's from a prefix.
-genKindIDs :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
-           => Word16 -> m [KindIDV4 prefix]
-genKindIDs = KID.genKindIDV4s
-{-# INLINE genKindIDs #-}
 
 -- | Obtain a 'KindIDV4' from a prefix and a 'UUID'.
 decorateKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))

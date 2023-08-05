@@ -12,11 +12,9 @@ module Data.TypeID.V4
     TypeIDV4
   , getPrefix
   , getUUID
-  , getTime
   -- * 'TypeIDV4' generation ('TypeIDV4'-specific)
   , genTypeID
   , genTypeID'
-  , genTypeIDs
   , decorateTypeID
   -- * 'TypeIDV4' generation (class methods)
   , genID
@@ -76,11 +74,6 @@ genTypeID = TID.genTypeIDV4
 genTypeID' :: MonadIO m => Text -> m TypeIDV4
 genTypeID' = TID.genTypeIDV4'
 {-# INLINE genTypeID' #-}
-
--- | Generate a list of 'TypeIDV4's from a prefix.
-genTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeIDV4]
-genTypeIDs = TID.genTypeIDV4s
-{-# INLINE genTypeIDs #-}
 
 -- | Obtain a 'TypeIDV4' from a prefix and a 'UUID'.
 decorateTypeID :: Text -> UUID -> Either TypeIDError TypeIDV4

@@ -232,7 +232,8 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
 
     genIDs_ :: MonadIO m
             => Proxy (KindID' 'V4 prefix) -> Word16 -> m [KindID' 'V4 prefix]
-    genIDs_ _ = genKindIDV4s
+    genIDs_ _ n
+      = fmap KindID' <$> replicateM (fromIntegral n) (liftIO V4.nextRandom)
     {-# INLINE genIDs_ #-}
 
     decorate_ :: Proxy (KindID' 'V4 prefix) -> UUID -> KindID' 'V4 prefix
@@ -292,13 +293,6 @@ genKindIDV4' :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
              => m (KindID' 'V4 prefix)
 genKindIDV4' = KindID' <$> liftIO randomIO
 {-# INLINE genKindIDV4' #-}
-
--- | Generate a list of 'Data.KindID.V4.KindID's from a prefix.
-genKindIDV4s :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
-             => Word16 -> m [KindID' 'V4 prefix]
-genKindIDV4s n
-  = fmap KindID' <$> replicateM (fromIntegral n) (liftIO V4.nextRandom)
-{-# INLINE genKindIDV4s #-}
 
 -- | Obtain a 'KindID'' from a prefix and a 'UUID'.
 decorateKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))

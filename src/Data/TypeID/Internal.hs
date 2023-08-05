@@ -262,7 +262,9 @@ instance IDGen (TypeID' 'V4) where
           -> Text
           -> Word16
           -> m [TypeID' 'V4]
-  genIDs_ _ = genTypeIDV4s
+  genIDs_ _ prefix n = case checkPrefix prefix of
+    Nothing  -> map (TypeID' prefix) <$> replicateM (fromIntegral n) randomIO
+    Just err -> liftIO $ throwIO err
   {-# INLINE genIDs_ #-}
 
   decorate_ :: Proxy (TypeID' 'V4)
@@ -326,12 +328,6 @@ genTypeIDV4' prefix = case checkPrefix prefix of
   Nothing  -> unsafeGenTypeIDV4' prefix
   Just err -> liftIO $ throwIO err
 {-# INLINE genTypeIDV4' #-}
-
-genTypeIDV4s :: MonadIO m => Text -> Word16 -> m [TypeID' 'V4]
-genTypeIDV4s prefix n = case checkPrefix prefix of
-  Nothing  -> unsafeGenTypeIDV4s prefix n
-  Just err -> liftIO $ throwIO err
-{-# INLINE genTypeIDV4s #-}
 
 -- | Obtain a 'TypeID'' from a prefix and a 'UUID'.
 decorateTypeID :: Text -> UUID -> Either TypeIDError (TypeID' version)
@@ -504,13 +500,6 @@ unsafeGenTypeIDV4' prefix = TypeID' prefix <$> liftIO randomIO
 unsafeGenTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID' V7]
 unsafeGenTypeIDs prefix n = map (TypeID' prefix) <$> V7.genUUIDs n
 {-# INLINE unsafeGenTypeIDs #-}
-
--- | Generate n 'TypeID'' ''V4's from a prefix, but without checking if the
--- prefix is valid.
-unsafeGenTypeIDV4s :: MonadIO m => Text -> Word16 -> m [TypeID' V4]
-unsafeGenTypeIDV4s prefix n
-  = map (TypeID' prefix) <$> replicateM (fromIntegral n) randomIO
-{-# INLINE unsafeGenTypeIDV4s #-}
 
 -- | Parse a 'TypeID'' from its 'String' representation, but crashes when
 -- parsing fails.

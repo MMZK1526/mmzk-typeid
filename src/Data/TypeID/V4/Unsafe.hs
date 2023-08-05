@@ -11,7 +11,6 @@ module Data.TypeID.V4.Unsafe
   -- * Unsafe 'TypeIDV4' generation
     unsafeGenTypeID
   , unsafeGenTypeID'
-  , unsafeGenTypeIDs
   -- * Unsafe decoding ('TypeIDV4'-specific)
   , unsafeParseString
   , unsafeParseText
@@ -29,7 +28,6 @@ import           Data.TypeID.Class
 import qualified Data.TypeID.Internal as TID
 import           Data.TypeID.V4 (TypeIDV4)
 import           Data.UUID.Types.Internal (UUID)
-import           Data.Word
 
 -- | Generate a new 'TypeIDV4' from a prefix, but without checking if the prefix
 -- is valid.
@@ -41,12 +39,6 @@ unsafeGenTypeID = TID.unsafeGenTypeIDV4
 unsafeGenTypeID' :: MonadIO m => Text -> m TypeIDV4
 unsafeGenTypeID' = TID.unsafeGenTypeIDV4'
 {-# INLINE unsafeGenTypeID' #-}
-
--- | Generate n 'TypeIDV4's from a prefix, but without checking if the prefix is
--- valid.
-unsafeGenTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeIDV4]
-unsafeGenTypeIDs = TID.unsafeGenTypeIDV4s
-{-# INLINE unsafeGenTypeIDs #-}
 
 -- | Parse a 'TypeIDV4' from its 'String' representation, but crashes when
 -- parsing fails.
