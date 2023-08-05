@@ -1,5 +1,5 @@
 -- |
--- Module      : Data.KindID.Unsafe
+-- Module      : Data.KindID.V7.Unsafe
 -- License     : MIT
 -- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
@@ -36,7 +36,7 @@ import           Data.TypeID.Class
 -- More specifically, if the prefix does not match, it will not complain and
 -- produce the wrong 'KindID'. If there are other parse errors, it will crash.
 unsafeParseString :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
-                  => String -> KindID' version prefix
+                  => String -> KindID prefix
 unsafeParseString = KID.unsafeParseString
 {-# INLINE unsafeParseString #-}
 
@@ -46,7 +46,7 @@ unsafeParseString = KID.unsafeParseString
 -- More specifically, if the prefix does not match, it will not complain and
 -- produce the wrong 'KindID'. If there are other parse errors, it will crash.
 unsafeParseText :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
-                => Text -> KindID' version prefix
+                => Text -> KindID prefix
 unsafeParseText = KID.unsafeParseText
 {-# INLINE unsafeParseText #-}
 
@@ -56,7 +56,7 @@ unsafeParseText = KID.unsafeParseText
 -- More specifically, if the prefix does not match, it will not complain and
 -- produce the wrong 'KindID'. If there are other parse errors, it will crash.
 unsafeParseByteString :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
-                      => ByteString -> KindID' version prefix
+                      => ByteString -> KindID prefix
 unsafeParseByteString = KID.unsafeParseByteString
 {-# INLINE unsafeParseByteString #-}
 
@@ -64,6 +64,6 @@ unsafeParseByteString = KID.unsafeParseByteString
 -- with the expected one as defined by the type, it does not complain and
 -- produces a wrong 'KindID''.
 unsafeFromTypeID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
-                 => TypeID' version -> KindID' version prefix
+                 => TypeID -> KindID prefix
 unsafeFromTypeID = KID.unsafeFromTypeID
 {-# INLINE unsafeFromTypeID #-}
