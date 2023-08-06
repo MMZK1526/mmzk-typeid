@@ -70,218 +70,220 @@ withChecks action = do
     Nothing -> pure tids
 
 main :: IO ()
-main = do
-  invalid   <- BSL.readFile "test/invalid.json" >>= throwDecode :: IO [TestData]
-  valid     <- BSL.readFile "test/valid.json" >>= throwDecode :: IO [TestData]
-  validUUID <- BSL.readFile "test/valid.json" >>= throwDecode :: IO [TestDataUUID]
+main = hspec do
+  v7Test
 
-  hspec do
-    describe "Generate TypeID" do
-      it "can generate TypeID with prefix" do
-        start <- V7.getEpochMilli
-        tid   <- withCheck $ genID @TypeID "mmzk"
-        getPrefix tid `shouldBe` "mmzk"
-        getTime tid `shouldSatisfy` \t -> t >= start
-      it "can generate TypeID without prefix" do
-        start <- V7.getEpochMilli
-        tid   <- withCheck $ genID @TypeID ""
-        getPrefix tid `shouldBe` ""
-        getTime tid `shouldSatisfy` \t -> t >= start
-      it "can generate TypeID with stateless UUIDv7" do
-        start <- V7.getEpochMilli
-        tid   <- withCheck $ genID' @TypeID "mmzk"
-        getPrefix tid `shouldBe` "mmzk"
-        getTime tid `shouldSatisfy` \t -> t >= start
-      it "can generate in batch with same timestamp and in ascending order" do
-        start <- V7.getEpochMilli
-        tids  <- withChecks $ genIDs @TypeID "mmzk" 1526
-        all ((== "mmzk") . getPrefix) tids `shouldBe` True
-        let timestamp = getTime $ head tids
-        all ((== timestamp) . getTime) tids `shouldBe` True
-        all (uncurry (<)) (zip tids $ tail tids) `shouldBe` True
-        timestamp `shouldSatisfy` \t -> t >= start
-      it "can parse TypeID from String" do
-        case string2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
-          Left err  -> expectationFailure $ "Parse error: " ++ show err
-          Right tid -> getPrefix tid `shouldBe` "mmzk"
+v7Test :: Spec
+v7Test = do
+  invalid   <- runIO (BSL.readFile "test/invalid.json" >>= throwDecode :: IO [TestData])
+  valid     <- runIO (BSL.readFile "test/valid.json" >>= throwDecode :: IO [TestData])
+  validUUID <- runIO (BSL.readFile "test/valid.json" >>= throwDecode :: IO [TestDataUUID])
+  describe "Generate TypeID" do
+    it "can generate TypeID with prefix" do
+      start <- V7.getEpochMilli
+      tid   <- withCheck $ genID @TypeID "mmzk"
+      getPrefix tid `shouldBe` "mmzk"
+      getTime tid `shouldSatisfy` \t -> t >= start
+    it "can generate TypeID without prefix" do
+      start <- V7.getEpochMilli
+      tid   <- withCheck $ genID @TypeID ""
+      getPrefix tid `shouldBe` ""
+      getTime tid `shouldSatisfy` \t -> t >= start
+    it "can generate TypeID with stateless UUIDv7" do
+      start <- V7.getEpochMilli
+      tid   <- withCheck $ genID' @TypeID "mmzk"
+      getPrefix tid `shouldBe` "mmzk"
+      getTime tid `shouldSatisfy` \t -> t >= start
+    it "can generate in batch with same timestamp and in ascending order" do
+      start <- V7.getEpochMilli
+      tids  <- withChecks $ genIDs @TypeID "mmzk" 1526
+      all ((== "mmzk") . getPrefix) tids `shouldBe` True
+      let timestamp = getTime $ head tids
+      all ((== timestamp) . getTime) tids `shouldBe` True
+      all (uncurry (<)) (zip tids $ tail tids) `shouldBe` True
+      timestamp `shouldSatisfy` \t -> t >= start
+    it "can parse TypeID from String" do
+      case string2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
+        Left err  -> expectationFailure $ "Parse error: " ++ show err
+        Right tid -> getPrefix tid `shouldBe` "mmzk"
 
-    describe "Parse TypeID" do
-      let invalidPrefixes = [ ("caps", "PREFIX")
-                            , ("numeric", "12323")
-                            , ("symbols", "pre.fix")
-                            , ("spaces", "  ")
-                            , ("long", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz")
-                            , ("ascii", "château") ]
-      describe "can detect invalid prefix" do
-        forM_ invalidPrefixes \(reason, prefix) -> it reason do
-          genID @TypeID prefix `shouldThrow` anyTypeIDError
-          case decorate @TypeID prefix nil of
-            Left _  -> pure ()
-            Right _ -> expectationFailure "Should not be able to decorate with invalid prefix"
-      let invalidSuffixes = [ ("spaces", " ")
-                            , ("short", "01234")
-                            , ("long", "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789")
-                            , ("caps", "00041061050R3GG28A1C60T3GF") -- Would be valid in lowercase
-                            , ("hyphens", "00041061050-3gg28a1-60t3gf")
-                            , ("crockford_ambiguous", "ooo41o61o5or3gg28a1c6ot3gi") -- Would be valid if we followed Crockford's substitution rules
-                            , ("symbols", "00041061050.3gg28a1_60t3gf")
-                            , ("wrong_alphabet", "ooooooiiiiiiuuuuuuulllllll") ]
-      describe "can detect invalid suffix" do
-        forM_ invalidSuffixes \(reason, suffix) -> it reason do
-          case string2ID @TypeID suffix of
-            Left _    -> pure ()
-            Right tid -> expectationFailure $ "Parsed TypeID: " ++ show tid
-
-    describe "Parse special values" do
-      let specialValues = [ ("nil", "00000000000000000000000000", "00000000-0000-0000-0000-000000000000")
-                          , ("one", "00000000000000000000000001", "00000000-0000-0000-0000-000000000001")
-                          , ("ten", "0000000000000000000000000a", "00000000-0000-0000-0000-00000000000a")
-                          , ("sixteen", "0000000000000000000000000g", "00000000-0000-0000-0000-000000000010")
-                          , ("thirty-two", "00000000000000000000000010", "00000000-0000-0000-0000-000000000020") ]
-      forM_ specialValues \(reason, tid, uuid) -> it reason do
-        case string2ID @TypeID tid of
-          Left err  -> expectationFailure $ "Parse error: " ++ show err
-          Right tid -> show (getUUID tid) `shouldBe` uuid
-
-    describe "TypeID valid JSON instances" do
-      it "Decode and then encode should be identity" do
-        tid  <- genID @TypeID "mmzk"
-        tid' <- genID @TypeID "foo"
-        let mapping = M.fromList [(tid, tid')]
-        let json    = encode mapping
-        decode json `shouldBe` Just mapping
-        fmap encode (decode @(Map TypeID TypeID) json) `shouldBe` Just json
-      describe "Valid JSON value" do
-        forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
-          case decode @TypeID (fromString $ show tid) of
-            Nothing  -> expectationFailure "Parse JSON failed!"
-            Just tid -> do
-              getPrefix tid `shouldBe` prefix
-              show (getUUID tid) `shouldBe` uuid
-      describe "Valid JSON key" do
-        forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
-          case decode @(Map TypeID Int) (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") of
-            Nothing      -> expectationFailure "Parse JSON failed!"
-            Just mapping -> do
-              let (tid, _) = M.elemAt 0 mapping
-              getPrefix tid `shouldBe` prefix
-              show (getUUID tid) `shouldBe` uuid
-
-    describe "TypeID invalid JSON instances" do
-      describe "Invalid JSON value" do
-        forM_ invalid \(TestData name tid _ _) -> it name do
-          case decode @TypeID (fromString $ show tid) of
-            Nothing  -> pure ()
-            Just tid -> expectationFailure $ "Parsed TypeID: " ++ show tid
-      describe "Invalid JSON key" do
-        forM_ invalid \(TestData name tid _ _) -> it name do
-          case decode @(Map TypeID Int) (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") of
-            Nothing  -> pure ()
-            Just tid -> expectationFailure "Invalid TypeID key shouldn't be parsed!"
-
-    describe "Test invalid.json" do
-      forM_ invalid \(TestData name tid _ _) -> it name do
-        case string2ID @TypeID tid of
+  describe "Parse TypeID" do
+    let invalidPrefixes = [ ("caps", "PREFIX")
+                          , ("numeric", "12323")
+                          , ("symbols", "pre.fix")
+                          , ("spaces", "  ")
+                          , ("long", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz")
+                          , ("ascii", "château") ]
+    describe "can detect invalid prefix" do
+      forM_ invalidPrefixes \(reason, prefix) -> it reason do
+        genID @TypeID prefix `shouldThrow` anyTypeIDError
+        case decorate @TypeID prefix nil of
+          Left _  -> pure ()
+          Right _ -> expectationFailure "Should not be able to decorate with invalid prefix"
+    let invalidSuffixes = [ ("spaces", " ")
+                          , ("short", "01234")
+                          , ("long", "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789")
+                          , ("caps", "00041061050R3GG28A1C60T3GF") -- Would be valid in lowercase
+                          , ("hyphens", "00041061050-3gg28a1-60t3gf")
+                          , ("crockford_ambiguous", "ooo41o61o5or3gg28a1c6ot3gi") -- Would be valid if we followed Crockford's substitution rules
+                          , ("symbols", "00041061050.3gg28a1_60t3gf")
+                          , ("wrong_alphabet", "ooooooiiiiiiuuuuuuulllllll") ]
+    describe "can detect invalid suffix" do
+      forM_ invalidSuffixes \(reason, suffix) -> it reason do
+        case string2ID @TypeID suffix of
           Left _    -> pure ()
           Right tid -> expectationFailure $ "Parsed TypeID: " ++ show tid
 
-    describe "Test valid.json (TypeID as literal)" do
+  describe "Parse special values" do
+    let specialValues = [ ("nil", "00000000000000000000000000", "00000000-0000-0000-0000-000000000000")
+                        , ("one", "00000000000000000000000001", "00000000-0000-0000-0000-000000000001")
+                        , ("ten", "0000000000000000000000000a", "00000000-0000-0000-0000-00000000000a")
+                        , ("sixteen", "0000000000000000000000000g", "00000000-0000-0000-0000-000000000010")
+                        , ("thirty-two", "00000000000000000000000010", "00000000-0000-0000-0000-000000000020") ]
+    forM_ specialValues \(reason, tid, uuid) -> it reason do
+      case string2ID @TypeID tid of
+        Left err  -> expectationFailure $ "Parse error: " ++ show err
+        Right tid -> show (getUUID tid) `shouldBe` uuid
+
+  describe "TypeID valid JSON instances" do
+    it "Decode and then encode should be identity" do
+      tid  <- genID @TypeID "mmzk"
+      tid' <- genID @TypeID "foo"
+      let mapping = M.fromList [(tid, tid')]
+      let json    = encode mapping
+      decode json `shouldBe` Just mapping
+      fmap encode (decode @(Map TypeID TypeID) json) `shouldBe` Just json
+    describe "Valid JSON value" do
       forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
-        case string2ID @TypeID tid of
-          Left err  -> expectationFailure $ "Parse error: " ++ show err
-          Right tid -> do
+        case decode @TypeID (fromString $ show tid) of
+          Nothing  -> expectationFailure "Parse JSON failed!"
+          Just tid -> do
+            getPrefix tid `shouldBe` prefix
+            show (getUUID tid) `shouldBe` uuid
+    describe "Valid JSON key" do
+      forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
+        case decode @(Map TypeID Int) (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") of
+          Nothing      -> expectationFailure "Parse JSON failed!"
+          Just mapping -> do
+            let (tid, _) = M.elemAt 0 mapping
             getPrefix tid `shouldBe` prefix
             show (getUUID tid) `shouldBe` uuid
 
-    describe "Test valid.json (TypeID as JSON)" do
-      forM_ validUUID \(TestDataUUID name tid prefix uuid) -> it name do
-        getPrefix tid `shouldBe` prefix
-        getUUID tid `shouldBe` uuid
+  describe "TypeID invalid JSON instances" do
+    describe "Invalid JSON value" do
+      forM_ invalid \(TestData name tid _ _) -> it name do
+        case decode @TypeID (fromString $ show tid) of
+          Nothing  -> pure ()
+          Just tid -> expectationFailure $ "Parsed TypeID: " ++ show tid
+    describe "Invalid JSON key" do
+      forM_ invalid \(TestData name tid _ _) -> it name do
+        case decode @(Map TypeID Int) (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") of
+          Nothing  -> pure ()
+          Just tid -> expectationFailure "Invalid TypeID key shouldn't be parsed!"
 
-    describe "Generate type-level TypeID (KindID) with 'Symbol' prefixes" do
-      it "can generate KindID with prefix" do
-        start <- V7.getEpochMilli
-        kid   <- withCheck $ genID @(KindID "mmzk")
-        getPrefix kid `shouldBe` "mmzk"
-        getTime kid `shouldSatisfy` \t -> start <= t
-      it "can generate KindID without prefix" do
-        start <- V7.getEpochMilli
-        kid   <- withCheck $ genID @(KindID "")
-        getPrefix kid `shouldBe` ""
-        getTime kid `shouldSatisfy` \t -> start <= t
-      it "can generate KindID with stateless UUID v7" do
-        start <- V7.getEpochMilli
-        kid   <- withCheck $ genID' @(KindID "mmzk")
-        getPrefix kid `shouldBe` "mmzk"
-        getTime kid `shouldSatisfy` \t -> start <= t
-      it "can generate in batch with same timestamp and in ascending order" do
-        start <- V7.getEpochMilli
-        kids  <- withChecks $ genIDs @(KindID "mmzk") 1526
-        all ((== "mmzk") . getPrefix) kids `shouldBe` True
-        let timestamp = getTime $ head kids
-        all ((== timestamp) . getTime) kids `shouldBe` True
-        all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
-        timestamp `shouldSatisfy` \t -> start <= t
-      it "can parse KindID from String" do
-        case string2ID @(KindID "mmzk") "mmzk_00041061050r3gg28a1c60t3gf" of
-          Left err  -> expectationFailure $ "Parse error: " ++ show err
-          Right kid -> getPrefix kid `shouldBe` "mmzk"
-      it "cannot parse KindID into wrong prefix" do
-        case string2ID @(KindID "foo") "mmzk_00041061050r3gg28a1c60t3gf" of
-          Left err  -> pure ()
-          Right kid -> expectationFailure $ "Parsed TypeID: " ++ show kid
+  describe "Test invalid.json" do
+    forM_ invalid \(TestData name tid _ _) -> it name do
+      case string2ID @TypeID tid of
+        Left _    -> pure ()
+        Right tid -> expectationFailure $ "Parsed TypeID: " ++ show tid
 
-    describe "Generate type-level TypeID with custom data kind prefixes" do
-      it "can generate TypeID with prefix" do
-          kid <- withCheck $ genID @(KindID 'Post)
-          getPrefix kid `shouldBe` "post"
-      it "can parse TypeID from String" do
-        case string2ID @(KindID User) "user_00041061050r3gg28a1c60t3gf" of
-          Left err  -> expectationFailure $ "Parse error: " ++ show err
-          Right kid -> getPrefix kid `shouldBe` "user"
-      it "cannot parse TypeID into wrong prefix" do
-        case string2ID @(KindID Comment) "user_00041061050r3gg28a1c60t3gf" of
-          Left err  -> pure ()
-          Right kid -> expectationFailure $ "Parsed TypeID: " ++ show kid
-      it "can generate in batch with same timestamp and in ascending order" do
-        kids <- withChecks $ genIDs @(KindID 'Comment) 1526
-        all ((== "comment") . getPrefix) kids `shouldBe` True
-        let timestamp = getTime $ head kids
-        all ((== timestamp) . getTime) kids `shouldBe` True
-        all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
+  describe "Test valid.json (TypeID as literal)" do
+    forM_ valid \(TestData name tid (Just prefix) (Just uuid)) -> it name do
+      case string2ID @TypeID tid of
+        Left err  -> expectationFailure $ "Parse error: " ++ show err
+        Right tid -> do
+          getPrefix tid `shouldBe` prefix
+          show (getUUID tid) `shouldBe` uuid
 
-    describe "Binary instance for TypeID and KindID" do
-      it "has correct binary instance for TypeID" do
-        tids <- withChecks $ genIDs @TypeID "abcdefghijklmnopqrstuvwxyz" 114
-        forM_ tids \tid -> do
-          let bytes = runPut (put tid)
-          let tid'  = runGet get bytes
-          tid' `shouldBe` tid
-      it "has correct binary instance for KindID" do
-        kids <- withChecks $ genIDs @(KindID "abcdefghijklmnopqrstuvwxyz") 114
-        forM_ kids \kid -> do
-          let bytes = runPut (put kid)
-          let kid'  = runGet get bytes
-          kid' `shouldBe` kid
+  describe "Test valid.json (TypeID as JSON)" do
+    forM_ validUUID \(TestDataUUID name tid prefix uuid) -> it name do
+      getPrefix tid `shouldBe` prefix
+      getUUID tid `shouldBe` uuid
 
-    describe "Storable instance for TypeID and KindID" do
-      it "has correct Storable instance for TypeID" do
-        tids <- withChecks $ genIDs @TypeID "abcdefghijklmnopqrstuvwxyz" 114
-        forM_ tids \tid -> do
-          ptr   <- new tid
-          tid'  <- peek ptr
-          tid' `shouldBe` tid
-          poke ptr tid'
-          tid'' <- peek ptr
-          tid'' `shouldBe` tid'
-          free ptr
-      it "has correct Storable instance for KindID" do
-        kids <- withChecks $ genIDs @(KindID "abcdefghijklmnopqrstuvwxyz") 114
-        forM_ kids \kid -> do
-          ptr   <- new kid
-          kid'  <- peek ptr
-          kid' `shouldBe` kid
-          poke ptr kid'
-          kid'' <- peek ptr
-          kid'' `shouldBe` kid'
-          free ptr
+  describe "Generate type-level TypeID (KindID) with 'Symbol' prefixes" do
+    it "can generate KindID with prefix" do
+      start <- V7.getEpochMilli
+      kid   <- withCheck $ genID @(KindID "mmzk")
+      getPrefix kid `shouldBe` "mmzk"
+      getTime kid `shouldSatisfy` \t -> start <= t
+    it "can generate KindID without prefix" do
+      start <- V7.getEpochMilli
+      kid   <- withCheck $ genID @(KindID "")
+      getPrefix kid `shouldBe` ""
+      getTime kid `shouldSatisfy` \t -> start <= t
+    it "can generate KindID with stateless UUID v7" do
+      start <- V7.getEpochMilli
+      kid   <- withCheck $ genID' @(KindID "mmzk")
+      getPrefix kid `shouldBe` "mmzk"
+      getTime kid `shouldSatisfy` \t -> start <= t
+    it "can generate in batch with same timestamp and in ascending order" do
+      start <- V7.getEpochMilli
+      kids  <- withChecks $ genIDs @(KindID "mmzk") 1526
+      all ((== "mmzk") . getPrefix) kids `shouldBe` True
+      let timestamp = getTime $ head kids
+      all ((== timestamp) . getTime) kids `shouldBe` True
+      all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
+      timestamp `shouldSatisfy` \t -> start <= t
+    it "can parse KindID from String" do
+      case string2ID @(KindID "mmzk") "mmzk_00041061050r3gg28a1c60t3gf" of
+        Left err  -> expectationFailure $ "Parse error: " ++ show err
+        Right kid -> getPrefix kid `shouldBe` "mmzk"
+    it "cannot parse KindID into wrong prefix" do
+      case string2ID @(KindID "foo") "mmzk_00041061050r3gg28a1c60t3gf" of
+        Left err  -> pure ()
+        Right kid -> expectationFailure $ "Parsed TypeID: " ++ show kid
+
+  describe "Generate type-level TypeID with custom data kind prefixes" do
+    it "can generate TypeID with prefix" do
+        kid <- withCheck $ genID @(KindID 'Post)
+        getPrefix kid `shouldBe` "post"
+    it "can parse TypeID from String" do
+      case string2ID @(KindID User) "user_00041061050r3gg28a1c60t3gf" of
+        Left err  -> expectationFailure $ "Parse error: " ++ show err
+        Right kid -> getPrefix kid `shouldBe` "user"
+    it "cannot parse TypeID into wrong prefix" do
+      case string2ID @(KindID Comment) "user_00041061050r3gg28a1c60t3gf" of
+        Left err  -> pure ()
+        Right kid -> expectationFailure $ "Parsed TypeID: " ++ show kid
+    it "can generate in batch with same timestamp and in ascending order" do
+      kids <- withChecks $ genIDs @(KindID 'Comment) 1526
+      all ((== "comment") . getPrefix) kids `shouldBe` True
+      let timestamp = getTime $ head kids
+      all ((== timestamp) . getTime) kids `shouldBe` True
+      all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
+
+  describe "Binary instance for TypeID and KindID" do
+    it "has correct binary instance for TypeID" do
+      tids <- withChecks $ genIDs @TypeID "abcdefghijklmnopqrstuvwxyz" 114
+      forM_ tids \tid -> do
+        let bytes = runPut (put tid)
+        let tid'  = runGet get bytes
+        tid' `shouldBe` tid
+    it "has correct binary instance for KindID" do
+      kids <- withChecks $ genIDs @(KindID "abcdefghijklmnopqrstuvwxyz") 114
+      forM_ kids \kid -> do
+        let bytes = runPut (put kid)
+        let kid'  = runGet get bytes
+        kid' `shouldBe` kid
+
+  describe "Storable instance for TypeID and KindID" do
+    it "has correct Storable instance for TypeID" do
+      tids <- withChecks $ genIDs @TypeID "abcdefghijklmnopqrstuvwxyz" 114
+      forM_ tids \tid -> do
+        ptr   <- new tid
+        tid'  <- peek ptr
+        tid' `shouldBe` tid
+        poke ptr tid'
+        tid'' <- peek ptr
+        tid'' `shouldBe` tid'
+        free ptr
+    it "has correct Storable instance for KindID" do
+      kids <- withChecks $ genIDs @(KindID "abcdefghijklmnopqrstuvwxyz") 114
+      forM_ kids \kid -> do
+        ptr   <- new kid
+        kid'  <- peek ptr
+        kid' `shouldBe` kid
+        poke ptr kid'
+        kid'' <- peek ptr
+        kid'' `shouldBe` kid'
+        free ptr
