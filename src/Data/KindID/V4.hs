@@ -77,7 +77,7 @@ genKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
 genKindID = KID.genKindIDV4
 {-# INLINE genKindID #-}
 
--- | Generate a new 'KindIDV4' from a prefix using insecure 'UUID'v4.
+-- | Generate a new 'KindIDV4' from a prefix based on insecure 'UUID'v4.
 genKindID' :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
            => m (KindIDV4 prefix)
 genKindID' = KID.genKindIDV4'

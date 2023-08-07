@@ -322,7 +322,7 @@ genTypeIDV4 prefix = case checkPrefix prefix of
   Just err -> liftIO $ throwIO err
 {-# INLINE genTypeIDV4 #-}
 
--- | Generate a new 'TypeID'' ''V4' from a prefix using insecure 'UUID'v4.
+-- | Generate a new 'TypeID'' ''V4' from a prefix based on insecure 'UUID'v4.
 genTypeIDV4' :: MonadIO m => Text -> m (TypeID' 'V4)
 genTypeIDV4' prefix = case checkPrefix prefix of
   Nothing  -> unsafeGenTypeIDV4' prefix
@@ -482,8 +482,8 @@ unsafeGenTypeID' :: MonadIO m => Text -> m (TypeID' V7)
 unsafeGenTypeID' prefix = TypeID' prefix <$> V7.genUUID'
 {-# INLINE unsafeGenTypeID' #-}
 
--- | Generate a new 'TypeID'' ''V4' from a prefix using insecure 'UUID'v4, but
--- without checking if the prefix is valid.
+-- | Generate a new 'TypeID'' ''V4' from a prefix based on insecure 'UUID'v4,
+-- but without checking if the prefix is valid.
 unsafeGenTypeIDV4' :: MonadIO m => Text -> m (TypeID' V4)
 unsafeGenTypeIDV4' prefix = TypeID' prefix <$> liftIO randomIO
 {-# INLINE unsafeGenTypeIDV4' #-}
