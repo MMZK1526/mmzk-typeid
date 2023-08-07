@@ -19,7 +19,6 @@ module Data.TypeID.V4
   -- * 'TypeIDV4' generation (class methods)
   , genID
   , genID'
-  , genIDs
   , decorate
   -- * Validation ('TypeIDV4'-specific)
   , checkPrefix

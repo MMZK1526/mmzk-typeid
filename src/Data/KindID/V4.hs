@@ -20,13 +20,11 @@ module Data.KindID.V4
   -- * 'KindIDV4' generation (class methods)
   , genID
   , genID'
-  , genIDs
   , decorate
   -- * Validation ('KindIDV4'-specific)
   , checkKindID
   -- * Validation (class methods)
   , checkID
-  , checkIDWithEnv
   -- * Encoding & decoding ('KindIDV4'-specific)
   , toString
   , toText
