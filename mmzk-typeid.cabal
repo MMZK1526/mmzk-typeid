@@ -27,7 +27,6 @@ description:
   .
   > {-# LANGUAGE OverloadedStrings #-}
   .
-  For a quick "how-to-use" guide, please refer to the README.md file at https://github.com/MMZK1526/mmzk-typeid#readme.
 
 homepage:           https://github.com/MMZK1526/mmzk-typeid
 bug-reports:        https://github.com/MMZK1526/mmzk-typeid/issues
