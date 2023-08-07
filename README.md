@@ -22,6 +22,7 @@ In addition to the features provided by [TypeID](https://github.com/jetpack-io/t
 
 1. Generating TypeIDs in a batch. They are guaranteed to have the same timestamp (up to the first 32768 ids) and of ascending order;
 2. Encoding the prefix in the [type level](src/Data/KindID.hs), so that if you accidentally pass in a wrong prefix, the code won't compile, avoiding the need for runtime checks.
+3. Support TypeID with other UUID versions. Currently v7 (default) and v4 are supported.
 
 ## Quick start
 
@@ -61,6 +62,38 @@ main = do
 For a full list of functions on `TypeID`, see [Data.TypeID](src/Data/TypeID.hs).
 
 ## More Usages
+
+### V4 TypeID
+
+We also support TypeID using UUIDv4, which loses the monoticity property. To use it, simply import `Data.TypeID.V4` instead of `Data.TypeID`.
+
+```Haskell
+{-# LANGUAGE OverloadedStrings #-}
+
+import           Control.Exception
+import           Data.TypeIDV4 (TypeIDV4)
+import qualified Data.TypeIDV4 as TID
+
+main :: IO ()
+main = do
+
+  -- Make a TypeID with prefix 'mmzk':
+  typeID <- TID.genTypeID "mmzk"
+  putStrLn $ TID.toString typeID
+
+  -- Get components from the TypeID:
+  let prefix = TID.getPrefix typeID -- "mmzk"
+      uuid   = TID.getUUID typeID
+
+  -- Make a TypeID without prefix:
+  typeID' <- TID.genTypeID ""
+  print typeID'
+
+  -- Parse a TypeID from string:
+  case TID.parseString "mmzk_5hjpeh96458fct8t49fnf9farw" of
+    Left err     -> throwIO err
+    Right typeID -> print typeID
+```
 
 ### Type-level TypeID (KindID)
 When using `TypeID`, if we want to check if the type matches, we usually need to get the prefix of the `TypeID` and compare it with the desired prefix at runtime. However, with Haskell's type system, we can do this at compile time instead. We call this TypeID with compile-time prefix a KindID.
