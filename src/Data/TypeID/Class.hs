@@ -199,7 +199,8 @@ class IDGen a where
   {-# INLINE genID'_ #-}
 
   -- | Generate a list of identifiers with the given prefix.
-  genIDs_ :: MonadIO m => Proxy a -> GenFunc (IDGenPrefix a) (Word16 -> m [a])
+  genIDs_ :: forall m. MonadIO m
+          => Proxy a -> GenFunc (IDGenPrefix a) (Word16 -> m [a])
 
   -- | Generate a new identifier with the given prefix and 'UUID' suffix.
   decorate_ :: Proxy a

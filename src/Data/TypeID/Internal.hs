@@ -33,6 +33,7 @@ import           Data.TypeID.Class
 import           Data.TypeID.Error
 import           Data.UUID.Types.Internal (UUID(..))
 import qualified Data.UUID.Types.Internal as UUID
+import qualified Data.UUID.V1 as V1
 import qualified Data.UUID.V4 as V4
 import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
@@ -246,6 +247,34 @@ instance IDGen (TypeID' 'V7) where
   checkIDWithEnv_ _ = checkTypeIDWithEnv
   {-# INLINE checkIDWithEnv_ #-}
 
+instance IDGen (TypeID' 'V1) where
+  type IDGenPrefix (TypeID' 'V1) = 'Just Text
+
+  genID_ :: MonadIO m => Proxy (TypeID' 'V1) -> Text -> m (TypeID' 'V1)
+  genID_ _ = genTypeIDV1
+  {-# INLINE genID_ #-}
+
+  genIDs_ :: MonadIO m
+          => Proxy (TypeID' 'V1)
+          -> Text
+          -> Word16
+          -> m [TypeID' 'V1]
+  genIDs_ _ prefix n = case checkPrefix prefix of
+    Nothing  -> map (TypeID' prefix) <$> replicateM (fromIntegral n) randomIO
+    Just err -> liftIO $ throwIO err
+  {-# INLINE genIDs_ #-}
+
+  decorate_ :: Proxy (TypeID' 'V1)
+            -> Text
+            -> UUID
+            -> Either TypeIDError (TypeID' 'V1)
+  decorate_ _ = decorateTypeID
+  {-# INLINE decorate_ #-}
+
+  checkID_ :: Proxy (TypeID' 'V1) -> TypeID' 'V1 -> Maybe TypeIDError
+  checkID_ _ = checkTypeIDV1
+  {-# INLINE checkID_ #-}
+
 instance IDGen (TypeID' 'V4) where
   type IDGenPrefix (TypeID' 'V4) = 'Just Text
 
@@ -263,7 +292,8 @@ instance IDGen (TypeID' 'V4) where
           -> Word16
           -> m [TypeID' 'V4]
   genIDs_ _ prefix n = case checkPrefix prefix of
-    Nothing  -> map (TypeID' prefix) <$> replicateM (fromIntegral n) randomIO
+    Nothing  -> map (TypeID' prefix)
+            <$> replicateM (fromIntegral n) (liftIO V4.nextRandom)
     Just err -> liftIO $ throwIO err
   {-# INLINE genIDs_ #-}
 
@@ -310,6 +340,17 @@ genTypeIDs prefix n = case checkPrefix prefix of
   Nothing  -> unsafeGenTypeIDs prefix n
   Just err -> liftIO $ throwIO err
 {-# INLINE genTypeIDs #-}
+
+-- | Generate a new 'TypeID'' ''V1' from a prefix.
+--
+-- It throws a 'TypeIDError' if the prefix does not match the specification,
+-- namely if it's longer than 63 characters or if it contains characters other
+-- than lowercase latin letters.
+genTypeIDV1 :: MonadIO m => Text -> m (TypeID' 'V1)
+genTypeIDV1 prefix = case checkPrefix prefix of
+  Nothing  -> unsafeGenTypeIDV1 prefix
+  Just err -> liftIO $ throwIO err
+{-# INLINE genTypeIDV1 #-}
 
 -- | Generate a new 'TypeID'' ''V4' from a prefix.
 --
@@ -448,6 +489,14 @@ checkTypeID (TypeID' prefix uuid)
          , TypeIDErrorUUIDError <$ guard (not $ V7.validate uuid) ]
 {-# INLINE checkTypeID #-}
 
+-- | Check if the prefix is valid and the suffix 'UUID' has the correct v1
+-- version and variant.
+checkTypeIDV1 :: TypeID' 'V1 -> Maybe TypeIDError
+checkTypeIDV1 (TypeID' prefix uuid)
+  = msum [ checkPrefix prefix
+         , TypeIDErrorUUIDError <$ guard (not $ validateWithVersion uuid V1) ]
+{-# INLINE checkTypeIDV1 #-}
+
 -- | Check if the prefix is valid and the suffix 'UUID' has the correct v4
 -- version and variant.
 checkTypeIDV4 :: TypeID' 'V4 -> Maybe TypeIDError
@@ -469,6 +518,14 @@ checkTypeIDWithEnv tid@(TypeID' _ uuid)
 unsafeGenTypeID :: MonadIO m => Text -> m (TypeID' 'V7)
 unsafeGenTypeID = fmap head . (`unsafeGenTypeIDs` 1)
 {-# INLINE unsafeGenTypeID #-}
+
+-- | Generate a new 'TypeID'' ''V1' from a prefix, but without checking if the
+-- prefix is valid.
+unsafeGenTypeIDV1 :: MonadIO m => Text -> m (TypeID' 'V1)
+unsafeGenTypeIDV1 prefix = TypeID' prefix <$> liftIO nextUUID
+  where
+    nextUUID = V1.nextUUID >>= maybe nextUUID pure
+{-# INLINE unsafeGenTypeIDV1 #-}
 
 -- | Generate a new 'TypeID'' ''V4' from a prefix, but without checking if the
 -- prefix is valid.
