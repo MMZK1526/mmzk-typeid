@@ -1,31 +1,30 @@
 -- |
--- Module      : Data.TypeID.V4
+-- Module      : Data.TypeID.V1
 -- License     : MIT
 -- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
--- 'Data.TypeID.V7.TypeID' with 'UUID'v4.
+-- 'Data.TypeID.V7.TypeID' with 'UUID'v1.
 --
-module Data.TypeID.V4
+module Data.TypeID.V1
   (
   -- * Data types
-    TypeIDV4
+    TypeIDV1
   , getPrefix
   , getUUID
-  -- * 'TypeIDV4' generation ('TypeIDV4'-specific)
+  -- * 'TypeIDV1' generation ('TypeIDV1'-specific)
   , genTypeID
-  , genTypeID'
   , decorateTypeID
-  -- * 'TypeIDV4' generation (class methods)
+  -- * 'TypeIDV1' generation (class methods)
   , genID
   , genID'
   , decorate
-  -- * Validation ('TypeIDV4'-specific)
+  -- * Validation ('TypeIDV1'-specific)
   , checkPrefix
   , checkTypeID
   -- * Validation (class methods)
   , checkID
-  -- * Encoding & decoding ('TypeIDV4'-specific)
+  -- * Encoding & decoding ('TypeIDV1'-specific)
   , toString
   , toText
   , toByteString
@@ -56,90 +55,85 @@ import qualified Data.TypeID.Internal as TID
 import           Data.UUID.Types (UUID)
 import           Data.UUID.Versions
 
--- | Similar to 'Data.TypeID.V7.TypeID', but uses 'UUID'v4.
-type TypeIDV4 = TID.TypeID' 'V4
+-- | Similar to 'Data.TypeID.V7.TypeID', but uses 'UUID'v1.
+type TypeIDV1 = TID.TypeID' 'V1
 
--- | Generate a new 'TypeIDV4' from a prefix.
+-- | Generate a new 'TypeIDV1' from a prefix.
 --
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
 -- namely if it's longer than 63 characters or if it contains characters other
 -- than lowercase latin letters.
-genTypeID :: MonadIO m => Text -> m TypeIDV4
-genTypeID = TID.genTypeIDV4
+genTypeID :: MonadIO m => Text -> m TypeIDV1
+genTypeID = TID.genTypeIDV1
 {-# INLINE genTypeID #-}
 
--- | Generate a new 'TypeIDV4' from a prefix based on insecure 'UUID'v4.
-genTypeID' :: MonadIO m => Text -> m TypeIDV4
-genTypeID' = TID.genTypeIDV4'
-{-# INLINE genTypeID' #-}
-
--- | Obtain a 'TypeIDV4' from a prefix and a 'UUID'.
-decorateTypeID :: Text -> UUID -> Either TypeIDError TypeIDV4
+-- | Obtain a 'TypeIDV1' from a prefix and a 'UUID'.
+decorateTypeID :: Text -> UUID -> Either TypeIDError TypeIDV1
 decorateTypeID = TID.decorateTypeID
 {-# INLINE decorateTypeID #-}
 
--- | Check if the given prefix is a valid 'TypeIDV4' prefix.
+-- | Check if the given prefix is a valid 'TypeIDV1' prefix.
 checkPrefix :: Text -> Maybe TypeIDError
 checkPrefix = TID.checkPrefix
 {-# INLINE checkPrefix #-}
 
--- | Check if the prefix is valid and the suffix 'UUID' has the correct v4
+-- | Check if the prefix is valid and the suffix 'UUID' has the correct v1
 -- version and variant.
-checkTypeID :: TypeIDV4 -> Maybe TypeIDError
-checkTypeID = TID.checkTypeIDV4
+checkTypeID :: TypeIDV1 -> Maybe TypeIDError
+checkTypeID = TID.checkTypeIDV1
 {-# INLINE checkTypeID #-}
 
--- | Pretty-print a 'TypeIDV4'. It is 'id2String' with concrete type.
-toString :: TypeIDV4 -> String
+-- | Pretty-print a 'TypeIDV1'. It is 'id2String' with concrete type.
+toString :: TypeIDV1 -> String
 toString = TID.toString
 {-# INLINE toString #-}
 
--- | Pretty-print a 'TypeIDV4' to strict 'Text'. It is 'id2Text' with concrete
+-- | Pretty-print a 'TypeIDV1' to strict 'Text'. It is 'id2Text' with concrete
 -- type.
-toText :: TypeIDV4 -> Text
+toText :: TypeIDV1 -> Text
 toText = TID.toText
 {-# INLINE toText #-}
 
--- | Pretty-print a 'TypeIDV4' to lazy 'ByteString'. It is 'id2ByteString'
+-- | Pretty-print a 'TypeIDV1' to lazy 'ByteString'. It is 'id2ByteString'
 -- with concrete type.
-toByteString :: TypeIDV4 -> ByteString
+toByteString :: TypeIDV1 -> ByteString
 toByteString = TID.toByteString
 {-# INLINE toByteString #-}
 
--- | Parse a 'TypeIDV4' from its 'String' representation. It is 'string2ID' with
+-- | Parse a 'TypeIDV1' from its 'String' representation. It is 'string2ID' with
 -- concrete type.
-parseString :: String -> Either TypeIDError TypeIDV4
+parseString :: String -> Either TypeIDError TypeIDV1
 parseString = TID.parseString
 {-# INLINE parseString #-}
 
--- | Parse a 'TypeIDV4' from its string representation as a strict 'Text'. It
+-- | Parse a 'TypeIDV1' from its string representation as a strict 'Text'. It
 -- is 'text2ID' with concrete type.
-parseText :: Text -> Either TypeIDError TypeIDV4
+parseText :: Text -> Either TypeIDError TypeIDV1
 parseText = TID.parseText
 {-# INLINE parseText #-}
 
--- | Parse a 'TypeIDV4' from its string representation as a lazy 'ByteString'.
+-- | Parse a 'TypeIDV1' from its string representation as a lazy 'ByteString'.
 -- It is 'byteString2ID' with concrete type.
-parseByteString :: ByteString -> Either TypeIDError TypeIDV4
+parseByteString :: ByteString -> Either TypeIDError TypeIDV1
 parseByteString = TID.parseByteString
 {-# INLINE parseByteString #-}
 
--- | Parse a 'TypeIDV4' from its 'String' representation, throwing an error when
+-- | Parse a 'TypeIDV1' from its 'String' representation, throwing an error when
 -- the parsing fails. It is 'string2IDM' with concrete type.
-parseStringM :: MonadIO m => String -> m TypeIDV4
+parseStringM :: MonadIO m => String -> m TypeIDV1
 parseStringM = TID.parseStringM
 {-# INLINE parseStringM #-}
 
--- | Parse a 'TypeIDV4' from its string representation as a strict 'Text',
+-- | Parse a 'TypeIDV1' from its string representation as a strict 'Text',
 -- throwing an error when the parsing fails. It is 'text2IDM' with concrete
 -- type.
-parseTextM :: MonadIO m => Text -> m TypeIDV4
+parseTextM :: MonadIO m => Text -> m TypeIDV1
 parseTextM = TID.parseTextM
 {-# INLINE parseTextM #-}
 
--- | Parse a 'TypeIDV4' from its string representation as a lazy 'ByteString',
+-- | Parse a 'TypeIDV1' from its string representation as a lazy 'ByteString',
 -- throwing an error when the parsing fails. It is 'byteString2IDM' with
 -- concrete type.
-parseByteStringM :: MonadIO m => ByteString -> m TypeIDV4
+parseByteStringM :: MonadIO m => ByteString -> m TypeIDV1
 parseByteStringM = TID.parseByteStringM
 {-# INLINE parseByteStringM #-}
