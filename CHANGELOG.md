@@ -1,9 +1,19 @@
 # Revision history for mmzk-typeid
 
 
+## 0.4.0.1 -- Unreleased
+
+* Support `TypeID` and `KindID` with `UUID` suffixes of version 1.
+  * They are exported in `Data.TypeID.V1` and `Data.KindID.V1`.
+
+* Tests for V1 `TypeID` and `KindID`.
+
+* Fix documentation typos.
+
+
 ## 0.4.0.0 -- 2023-08-08
 
-* Support `TypeID` and `KindID` with `UUID` suffixes of version 1 and version 4.
+* Support `TypeID` and `KindID` with `UUID` suffixes of version 4.
   * They are exported in `Data.TypeID.V4` and `Data.KindID.V4`.
   * By default, `TypeID` and `KindID` has a `UUID` suffix of version 7.
   * The default `TypeID` and `KindID` is also exported via `Data.TypeID.V7` and
@@ -16,7 +26,7 @@
 * Provide some default implementations for methods of `IDConv`.
 
 * Fix typoes in the Haddock.
-  
+
 * Tests for V4 `TypeID` and `KindID`.
 
 
@@ -37,7 +47,7 @@
 
 * Add a version upper-bound for 'uuid-types'.
 
-* Fix documentation typos. 
+* Fix documentation typos.
 
 
 ## 0.3.0.0 -- 2023-07-17
