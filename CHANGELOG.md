@@ -3,7 +3,7 @@
 
 ## 0.4.0.0 -- 2023-08-08
 
-* Support `TypeID` and `KindID` with `UUID` suffixes of version 4.
+* Support `TypeID` and `KindID` with `UUID` suffixes of version 1 and version 4.
   * They are exported in `Data.TypeID.V4` and `Data.KindID.V4`.
   * By default, `TypeID` and `KindID` has a `UUID` suffix of version 7.
   * The default `TypeID` and `KindID` is also exported via `Data.TypeID.V7` and

@@ -17,7 +17,6 @@ module Data.TypeID.V1
   , decorateTypeID
   -- * 'TypeIDV1' generation (class methods)
   , genID
-  , genID'
   , decorate
   -- * Validation ('TypeIDV1'-specific)
   , checkPrefix

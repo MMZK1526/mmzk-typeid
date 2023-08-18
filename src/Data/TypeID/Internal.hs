@@ -260,7 +260,8 @@ instance IDGen (TypeID' 'V1) where
           -> Word16
           -> m [TypeID' 'V1]
   genIDs_ _ prefix n = case checkPrefix prefix of
-    Nothing  -> map (TypeID' prefix) <$> replicateM (fromIntegral n) randomIO
+    Nothing  -> map (TypeID' prefix)
+            <$> replicateM (fromIntegral n) (liftIO nextUUID)
     Just err -> liftIO $ throwIO err
   {-# INLINE genIDs_ #-}
 
@@ -523,8 +524,6 @@ unsafeGenTypeID = fmap head . (`unsafeGenTypeIDs` 1)
 -- prefix is valid.
 unsafeGenTypeIDV1 :: MonadIO m => Text -> m (TypeID' 'V1)
 unsafeGenTypeIDV1 prefix = TypeID' prefix <$> liftIO nextUUID
-  where
-    nextUUID = V1.nextUUID >>= maybe nextUUID pure
 {-# INLINE unsafeGenTypeIDV1 #-}
 
 -- | Generate a new 'TypeID'' ''V4' from a prefix, but without checking if the
@@ -603,6 +602,11 @@ separate5BitInts
     toBytes 0 = []
     toBytes x = fromIntegral (x .&. 0x1F) : toBytes (x `shiftR` 5)
 {-# INLINE separate5BitInts #-}
+
+-- | A helper for generating 'UUID'v1.
+nextUUID :: IO UUID
+nextUUID = V1.nextUUID >>= maybe nextUUID pure
+{-# INLINE nextUUID #-}
 
 -- The helpers below are verbatim translations from the official highly magical
 -- Go implementation.
