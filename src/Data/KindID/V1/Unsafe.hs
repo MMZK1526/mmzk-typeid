@@ -1,5 +1,5 @@
 -- |
--- Module      : Data.KindID.V4.Unsafe
+-- Module      : Data.KindID.V1.Unsafe
 -- License     : MIT
 -- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
