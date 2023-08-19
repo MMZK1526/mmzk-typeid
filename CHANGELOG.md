@@ -1,7 +1,7 @@
 # Revision history for mmzk-typeid
 
 
-## 0.4.0.1 -- Unreleased
+## 0.4.0.1 -- 2023-08-19
 
 * Support `TypeID` and `KindID` with `UUID` suffixes of version 1.
   * They are exported in `Data.TypeID.V1` and `Data.KindID.V1`.
@@ -9,6 +9,10 @@
 * Tests for V1 `TypeID` and `KindID`.
 
 * Fix documentation typos.
+
+* The `decorate` method will be moved from `IDGen` to `IDType` in the next major release.
+
+* The type signature for `genID_` is likely to change in the next major release to support `UUID`v5. Hopefully it will not affect any existing concrete functions.
 
 
 ## 0.4.0.0 -- 2023-08-08
