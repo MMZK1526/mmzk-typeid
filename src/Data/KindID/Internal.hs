@@ -23,9 +23,10 @@ import           Data.TypeID.Error
 import           Data.TypeID.Internal (TypeID'(..))
 import qualified Data.TypeID.Internal as TID
 import           Data.UUID.Types.Internal (UUID(..))
+import qualified Data.TypeID.V1.Unsafe as V1
+import qualified Data.TypeID.V4.Unsafe as V4
 import           Data.TypeID.V7 (TypeID)
-import qualified Data.UUID.V1 as V1
-import qualified Data.UUID.V4 as V4
+import qualified Data.TypeID.V7.Unsafe as V7
 import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
 import           Foreign
@@ -265,8 +266,7 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
 
     genIDs_ :: MonadIO m
             => Proxy (KindID' 'V4 prefix) -> Word16 -> m [KindID' 'V4 prefix]
-    genIDs_ _ n
-      = fmap KindID' <$> replicateM (fromIntegral n) (liftIO V4.nextRandom)
+    genIDs_ p n = replicateM (fromIntegral n) (genID_ p)
     {-# INLINE genIDs_ #-}
 
     decorate_ :: Proxy (KindID' 'V4 prefix) -> UUID -> KindID' 'V4 prefix
@@ -284,18 +284,26 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
 -- namely if it's longer than 63 characters or if it contains characters other
 -- than lowercase latin letters.
-genKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+genKindID :: forall prefix m
+           . ( ToPrefix prefix
+             , ValidPrefix (PrefixSymbol prefix)
+             , MonadIO m )
           => m (KindID' 'V7 prefix)
-genKindID = KindID' <$> V7.genUUID
+genKindID = unsafeFromTypeID 
+        <$> V7.unsafeGenTypeID (T.pack $ symbolVal @(PrefixSymbol prefix) Proxy)
 {-# INLINE genKindID #-}
 
 -- | Generate a new 'Data.KindID.V7.KindID' from a prefix based on stateless
 -- 'UUID'v7.
 --
 -- See the documentation of 'V7.genUUID'' for more information.
-genKindID' :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+genKindID' :: forall prefix m
+            . ( ToPrefix prefix
+              , ValidPrefix (PrefixSymbol prefix)
+              , MonadIO m )
            => m (KindID' 'V7 prefix)
-genKindID' = KindID' <$> V7.genUUID'
+genKindID' = fmap unsafeFromTypeID . V7.unsafeGenTypeID' . T.pack
+           $ symbolVal @(PrefixSymbol prefix) Proxy
 {-# INLINE genKindID' #-}
 
 -- | Generate a list of 'Data.KindID.V7.KindID's from a prefix.
@@ -306,9 +314,13 @@ genKindID' = KindID' <$> V7.genUUID'
 --
 -- It is guaranteed that the first 32768 'Data.KindID.V7.KindID's are generated
 -- at the same timestamp.
-genKindIDs :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+genKindIDs :: forall prefix m
+            . ( ToPrefix prefix
+              , ValidPrefix (PrefixSymbol prefix)
+              , MonadIO m )
            => Word16 -> m [KindID' 'V7 prefix]
-genKindIDs n = fmap KindID' <$> V7.genUUIDs n
+genKindIDs n = fmap (unsafeFromTypeID <$>) . flip V7.unsafeGenTypeIDs n . T.pack
+             $ symbolVal @(PrefixSymbol prefix) Proxy
 {-# INLINE genKindIDs #-}
 
 -- | Generate a new 'KindID'' ''V1' from a prefix.
@@ -316,9 +328,13 @@ genKindIDs n = fmap KindID' <$> V7.genUUIDs n
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
 -- namely if it's longer than 63 characters or if it contains characters other
 -- than lowercase latin letters.
-genKindIDV1 :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
-            => m (KindID' 'V1 prefix)
-genKindIDV1 = KindID' <$> liftIO TID.nextUUID
+genKindIDV1 :: forall prefix m
+           . ( ToPrefix prefix
+             , ValidPrefix (PrefixSymbol prefix)
+             , MonadIO m )
+          => m (KindID' 'V1 prefix)
+genKindIDV1 = fmap unsafeFromTypeID . V1.unsafeGenTypeID . T.pack
+            $ symbolVal @(PrefixSymbol prefix) Proxy
 {-# INLINE genKindIDV1 #-}
 
 -- | Generate a new 'KindID'' ''V4' from a prefix.
@@ -326,15 +342,23 @@ genKindIDV1 = KindID' <$> liftIO TID.nextUUID
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
 -- namely if it's longer than 63 characters or if it contains characters other
 -- than lowercase latin letters.
-genKindIDV4 :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+genKindIDV4 :: forall prefix m
+             . ( ToPrefix prefix
+             , ValidPrefix (PrefixSymbol prefix)
+             , MonadIO m )
             => m (KindID' 'V4 prefix)
-genKindIDV4 = KindID' <$> liftIO V4.nextRandom
+genKindIDV4 = fmap unsafeFromTypeID . V4.unsafeGenTypeID . T.pack
+            $ symbolVal @(PrefixSymbol prefix) Proxy
 {-# INLINE genKindIDV4 #-}
 
 -- | Generate a new 'KindID'' ''V4' from a prefix with insecure 'UUID'v4.
-genKindIDV4' :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+genKindIDV4' :: forall prefix m
+              . ( ToPrefix prefix
+                , ValidPrefix (PrefixSymbol prefix)
+                , MonadIO m )
              => m (KindID' 'V4 prefix)
-genKindIDV4' = KindID' <$> liftIO randomIO
+genKindIDV4' = fmap unsafeFromTypeID . V4.unsafeGenTypeID' . T.pack
+             $ symbolVal @(PrefixSymbol prefix) Proxy
 {-# INLINE genKindIDV4' #-}
 
 -- | Obtain a 'KindID'' from a prefix and a 'UUID'.
