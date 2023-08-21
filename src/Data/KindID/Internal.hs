@@ -188,6 +188,8 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
   => IDGen (KindID' 'V7 prefix) where
     type IDGenPrefix (KindID' 'V7 prefix) = 'Nothing
 
+    type IDGenReq (KindID' 'V7 prefix) r = r
+
     genID_ :: MonadIO m => Proxy (KindID' 'V7 prefix) -> m (KindID' 'V7 prefix)
     genID_ _ = genKindID
     {-# INLINE genID_ #-}
@@ -224,6 +226,8 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
   => IDGen (KindID' 'V1 prefix) where
     type IDGenPrefix (KindID' 'V1 prefix) = 'Nothing
 
+    type IDGenReq (KindID' 'V1 prefix) r = r
+
     genID_ :: MonadIO m => Proxy (KindID' 'V1 prefix) -> m (KindID' 'V1 prefix)
     genID_ _ = genKindIDV1
     {-# INLINE genID_ #-}
@@ -248,6 +252,8 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
 instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
   => IDGen (KindID' 'V4 prefix) where
     type IDGenPrefix (KindID' 'V4 prefix) = 'Nothing
+
+    type IDGenReq (KindID' 'V4 prefix) r = r
 
     genID_ :: MonadIO m => Proxy (KindID' 'V4 prefix) -> m (KindID' 'V4 prefix)
     genID_ _ = genKindIDV4

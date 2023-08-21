@@ -140,7 +140,8 @@ class IDConv a where
             | byteString2ID, id2ByteString #-}
 
 -- | Generate a new identifier with the given prefix.
-genID :: forall a m. (IDGen a, MonadIO m) => GenFunc (IDGenPrefix a) (m a)
+genID :: forall a m. (IDGen a, MonadIO m)
+      => GenFunc (IDGenPrefix a) (IDGenReq a (m a))
 genID = genID_ @a @m Proxy
 {-# INLINE genID #-}
 
@@ -149,13 +150,14 @@ genID = genID_ @a @m Proxy
 -- monotonically increasing for 'UUID'v7-based identifiers.
 --
 -- The default implementation is the same as 'genID'.
-genID' :: forall a m. (IDGen a, MonadIO m) => GenFunc (IDGenPrefix a) (m a)
+genID' :: forall a m. (IDGen a, MonadIO m)
+       => GenFunc (IDGenPrefix a) (IDGenReq a (m a))
 genID' = genID'_ @a @m Proxy
 {-# INLINE genID' #-}
 
 -- | Generate a list of identifiers with the given prefix.
 genIDs :: forall a m. (IDGen a, MonadIO m)
-       => GenFunc (IDGenPrefix a) (Word16 -> m [a])
+       => GenFunc (IDGenPrefix a) (IDGenReq a (Word16 -> m [a]))
 genIDs = genIDs_ @a @m Proxy
 {-# INLINE genIDs #-}
 
@@ -186,21 +188,27 @@ class IDGen a where
   -- type of the prefix (e.g. 'Text').
   type IDGenPrefix a :: Maybe Type
 
+  -- | If the identifier's generation requires additional information (such as
+  -- 'UUID' version 5), this type corresponds to how to generate @r@ from the
+  -- required information. Otherwise it should be simply @r@.
+  type IDGenReq a r :: Type
+
   -- | Generate an identifier with the given prefix.
-  genID_ :: MonadIO m => Proxy a -> GenFunc (IDGenPrefix a) (m a)
+  genID_ :: MonadIO m => Proxy a -> GenFunc (IDGenPrefix a) (IDGenReq a (m a))
 
   -- | Similar to 'genID'_, but stateless. It can be a faster implementation
   -- than 'genID'_, but it does not guarantee any stateful property, such as
   -- monotonically increasing for 'UUID'v7-based identifiers.
   --
   -- The default implementation is the same as 'genID'_.
-  genID'_ :: forall m. MonadIO m => Proxy a -> GenFunc (IDGenPrefix a) (m a)
+  genID'_ :: forall m. MonadIO m
+          => Proxy a -> GenFunc (IDGenPrefix a) (IDGenReq a (m a))
   genID'_ = genID_ @_ @m
   {-# INLINE genID'_ #-}
 
   -- | Generate a list of identifiers with the given prefix.
   genIDs_ :: forall m. MonadIO m
-          => Proxy a -> GenFunc (IDGenPrefix a) (Word16 -> m [a])
+          => Proxy a -> GenFunc (IDGenPrefix a) (IDGenReq a (Word16 -> m [a]))
 
   -- | Generate a new identifier with the given prefix and 'UUID' suffix.
   decorate_ :: Proxy a
