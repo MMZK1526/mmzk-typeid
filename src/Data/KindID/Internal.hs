@@ -25,7 +25,6 @@ import qualified Data.TypeID.Internal as TID
 import           Data.UUID.Types.Internal (UUID(..))
 import qualified Data.TypeID.V1.Unsafe as V1
 import qualified Data.TypeID.V4.Unsafe as V4
-import           Data.TypeID.V7 (TypeID)
 import qualified Data.TypeID.V7.Unsafe as V7
 import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
@@ -220,7 +219,6 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                     -> m (Maybe TypeIDError)
     checkIDWithEnv_ _ = checkKindIDWithEnv
     {-# INLINE checkIDWithEnv_ #-}
-
 
 -- | Generate 'KindID'' ''V1's.
 instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))

@@ -250,6 +250,7 @@ instance IDGen (TypeID' 'V7) where
   checkIDWithEnv_ _ = checkTypeIDWithEnv
   {-# INLINE checkIDWithEnv_ #-}
 
+-- | Generate 'TypeID'' ''V1's.
 instance IDGen (TypeID' 'V1) where
   type IDGenPrefix (TypeID' 'V1) = 'Just Text
 
@@ -281,37 +282,7 @@ instance IDGen (TypeID' 'V1) where
   checkID_ _ = checkTypeIDV1
   {-# INLINE checkID_ #-}
 
-instance IDGen (TypeID' 'V5) where
-  type IDGenPrefix (TypeID' 'V5) = 'Just Text
-
-  type IDGenReq (TypeID' 'V5) a = UUID -> Text -> a
-
-  genID_ :: MonadIO m
-         => Proxy (TypeID' 'V5) -> Text -> UUID -> Text -> m (TypeID' 'V5)
-  genID_ _ = undefined
-  {-# INLINE genID_ #-}
-
-  genIDs_ :: MonadIO m
-          => Proxy (TypeID' 'V5)
-          -> Text
-          -> UUID
-          -> Text
-          -> Word16
-          -> m [TypeID' 'V5]
-  genIDs_ _ prefix n = undefined
-  {-# INLINE genIDs_ #-}
-
-  decorate_ :: Proxy (TypeID' 'V5)
-            -> Text
-            -> UUID
-            -> Either TypeIDError (TypeID' 'V5)
-  decorate_ _ = decorateTypeID
-  {-# INLINE decorate_ #-}
-
-  checkID_ :: Proxy (TypeID' 'V5) -> TypeID' 'V5 -> Maybe TypeIDError
-  checkID_ _ = undefined
-  {-# INLINE checkID_ #-}
-
+-- | Generate 'TypeID'' ''V4's.
 instance IDGen (TypeID' 'V4) where
   type IDGenPrefix (TypeID' 'V4) = 'Just Text
 
@@ -347,6 +318,37 @@ instance IDGen (TypeID' 'V4) where
   checkID_ _ = checkTypeIDV4
   {-# INLINE checkID_ #-}
 
+-- | Generate 'TypeID'' ''V5's.
+instance IDGen (TypeID' 'V5) where
+  type IDGenPrefix (TypeID' 'V5) = 'Just Text
+
+  type IDGenReq (TypeID' 'V5) a = UUID -> Text -> a
+
+  genID_ :: MonadIO m
+         => Proxy (TypeID' 'V5) -> Text -> UUID -> Text -> m (TypeID' 'V5)
+  genID_ _ = undefined
+  {-# INLINE genID_ #-}
+
+  genIDs_ :: MonadIO m
+          => Proxy (TypeID' 'V5)
+          -> Text
+          -> UUID
+          -> Text
+          -> Word16
+          -> m [TypeID' 'V5]
+  genIDs_ _ prefix n = undefined
+  {-# INLINE genIDs_ #-}
+
+  decorate_ :: Proxy (TypeID' 'V5)
+            -> Text
+            -> UUID
+            -> Either TypeIDError (TypeID' 'V5)
+  decorate_ _ = decorateTypeID
+  {-# INLINE decorate_ #-}
+
+  checkID_ :: Proxy (TypeID' 'V5) -> TypeID' 'V5 -> Maybe TypeIDError
+  checkID_ _ = undefined
+  {-# INLINE checkID_ #-}
 
 -- | Generate a new 'Data.TypeID.V7.TypeID' from a prefix.
 --
