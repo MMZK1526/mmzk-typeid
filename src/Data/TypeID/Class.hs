@@ -190,7 +190,8 @@ class IDGen a where
 
   -- | If the identifier's generation requires additional information (such as
   -- 'UUID' version 5), this type corresponds to how to generate @r@ from the
-  -- required information. Otherwise it should be simply @r@.
+  -- required information. Otherwise it should be simply
+  -- @ type IDGenReq a r = r @.
   type IDGenReq a r :: Type
 
   -- | Generate an identifier with the given prefix.

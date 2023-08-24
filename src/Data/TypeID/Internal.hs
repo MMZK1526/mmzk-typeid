@@ -322,21 +322,25 @@ instance IDGen (TypeID' 'V4) where
 instance IDGen (TypeID' 'V5) where
   type IDGenPrefix (TypeID' 'V5) = 'Just Text
 
-  type IDGenReq (TypeID' 'V5) a = UUID -> Text -> a
+  type IDGenReq (TypeID' 'V5) a = UUID -> [Word8] -> a
 
   genID_ :: MonadIO m
-         => Proxy (TypeID' 'V5) -> Text -> UUID -> Text -> m (TypeID' 'V5)
-  genID_ _ = undefined
+         => Proxy (TypeID' 'V5) -> Text -> UUID -> [Word8] -> m (TypeID' 'V5)
+  genID_ _ = ((pure .) .) . genTypeIDV5
   {-# INLINE genID_ #-}
 
   genIDs_ :: MonadIO m
           => Proxy (TypeID' 'V5)
           -> Text
           -> UUID
-          -> Text
+          -> [Word8]
           -> Word16
           -> m [TypeID' 'V5]
-  genIDs_ _ prefix n = undefined
+  -- Apparently this function is useless...
+  genIDs_ _ prefix ns obj n = case checkPrefix prefix of
+    Nothing  -> replicateM (fromIntegral n)
+              $ pure (TypeID' prefix $ V5.generateNamed ns obj)
+    Just err -> liftIO $ throwIO err
   {-# INLINE genIDs_ #-}
 
   decorate_ :: Proxy (TypeID' 'V5)
@@ -411,6 +415,17 @@ genTypeIDV4' prefix = case checkPrefix prefix of
   Nothing  -> unsafeGenTypeIDV4' prefix
   Just err -> liftIO $ throwIO err
 {-# INLINE genTypeIDV4' #-}
+
+-- | Generate a new 'TypeID'' ''V5' from a prefix, namespace, and object.
+--
+-- It throws a 'TypeIDError' if the prefix does not match the specification,
+-- namely if it's longer than 63 characters or if it contains characters other
+-- than lowercase latin letters.
+genTypeIDV5 :: Text -> UUID -> [Word8] -> TypeID' 'V5
+genTypeIDV5 prefix ns obj = case checkPrefix prefix of
+  Nothing  -> unsafeGenTypeIDV5 prefix ns obj
+  Just err -> throw err
+{-# INLINE genTypeIDV5 #-}
 
 -- | Obtain a 'TypeID'' from a prefix and a 'UUID'.
 decorateTypeID :: Text -> UUID -> Either TypeIDError (TypeID' version)
@@ -547,6 +562,14 @@ checkTypeIDV4 (TypeID' prefix uuid)
          , TypeIDErrorUUIDError <$ guard (not $ validateWithVersion uuid V4) ]
 {-# INLINE checkTypeIDV4 #-}
 
+-- | Check if the prefix is valid and the suffix 'UUID' has the correct v4
+-- version and variant.
+checkTypeIDV5 :: TypeID' 'V5 -> Maybe TypeIDError
+checkTypeIDV5 (TypeID' prefix uuid)
+  = msum [ checkPrefix prefix
+         , TypeIDErrorUUIDError <$ guard (not $ validateWithVersion uuid V5) ]
+{-# INLINE checkTypeIDV5 #-}
+
 -- | Similar to 'checkTypeID', but also checks if the suffix 'UUID' is
 -- generated in the past.
 checkTypeIDWithEnv :: MonadIO m => TypeID' 'V7 -> m (Maybe TypeIDError)
@@ -572,6 +595,12 @@ unsafeGenTypeIDV1 prefix = TypeID' prefix <$> liftIO nextUUID
 unsafeGenTypeIDV4 :: MonadIO m => Text -> m (TypeID' 'V4)
 unsafeGenTypeIDV4 prefix = TypeID' prefix <$> liftIO V4.nextRandom
 {-# INLINE unsafeGenTypeIDV4 #-}
+
+-- | Generate a new 'TypeID'' ''V5' from a prefix, namespace, and object, but
+-- without checking if the prefix is valid.
+unsafeGenTypeIDV5 :: Text -> UUID -> [Word8] -> TypeID' 'V5
+unsafeGenTypeIDV5 prefix ns obj = TypeID' prefix (V5.generateNamed ns obj)
+{-# INLINE unsafeGenTypeIDV5 #-}
 
 -- | Generate a new 'Data.TypeID.V7.TypeID' from a prefix based on stateless
 -- 'UUID'v7, but without checking if the prefix is valid.
