@@ -322,7 +322,7 @@ instance IDGen (TypeID' 'V4) where
 instance IDGen (TypeID' 'V5) where
   type IDGenPrefix (TypeID' 'V5) = 'Just Text
 
-  type IDGenReq (TypeID' 'V5) a = UUID -> [Word8] -> a
+  type IDGenReq (TypeID' 'V5) r = UUID -> [Word8] -> r
 
   genID_ :: MonadIO m
          => Proxy (TypeID' 'V5) -> Text -> UUID -> [Word8] -> m (TypeID' 'V5)

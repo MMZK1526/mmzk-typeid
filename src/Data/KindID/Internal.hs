@@ -25,6 +25,7 @@ import qualified Data.TypeID.Internal as TID
 import           Data.UUID.Types.Internal (UUID(..))
 import qualified Data.TypeID.V1.Unsafe as V1
 import qualified Data.TypeID.V4.Unsafe as V4
+import qualified Data.TypeID.Internal as V5
 import qualified Data.TypeID.V7.Unsafe as V7
 import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
@@ -277,6 +278,40 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
     checkID_ _ = checkKindIDV4
     {-# INLINE checkID_ #-}
 
+-- | Generate 'KindID'' ''V5's.
+instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+  => IDGen (KindID' 'V5 prefix) where
+    type IDGenPrefix (KindID' 'V5 prefix) = 'Nothing
+
+    type IDGenReq (KindID' 'V5 prefix) r = UUID -> [Word8] -> r
+
+    genID_ :: MonadIO m
+           => Proxy (KindID' 'V5 prefix)
+           -> UUID
+           -> [Word8]
+           -> m (KindID' 'V5 prefix)
+    genID_ _ = (pure .) . genKindIDV5
+    {-# INLINE genID_ #-}
+
+    genIDs_ :: MonadIO m
+            => Proxy (KindID' 'V5 prefix)
+            -> UUID
+            -> [Word8]
+            -> Word16
+            -> m [KindID' 'V5 prefix]
+    genIDs_ p ns obj n = replicateM (fromIntegral n) (genID_ p ns obj)
+    {-# INLINE genIDs_ #-}
+
+    decorate_ :: Proxy (KindID' 'V5 prefix) -> UUID -> KindID' 'V5 prefix
+    decorate_ _ = decorateKindID
+    {-# INLINE decorate_ #-}
+
+    checkID_ :: Proxy (KindID' 'V5 prefix)
+             -> KindID' 'V5 prefix
+             -> Maybe TypeIDError
+    checkID_ _ = checkKindIDV5
+    {-# INLINE checkID_ #-}
+
 -- | Generate a new 'Data.KindID.V7.KindID' from a prefix.
 --
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
@@ -287,7 +322,7 @@ genKindID :: forall prefix m
              , ValidPrefix (PrefixSymbol prefix)
              , MonadIO m )
           => m (KindID' 'V7 prefix)
-genKindID = unsafeFromTypeID 
+genKindID = unsafeFromTypeID
         <$> V7.unsafeGenTypeID (T.pack $ symbolVal @(PrefixSymbol prefix) Proxy)
 {-# INLINE genKindID #-}
 
@@ -358,6 +393,18 @@ genKindIDV4' :: forall prefix m
 genKindIDV4' = fmap unsafeFromTypeID . V4.unsafeGenTypeID' . T.pack
              $ symbolVal @(PrefixSymbol prefix) Proxy
 {-# INLINE genKindIDV4' #-}
+
+-- | Generate a new 'KindID'' ''V5' from a namespace and an object.
+genKindIDV5 :: forall prefix
+             . ( ToPrefix prefix
+               , ValidPrefix (PrefixSymbol prefix))
+            => UUID
+            -> [Word8]
+            -> KindID' 'V5 prefix
+genKindIDV5 ns obj
+  = unsafeFromTypeID . flip (`V5.unsafeGenTypeIDV5` ns) obj . T.pack
+  $ symbolVal @(PrefixSymbol prefix) Proxy
+{-# INLINE genKindIDV5 #-}
 
 -- | Obtain a 'KindID'' from a prefix and a 'UUID'.
 decorateKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
@@ -498,6 +545,12 @@ checkKindIDV4 :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
               => KindID' 'V4 prefix -> Maybe TypeIDError
 checkKindIDV4 = TID.checkTypeIDV4 . toTypeID
 {-# INLINE checkKindIDV4 #-}
+
+-- | Check if the prefix is valid and the suffix 'UUID' has the correct v5
+-- version and variant.
+checkKindIDV5 :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
+              => KindID' 'V5 prefix -> Maybe TypeIDError
+checkKindIDV5 = TID.checkTypeIDV5 . toTypeID
 
 -- | Convert a 'TypeID'' to a 'KindID''. If the actual prefix does not match
 -- with the expected one as defined by the type, it does not complain and
