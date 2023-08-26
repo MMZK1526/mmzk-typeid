@@ -326,7 +326,7 @@ instance IDGen (TypeID' 'V5) where
 
   genID_ :: MonadIO m
          => Proxy (TypeID' 'V5) -> Text -> UUID -> [Word8] -> m (TypeID' 'V5)
-  genID_ _ = ((pure .) .) . genTypeIDV5
+  genID_ _ = genTypeIDV5
   {-# INLINE genID_ #-}
 
   genIDs_ :: MonadIO m
@@ -421,9 +421,9 @@ genTypeIDV4' prefix = case checkPrefix prefix of
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
 -- namely if it's longer than 63 characters or if it contains characters other
 -- than lowercase latin letters.
-genTypeIDV5 :: Text -> UUID -> [Word8] -> TypeID' 'V5
+genTypeIDV5 :: MonadIO m => Text -> UUID -> [Word8] -> m (TypeID' 'V5)
 genTypeIDV5 prefix ns obj = case checkPrefix prefix of
-  Nothing  -> unsafeGenTypeIDV5 prefix ns obj
+  Nothing  -> pure $ unsafeGenTypeIDV5 prefix ns obj
   Just err -> throw err
 {-# INLINE genTypeIDV5 #-}
 
