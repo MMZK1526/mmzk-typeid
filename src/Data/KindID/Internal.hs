@@ -25,7 +25,7 @@ import qualified Data.TypeID.Internal as TID
 import           Data.UUID.Types.Internal (UUID(..))
 import qualified Data.TypeID.V1.Unsafe as V1
 import qualified Data.TypeID.V4.Unsafe as V4
-import qualified Data.TypeID.Internal as V5
+import qualified Data.TypeID.V5.Unsafe as V5
 import qualified Data.TypeID.V7.Unsafe as V7
 import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
@@ -402,7 +402,7 @@ genKindIDV5 :: forall prefix
             -> [Word8]
             -> KindID' 'V5 prefix
 genKindIDV5 ns obj
-  = unsafeFromTypeID . flip (`V5.unsafeGenTypeIDV5` ns) obj . T.pack
+  = unsafeFromTypeID . flip (`V5.unsafeGenTypeID` ns) obj . T.pack
   $ symbolVal @(PrefixSymbol prefix) Proxy
 {-# INLINE genKindIDV5 #-}
 
