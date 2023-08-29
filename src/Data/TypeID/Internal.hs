@@ -351,7 +351,7 @@ instance IDGen (TypeID' 'V5) where
   {-# INLINE decorate_ #-}
 
   checkID_ :: Proxy (TypeID' 'V5) -> TypeID' 'V5 -> Maybe TypeIDError
-  checkID_ _ = undefined
+  checkID_ _ = checkTypeIDV5
   {-# INLINE checkID_ #-}
 
 -- | Generate a new 'Data.TypeID.V7.TypeID' from a prefix.
