@@ -1,6 +1,16 @@
 # Revision history for mmzk-typeid
 
 
+## 0.5.0.0 -- 2023-08-31
+
+* Support `TypeID` and `KindID` with `UUID` suffixes of version 5.
+  * They are exported in `Data.TypeID.V5` and `Data.KindID.V5`.
+
+* Tests for V5 `TypeID` and `KindID`.
+
+* Change signature for `genID_` to support `UUID`v5.
+
+
 ## 0.4.0.1 -- 2023-08-19
 
 * Support `TypeID` and `KindID` with `UUID` suffixes of version 1.
