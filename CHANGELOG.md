@@ -10,6 +10,8 @@
 
 * Change signature for `genID_` to support `UUID`v5.
 
+* Decide against moving the `decorate` method.
+
 
 ## 0.4.0.1 -- 2023-08-19
 
