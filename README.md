@@ -21,7 +21,7 @@ If you notice any issues or have any suggestions, please feel free to open an is
 In addition to the features provided by [TypeID](https://github.com/jetpack-io/typeid), this implementation also supports:
 
 1. Generating TypeIDs in a batch. They are guaranteed to have the same timestamp (up to the first 32768 ids) and of ascending order;
-2. Encoding the prefix in the [type level](src/Data/KindID.hs), so that if you accidentally pass in a wrong prefix, the code won't compile, avoiding the need for runtime checks.
+2. Encoding the prefix in the [type level](https://hackage.haskell.org/package/mmzk-typeid/docs/Data-KindID.html), so that if you accidentally pass in a wrong prefix, the code won't compile, avoiding the need for runtime checks.
 3. Support TypeID with other UUID versions. Currently v7 (default) and v4 are supported.
 
 ## Quick start
@@ -59,7 +59,7 @@ main = do
     Right typeID -> print typeID
 ```
 
-For a full list of functions on `TypeID`, see [Data.TypeID](src/Data/TypeID.hs).
+For a full list of functions on `TypeID`, see [Data.TypeID](https://hackage.haskell.org/package/mmzk-typeid/docs/Data-TypeID.html).
 
 ## More Usages
 
@@ -141,7 +141,7 @@ main = do
     Right kindID -> print kindID
 ```
 
-For a full list of functions on `KindID`, see [Data.KindID](src/Data/KindID.hs).
+For a full list of functions on `KindID`, see [Data.KindID](https://hackage.haskell.org/package/mmzk-typeid/docs/Data-KindID.html).
 
 ### Functions with More General Types
 `TypeID` and `KindID` shares many functions with the same name and functionality. So far, we are using qualified imports to diffentiate them (*e.g* `KID.fromString` and `TID.fromString`). Alternatively, we can use the methods of `IDConv` to use the same functions for both `TypeID` and `KindID`.
@@ -180,7 +180,7 @@ We no longer need to use qualified imports, but on the down side, we need to add
 
 Note that with the class methods, the type application with `Symbol` no longer works as the full type must be provided. For example, `string2ID @"mmzk" "mmzk_01h455vb4pex5vsknk084sn02q"` will not compile.
 
-For a full list of these functions, see [Data.TypeID.Class](src/Data/TypeID/Class.hs).
+For a full list of these functions, see [Data.TypeID.Class](https://hackage.haskell.org/package/mmzk-typeid/docs/Data-TypeID-Class.html).
 
 ### KindID with Data Kinds
 Instead of using raw `Symbol`s as `KindID` prefixes, we can also define our custom data type for better semantics.
@@ -219,7 +219,7 @@ main = do
   -- ...
 ```
 
-For more information, see [Data.KindID.Class](src/Data/KindID/Class.hs).
+For more information, see [Data.KindID.Class]([src/Data/KindID/Class.hs](https://hackage.haskell.org/package/mmzk-typeid/docs/Data-KindID-Class.html)).
 
 ## Note
 Not explicitly exported functions are considered internal and are subjected to changes.
