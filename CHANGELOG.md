@@ -1,6 +1,11 @@
 # Revision history for mmzk-typeid
 
 
+## 0.5.0.1 --2023-9-18
+
+* Fix bad links in the documentation.
+
+
 ## 0.5.0.0 -- 2023-08-31
 
 * Support `TypeID` and `KindID` with `UUID` suffixes of version 5.
