@@ -22,7 +22,7 @@ In addition to the features provided by [TypeID](https://github.com/jetpack-io/t
 
 1. Generating TypeIDs in a batch. They are guaranteed to have the same timestamp (up to the first 32768 ids) and of ascending order;
 2. Encoding the prefix in the [type level](https://hackage.haskell.org/package/mmzk-typeid/docs/Data-KindID.html), so that if you accidentally pass in a wrong prefix, the code won't compile, avoiding the need for runtime checks.
-3. Support TypeID with other UUID versions. Currently v7 (default) and v4 are supported.
+3. Support TypeID with other UUID versions. Currently v7 (default), v1,  v4, and v5 are supported.
 
 ## Quick start
 
