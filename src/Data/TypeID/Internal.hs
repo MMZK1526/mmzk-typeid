@@ -35,7 +35,6 @@ import           Data.Typeable (Typeable)
 import           Data.TypeID.Class
 import           Data.TypeID.Error
 import           Data.UUID.Types.Internal (UUID(..))
-import qualified Data.UUID.Types.Internal as UUID
 import qualified Data.UUID.V1 as V1
 import qualified Data.UUID.V4 as V4
 import qualified Data.UUID.V5 as V5
@@ -475,15 +474,15 @@ parseStringS :: String -> Either TypeIDError (TypeID' version, String)
 parseStringS str = case span (/= '_') str of
   ("", _)              -> Left TypeIDExtraSeparator
   (_, "")              -> do
-    let (uuid, rem) = splitAt 26 str
+    let (uuid, nks) = splitAt 26 str
         bs          = fromString uuid
-    (, rem) . TypeID' "" <$> decodeUUID bs
+    (, nks) . TypeID' "" <$> decodeUUID bs
   (prefix, _ : suffix) -> do
     let prefix'     = T.pack prefix
-        (uuid, rem) = splitAt 26 suffix
+        (uuid, nks) = splitAt 26 suffix
         bs          = fromString uuid
     case checkPrefix prefix' of
-      Nothing  -> (, rem) . TypeID' prefix' <$> decodeUUID bs
+      Nothing  -> (, nks) . TypeID' prefix' <$> decodeUUID bs
       Just err -> Left err
 
 -- | Parse a 'TypeID'' from its string representation as a strict 'Text'. It is

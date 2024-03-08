@@ -22,10 +22,8 @@ module Data.KindID.V4.Unsafe
 
 import           Data.ByteString.Lazy (ByteString)
 import           Data.KindID.Class
-import           Data.KindID.Internal (KindID')
 import qualified Data.KindID.Internal as KID
 import           Data.KindID.V4 (KindIDV4)
-import           Data.TypeID.Internal (TypeID')
 import           Data.TypeID.V4 (TypeIDV4)
 import           Data.Text (Text)
 import           Data.TypeID.Class

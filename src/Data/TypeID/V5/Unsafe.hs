@@ -20,7 +20,6 @@ module Data.TypeID.V5.Unsafe
   , unsafeByteString2ID
   ) where
 
-import           Control.Monad.IO.Class
 import           Data.ByteString.Lazy (ByteString)
 import           Data.Text (Text)
 import           Data.TypeID.Class

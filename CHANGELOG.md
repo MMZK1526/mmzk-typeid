@@ -6,6 +6,8 @@
 * Add `Typeable` and `Data` instances for `TypeID` and `KindID`.
   * Kindly contributed by @shinzui.
 
+* Fix all warnings.
+
 
 ## 0.5.0.1 -- 2023-9-18
 

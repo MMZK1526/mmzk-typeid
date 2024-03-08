@@ -15,11 +15,11 @@ module Data.KindID.Class
     ValidPrefix
   , ToPrefix(..)
   -- * Helpers
-  , LengthSymbol(..)
-  , IsLowerSymbol(..)
-  , IsLowerChar(..)
-  , LSUH(..)
-  , ILSUH(..)
+  , LengthSymbol
+  , IsLowerSymbol
+  , IsLowerChar
+  , LSUH
+  , ILSUH
   ) where
 
 import           Data.Type.Bool

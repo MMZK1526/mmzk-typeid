@@ -51,13 +51,11 @@ module Data.KindID.V1
 import           Control.Monad.IO.Class
 import           Data.ByteString.Lazy (ByteString)
 import           Data.KindID.Class
-import           Data.KindID.Internal (KindID'(..))
 import qualified Data.KindID.Internal as KID
 import           Data.Text (Text)
 import           Data.TypeID.Class
 import           Data.TypeID.Error
 import           Data.TypeID.V1 (TypeIDV1)
-import           Data.TypeID.V7 (TypeID)
 import           Data.UUID.Types.Internal (UUID)
 import           Data.UUID.Versions
 

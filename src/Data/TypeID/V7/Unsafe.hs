@@ -28,7 +28,6 @@ import           Data.Text (Text)
 import           Data.TypeID.Class
 import qualified Data.TypeID.Internal as TID
 import           Data.TypeID.V7 (TypeID)
-import           Data.UUID.Types.Internal (UUID)
 import           Data.Word
 
 -- | Generate a new 'TypeID' from a prefix, but without checking if the prefix
@@ -47,7 +46,8 @@ unsafeGenTypeID' = TID.unsafeGenTypeID'
 -- valid.
 --
 -- It tries its best to generate 'TypeID's at the same timestamp, but it may not
--- be possible if we are asking too many 'UUID's at the same time.
+-- be possible if we are asking too many 'Data.UUID.Types.Internal.UUID's at the
+-- same time.
 --
 -- It is guaranteed that the first 32768 'TypeID's are generated at the same
 -- timestamp.

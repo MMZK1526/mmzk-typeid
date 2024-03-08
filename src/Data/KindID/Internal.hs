@@ -33,7 +33,6 @@ import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
 import           Foreign
 import           GHC.TypeLits (symbolVal)
-import           System.Random
 
 -- | A TypeID with the prefix encoded at type level.
 --
@@ -53,9 +52,9 @@ instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
     readsPrec :: Int -> String -> [(KindID' version prefix, String)]
     readsPrec _ str = case TID.parseStringS str of
       Left _           -> []
-      Right (tid, rem) -> case fromTypeID tid of
+      Right (tid, nks) -> case fromTypeID tid of
         Nothing  -> []
-        Just kid -> [(kid, rem)]
+        Just kid -> [(kid, nks)]
     {-# INLINE readsPrec #-}
 
 instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))

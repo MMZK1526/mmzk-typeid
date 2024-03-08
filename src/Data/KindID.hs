@@ -7,10 +7,11 @@
 -- Similar to "Data.TypeID", but the type is statically determined in the type
 -- level.
 --
--- When using 'TypeID', if we want to check if the type matches, we usually need
--- to get the prefix of the 'TypeID' and compare it with the desired prefix at
--- runtime. However, with Haskell's type system, we can do this at compile time
--- instead. We call this TypeID with compile-time prefix a 'KindID'.
+-- When using 'Data.TypeID.V7.TypeID', if we want to check if the type matches,
+-- we usually need to get the prefix of the 'TypeID' and compare it with the
+-- desired prefix at runtime. However, with Haskell's type system, we can do
+-- this at compile time instead. We call this TypeID with compile-time prefix a
+-- 'KindID'.
 --
 -- Of course, that would require the desired prefix to be known at compile time.
 -- This is actually quite common, especially when we are using one prefix for
@@ -87,5 +88,3 @@ module Data.KindID
 
 import           Data.KindID.Internal (KindID')
 import           Data.KindID.V7
-import           Data.TypeID.Class
-import           Data.TypeID.V7 (TypeID)

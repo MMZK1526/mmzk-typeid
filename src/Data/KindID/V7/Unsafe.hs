@@ -22,10 +22,8 @@ module Data.KindID.V7.Unsafe
 
 import           Data.ByteString.Lazy (ByteString)
 import           Data.KindID.Class
-import           Data.KindID.Internal (KindID')
 import qualified Data.KindID.Internal as KID
 import           Data.KindID.V7 (KindID)
-import           Data.TypeID.Internal (TypeID')
 import           Data.TypeID.V7 (TypeID)
 import           Data.Text (Text)
 import           Data.TypeID.Class
@@ -60,9 +58,10 @@ unsafeParseByteString :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
 unsafeParseByteString = KID.unsafeParseByteString
 {-# INLINE unsafeParseByteString #-}
 
--- | Convert a 'TypeID'' to a 'KindID''. If the actual prefix does not match
--- with the expected one as defined by the type, it does not complain and
--- produces a wrong 'KindID''.
+-- | Convert a 'Data.TypeID.Internal.TypeID'' to a
+-- 'Data.KindID.Internal.KindID''. If the actual prefix does not match with the
+-- expected one as defined by the type, it does not complain and produces a
+-- wrong 'Data.KindID.Internal.KindID''.
 unsafeFromTypeID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                  => TypeID -> KindID prefix
 unsafeFromTypeID = KID.unsafeFromTypeID

@@ -26,8 +26,8 @@ module Data.TypeID.Class
   , checkID
   , checkIDWithEnv
   -- * Helper types
-  , GenFunc(..)
-  , ResWithErr(..)
+  , GenFunc
+  , ResWithErr
   ) where
 
 import           Control.Exception

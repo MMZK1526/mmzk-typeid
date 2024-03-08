@@ -179,7 +179,7 @@ test-suite test
         uuid-types,
     ghc-options:
         -Wall
-        -O2
+        -O0
     hs-source-dirs:
         src
         test

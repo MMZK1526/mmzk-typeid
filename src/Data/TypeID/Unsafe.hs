@@ -10,11 +10,11 @@
 --
 module Data.TypeID.Unsafe
   (
-  -- * Unsafe 'TypeID' generation
+  -- * Unsafe 'Data.TypeID.V7.TypeID' generation
     unsafeGenTypeID
   , unsafeGenTypeID'
   , unsafeGenTypeIDs
-  -- * Unsafe decoding ('TypeID'-specific)
+  -- * Unsafe decoding ('Data.TypeID.V7.TypeID'-specific)
   , unsafeParseString
   , unsafeParseText
   , unsafeParseByteString
@@ -25,5 +25,4 @@ module Data.TypeID.Unsafe
   ) where
 
 import           Data.TypeID.Class
-import           Data.TypeID.V7 (TypeID)
 import           Data.TypeID.V7.Unsafe

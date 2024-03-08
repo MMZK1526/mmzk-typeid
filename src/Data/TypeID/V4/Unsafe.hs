@@ -27,7 +27,6 @@ import           Data.Text (Text)
 import           Data.TypeID.Class
 import qualified Data.TypeID.Internal as TID
 import           Data.TypeID.V4 (TypeIDV4)
-import           Data.UUID.Types.Internal (UUID)
 
 -- | Generate a new 'TypeIDV4' from a prefix, but without checking if the prefix
 -- is valid.
