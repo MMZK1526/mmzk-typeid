@@ -1,4 +1,5 @@
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 
 -- |
 -- Module      : Data.KindID.Internal
@@ -13,11 +14,13 @@ import           Control.Monad.IO.Class
 import           Data.Aeson.Types hiding (String)
 import           Data.Binary
 import           Data.ByteString.Lazy (ByteString)
+import           Data.Data (Data)
 import           Data.Hashable
 import           Data.Proxy
 import           Data.KindID.Class
 import           Data.Text (Text)
 import qualified Data.Text as T
+import           Data.Typeable (Typeable)
 import           Data.TypeID.Class
 import           Data.TypeID.Error
 import           Data.TypeID.Internal (TypeID'(..))
@@ -38,7 +41,7 @@ import           System.Random
 -- It is dubbed 'Data.KindID.V7.KindID' because the prefix here is a data kind
 -- rather than a type.
 newtype KindID' (version :: UUIDVersion) prefix = KindID' UUID
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Data, Typeable)
 
 instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
   => Show (KindID' version prefix) where
