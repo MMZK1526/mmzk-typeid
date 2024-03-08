@@ -1,3 +1,5 @@
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 -- |
 -- Module      : Data.TypeID.Internal
 -- License     : MIT
@@ -23,12 +25,14 @@ import qualified Data.ByteString as BS
 import           Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Lazy as BSL
 import           Data.Char
+import           Data.Data (Data)
 import           Data.Hashable
 import           Data.Proxy
 import           Data.String
 import           Data.Text (Text)
 import qualified Data.Text as T
 import           Data.Text.Encoding
+import           Data.Typeable (Typeable)
 import           Data.TypeID.Class
 import           Data.TypeID.Error
 import           Data.UUID.Types.Internal (UUID(..))
@@ -47,7 +51,7 @@ import           Foreign
 --  The constructor is not exposed to the public API to prevent generating
 -- invalid 'TypeID''s.
 data TypeID' (version :: UUIDVersion) = TypeID' Text UUID
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Data, Typeable)
 
 instance Show (TypeID' version) where
   show :: TypeID' version -> String
