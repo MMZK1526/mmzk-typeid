@@ -1,5 +1,4 @@
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE DeriveDataTypeable #-}
 -- |
 -- Module      : Data.TypeID.Internal
 -- License     : MIT
