@@ -1,7 +1,7 @@
 # Revision history for mmzk-typeid
 
 
-## 0.5.0.2 -- To be released
+## 0.5.0.2 -- 2024-3-10
 
 * Add `Typeable` and `Data` instances for `TypeID` and `KindID`.
   * Kindly contributed by @shinzui.
