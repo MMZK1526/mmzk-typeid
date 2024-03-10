@@ -4,7 +4,7 @@
 -- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
--- Unsafe 'TypeID' functions.
+-- Unsafe 'Data.TypeID.V7.TypeID' functions.
 --
 -- It is a re-export of "Data.TypeID.V7.Unsafe".
 --

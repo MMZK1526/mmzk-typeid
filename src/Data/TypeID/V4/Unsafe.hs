@@ -34,7 +34,8 @@ unsafeGenTypeID :: MonadIO m => Text -> m TypeIDV4
 unsafeGenTypeID = TID.unsafeGenTypeIDV4
 {-# INLINE unsafeGenTypeID #-}
 
--- | Generate a new 'TypeIDV4' from a prefix based on insecure 'UUID'v4.
+-- | Generate a new 'TypeIDV4' from a prefix based on insecure
+-- 'Data.UUID.Types.Internal.UUID'v4.
 unsafeGenTypeID' :: MonadIO m => Text -> m TypeIDV4
 unsafeGenTypeID' = TID.unsafeGenTypeIDV4'
 {-# INLINE unsafeGenTypeID' #-}
