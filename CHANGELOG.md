@@ -1,6 +1,15 @@
 # Revision history for mmzk-typeid
 
 
+## 0.6.0.2 -- Unreleased
+
+* Update implementation to conform with specification v0.3.0.
+  * Allow `TypeID` prefix to contain underscores.
+  * Update parsing logic as well as `Binary` and `Storable` instances to reflect the changes.
+  * Add tests.
+* Have a breaking change in `TypeIDError` to better reflect the error cases for the update in the specification.
+
+
 ## 0.5.0.2 -- 2024-3-10
 
 * Add `Typeable` and `Data` instances for `TypeID` and `KindID`.
