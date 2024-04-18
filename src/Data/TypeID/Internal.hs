@@ -25,6 +25,7 @@ import           Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Lazy as BSL
 import           Data.Char
 import           Data.Data (Data)
+import           Data.Functor.Identity
 import           Data.Hashable
 import           Data.Proxy
 import           Data.String
@@ -42,6 +43,7 @@ import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
 import           System.Random
 import           Foreign
+import Data.Tuple
 
 -- | This data type also supports 'Data.TypeID.V7.TypeID's with 'UUID' versions
 -- other than v7.
@@ -471,14 +473,14 @@ parseString str = case parseStringS str of
 {-# INLINE parseString #-}
 
 parseStringS :: String -> Either TypeIDError (TypeID' version, String)
-parseStringS str = case span (/= '_') str of
-  ("", _)              -> Left TypeIDExtraSeparator
-  (_, "")              -> do
+parseStringS str = case spanEnd (/= '_') str of
+  (_, "")          -> do
     let (uuid, nks) = splitAt 26 str
         bs          = fromString uuid
     (, nks) . TypeID' "" <$> decodeUUID bs
-  (prefix, _ : suffix) -> do
-    let prefix'     = T.pack prefix
+  (_, "_")         -> Left TypeIDExtraSeparator
+  (suffix, prefix) -> do
+    let prefix'     = T.pack $ init prefix
         (uuid, nks) = splitAt 26 suffix
         bs          = fromString uuid
     case checkPrefix prefix' of
@@ -488,11 +490,12 @@ parseStringS str = case span (/= '_') str of
 -- | Parse a 'TypeID'' from its string representation as a strict 'Text'. It is
 -- 'text2ID' with concrete type.
 parseText :: Text -> Either TypeIDError (TypeID' version)
-parseText text = case second T.uncons $ T.span (/= '_') text of
-  ("", _)                    -> Left TypeIDExtraSeparator
+parseText text = case second T.unsnoc . swap . runIdentity
+               $ T.spanEndM (pure . (/= '_')) text of
   (_, Nothing)               -> TypeID' ""
                             <$> decodeUUID (BSL.fromStrict $ encodeUtf8 text)
-  (prefix, Just (_, suffix)) -> do
+  (_, Just ("", _))          -> Left TypeIDExtraSeparator
+  (suffix, Just (prefix, _)) -> do
     case checkPrefix prefix of
       Nothing  -> TypeID' prefix
               <$> decodeUUID (BSL.fromStrict $ encodeUtf8 suffix)
@@ -534,8 +537,13 @@ parseByteStringM = byteString2IDM
 checkPrefix :: Text -> Maybe TypeIDError
 checkPrefix prefix
   | T.length prefix > 63 = Just $ TypeIDErrorPrefixTooLong (T.length prefix)
+  | T.null prefix        = Nothing
+  | T.head prefix == '_' = Just TypeIDStartWithUnderscore
+  | T.last prefix == '_' = Just TypeIDEndWithUnderscore
   | otherwise
-      = case T.uncons (T.dropWhile (liftM2 (&&) isLower isAscii) prefix) of
+      = case T.uncons ( T.dropWhile ( liftM2 (||) (== '_')
+                                    $ liftM2 (&&) isLower isAscii)
+                        prefix) of
         Nothing     -> Nothing
         Just (c, _) -> Just $ TypeIDErrorPrefixInvalidChar c
 {-# INLINE checkPrefix #-}
@@ -679,6 +687,10 @@ separate5BitInts
 nextUUID :: IO UUID
 nextUUID = V1.nextUUID >>= maybe nextUUID pure
 {-# INLINE nextUUID #-}
+
+spanEnd :: (a -> Bool) -> [a] -> ([a], [a])
+spanEnd p = bimap reverse reverse . span p . reverse
+{-# INLINE spanEnd #-}
 
 -- The helpers below are verbatim translations from the official highly magical
 -- Go implementation.

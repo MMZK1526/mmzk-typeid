@@ -2,11 +2,11 @@
 
 ## Introduction
 
-A [TypeID](https://github.com/jetpack-io/typeid) implementation in Haskell. It is a "type-safe, K-sortable, globally unique identifier" extended on top of UUIDv7.
+A [TypeID](https://github.com/jetpack-io/typeid) implementation in Haskell that conforms with specification v0.3.0. It is a "type-safe, K-sortable, globally unique identifier" extended on top of UUIDv7.
 
 TypeIDs are canonically encoded as lowercase strings consisting of three parts:
 
-1. A type prefix (at most 63 characters in all lowercase ASCII [a-z]);
+1. A type prefix (at most 63 characters in all lowercase snake_case ASCII [a-z_]);
 2. An underscore '_' separator;
 3. A 128-bit UUIDv7 encoded as a 26-character string using a modified base32 encoding.
 
