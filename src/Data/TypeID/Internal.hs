@@ -1,4 +1,3 @@
-{-# LANGUAGE UndecidableInstances #-}
 -- |
 -- Module      : Data.TypeID.Internal
 -- License     : MIT
@@ -121,9 +120,9 @@ instance Binary (TypeID' version) where
     uuid          <- get
     len           <- getWord8
     encodedPrefix <- separate5BitInts <$> replicateM (fromIntegral len) getWord8
-    when (length encodedPrefix > 63) $ fail "Binary: Prefix too long"
-    when (any (liftM2 (&&) (< 1) (> 26)) encodedPrefix)
-         (fail "Binary: Invalid prefix")
+    when (length encodedPrefix > 63) do fail "Binary: Prefix too long"
+    when (any (liftM2 (&&) (< 1) (> 26)) encodedPrefix) do
+      fail "Binary: Invalid prefix"
     let back 27 = 95
         back a  = a + 96
     pure $ TypeID' (decodeUtf8 . BS.pack $ fmap back encodedPrefix) uuid
@@ -146,8 +145,8 @@ instance Storable (TypeID' version) where
     encodedPrefix <- separate5BitInts
                  <$> forM [1..len] \ix -> peekByteOff @Word8 ptr (16 + ix)
     when (length encodedPrefix > 63) $ fail "Storable: Prefix too long"
-    when (any (liftM2 (&&) (< 1) (> 26)) encodedPrefix)
-         (fail "Storable: Invalid prefix")
+    when (any (liftM2 (&&) (< 1) (> 26)) encodedPrefix) do
+      fail "Storable: Invalid prefix"
     let back 27 = 95
         back a  = a + 96
     pure $ TypeID' (decodeUtf8 . BS.pack $ fmap back encodedPrefix) uuid
@@ -761,7 +760,8 @@ decodeUUID :: ByteString -> Either TypeIDError UUID
 decodeUUID bs = do
   unless (BSL.length bs == 26) $ Left TypeIDErrorUUIDError
   unless (bs `BSL.index` 0 <= 55) $ Left TypeIDErrorUUIDError
-  when (any ((== 0xFF) . (base32Table !)) $ BSL.unpack bs) $ Left TypeIDErrorUUIDError
+  when (any ((== 0xFF) . (base32Table !)) $ BSL.unpack bs) do
+    Left TypeIDErrorUUIDError
   pure $ unsafeDecodeUUID bs
 {-# INLINE decodeUUID #-}
 
