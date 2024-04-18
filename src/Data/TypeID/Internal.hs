@@ -504,10 +504,10 @@ parseText text = case second T.unsnoc . swap . runIdentity
 -- | Parse a 'TypeID'' from its string representation as a lazy 'ByteString'. It
 -- is 'byteString2ID' with concrete type.
 parseByteString :: ByteString -> Either TypeIDError (TypeID' version)
-parseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
-  ("", _)                    -> Left TypeIDExtraSeparator
+parseByteString bs = case second BSL.unsnoc . swap $ BSL.spanEnd (/= 95) bs of
+  (_, Just ("", _))          -> Left TypeIDExtraSeparator
   (_, Nothing)               -> TypeID' "" <$> decodeUUID bs
-  (prefix, Just (_, suffix)) -> do
+  (suffix, Just (prefix, _)) -> do
     let prefix' = decodeUtf8 $ BSL.toStrict prefix
     case checkPrefix prefix' of
       Nothing  -> TypeID' prefix' <$> decodeUUID suffix

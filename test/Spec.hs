@@ -17,6 +17,8 @@ import           Data.Map (Map)
 import qualified Data.Map as M
 import           Data.String
 import           Data.Text (Text)
+import qualified Data.Text as T
+import           Data.Text.Encoding
 import           Data.TypeID
 import           Data.TypeID.V1 (TypeIDV1)
 import           Data.TypeID.V4 (TypeIDV4)
@@ -169,6 +171,9 @@ v7Test = do
           Just t  -> do
             getPrefix t `shouldBe` pref
             show (getUUID t) `shouldBe` uid
+            Right t `shouldBe` string2ID tid
+            Right t `shouldBe` text2ID (T.pack tid)
+            Right t `shouldBe` byteString2ID (BSL.fromStrict . encodeUtf8 $ T.pack tid)
     describe "Valid JSON key" do
       forM_ valid \(TestData n tid (Just pref) (Just uid)) -> it n do
         case decode @(Map TypeID Int) (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") of
@@ -370,6 +375,9 @@ v1Test = do
           Just t -> do
             getPrefix t `shouldBe` pref
             show (getUUID t) `shouldBe` uid
+            Right t `shouldBe` string2ID tid
+            Right t `shouldBe` text2ID (T.pack tid)
+            Right t `shouldBe` byteString2ID (BSL.fromStrict . encodeUtf8 $ T.pack tid)
     describe "Valid JSON key" do
       forM_ valid \(TestData n tid (Just pref) (Just uid)) -> it n do
         case decode @(Map TypeIDV1 Int) (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") of
@@ -548,6 +556,9 @@ v4Test = do
           Just t  -> do
             getPrefix t `shouldBe` pref
             show (getUUID t) `shouldBe` uid
+            Right t `shouldBe` string2ID tid
+            Right t `shouldBe` text2ID (T.pack tid)
+            Right t `shouldBe` byteString2ID (BSL.fromStrict . encodeUtf8 $ T.pack tid)
     describe "Valid JSON key" do
       forM_ valid \(TestData n tid (Just pref) (Just uid)) -> it n do
         case decode @(Map TypeIDV4 Int) (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") of
@@ -730,6 +741,9 @@ v5Test = do
           Just t  -> do
             getPrefix t `shouldBe` pref
             show (getUUID t) `shouldBe` uid
+            Right t `shouldBe` string2ID tid
+            Right t `shouldBe` text2ID (T.pack tid)
+            Right t `shouldBe` byteString2ID (BSL.fromStrict . encodeUtf8 $ T.pack tid)
     describe "Valid JSON key" do
       forM_ valid \(TestData n tid (Just pref) (Just uid)) -> it n do
         case decode @(Map TypeIDV5 Int) (fromString $ "{" ++ show tid ++ ":" ++ "114514" ++ "}") of
