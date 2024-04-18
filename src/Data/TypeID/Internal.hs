@@ -97,7 +97,7 @@ instance FromJSONKey (TypeID' version) where
 -- * The first 16 bytes are the suffix 'UUID' encoded in base32.
 -- * The next byte is the length of the prefix encoded in a byte.
 -- * The next bytes are the prefix, each letter taking 5 bits, mapping \'a\' to
---   1 and \'z\' to 26.
+--   1 and \'z\' to 26. The underscore \'_\' is mapped to 27.
 --
 -- Note that the prefix and the 'UUID' is swapped compared to the string
 -- representation, this is for the convenience of the use case where only the
@@ -108,7 +108,9 @@ instance Binary (TypeID' version) where
   put :: TypeID' version -> Put
   put (TypeID' prefix uuid) = do
     put uuid
-    let encodedPrefix = concat5BitInts . fmap (subtract 96) . BS.unpack
+    let fore 95 = 27
+        fore a  = a - 96
+    let encodedPrefix = concat5BitInts . fmap fore . BS.unpack
                       $ encodeUtf8 prefix
     putWord8 . fromIntegral $ length encodedPrefix
     forM_ encodedPrefix putWord8
@@ -120,9 +122,11 @@ instance Binary (TypeID' version) where
     len           <- getWord8
     encodedPrefix <- separate5BitInts <$> replicateM (fromIntegral len) getWord8
     when (length encodedPrefix > 63) $ fail "Binary: Prefix too long"
-    when (any (liftM2 (&&) (< 1) (> 25)) encodedPrefix)
+    when (any (liftM2 (&&) (< 1) (> 26)) encodedPrefix)
          (fail "Binary: Invalid prefix")
-    pure $ TypeID' (decodeUtf8 . BS.pack $ fmap (+ 96) encodedPrefix) uuid
+    let back 27 = 95
+        back a  = a + 96
+    pure $ TypeID' (decodeUtf8 . BS.pack $ fmap back encodedPrefix) uuid
   {-# INLINE get #-}
 
 -- | Similar to the 'Binary' instance, but the 'UUID' is stored in host endian.
@@ -142,15 +146,19 @@ instance Storable (TypeID' version) where
     encodedPrefix <- separate5BitInts
                  <$> forM [1..len] \ix -> peekByteOff @Word8 ptr (16 + ix)
     when (length encodedPrefix > 63) $ fail "Storable: Prefix too long"
-    when (any (liftM2 (&&) (< 1) (> 25)) encodedPrefix)
+    when (any (liftM2 (&&) (< 1) (> 26)) encodedPrefix)
          (fail "Storable: Invalid prefix")
-    pure $ TypeID' (decodeUtf8 . BS.pack $ fmap (+ 96) encodedPrefix) uuid
+    let back 27 = 95
+        back a  = a + 96
+    pure $ TypeID' (decodeUtf8 . BS.pack $ fmap back encodedPrefix) uuid
   {-# INLINE peek #-}
 
   poke :: Ptr (TypeID' version) -> TypeID' version -> IO ()
   poke ptr (TypeID' prefix uuid) = do
     poke (castPtr ptr) uuid
-    let encodedPrefix = concat5BitInts . fmap (subtract 96) . BS.unpack
+    let fore 95 = 27
+        fore a  = a - 96
+    let encodedPrefix = concat5BitInts . fmap fore . BS.unpack
                       $ encodeUtf8 prefix
     pokeByteOff @Word8 ptr 16 (fromIntegral $ length encodedPrefix)
     zipWithM_ (pokeByteOff ptr . (+ 16)) [1..] encodedPrefix
