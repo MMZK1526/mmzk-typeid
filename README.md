@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A [TypeID](https://github.com/jetpack-io/typeid) implementation in Haskell that conforms with specification v0.3.0. It is a "type-safe, K-sortable, globally unique identifier" extended on top of UUIDv7.
+A [TypeID](https://github.com/jetpack-io/typeid) implementation in Haskell. It is a "type-safe, K-sortable, globally unique identifier" extended on top of UUIDv7.
 
 TypeIDs are canonically encoded as lowercase strings consisting of three parts:
 
@@ -10,7 +10,7 @@ TypeIDs are canonically encoded as lowercase strings consisting of three parts:
 2. An underscore '_' separator;
 3. A 128-bit UUIDv7 encoded as a 26-character string using a modified base32 encoding.
 
-For more information, please check out the [specification](https://github.com/jetpack-io/typeid/blob/main/README.md).
+For more information, please check out [specification v0.3.0](https://github.com/jetpack-io/typeid/blob/main/README.md).
 
 It also serves as a (temporary) UUIDv7 implementation in Haskell, since there are no official ones yet.
 
@@ -222,4 +222,4 @@ main = do
 For more information, see [Data.KindID.Class]([src/Data/KindID/Class.hs](https://hackage.haskell.org/package/mmzk-typeid/docs/Data-KindID-Class.html)).
 
 ## Note
-Not explicitly exported functions are considered internal and are subjected to changes.
+Functions not explicitly exported are considered internal and are subjected to changes.
