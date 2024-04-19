@@ -190,6 +190,7 @@ For example, suppose we have three tables for users, posts, and comments, and ea
 ```Haskell
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TypeApplications #-}
 
 import           Data.KindID
