@@ -36,7 +36,7 @@ maintainer:         Yitang Chen <mmzk1526@outlook.com>
 category:           Data, UUID, TypeID
 tested-with:
     GHC == 9.2.8
-    GHC == 9.6.2
+    GHC == 9.6.1
 extra-source-files:
     CHANGELOG.md
     LICENSE
