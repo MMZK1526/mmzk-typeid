@@ -161,9 +161,9 @@ v7Test = do
       tid  <- genID @TypeID "mmzk"
       tid' <- genID @TypeID "foo"
       let mapping = M.fromList [(tid, tid')]
-      let json    = encode mapping
-      decode json `shouldBe` Just mapping
-      fmap encode (decode @(Map TypeID TypeID) json) `shouldBe` Just json
+      let tJson   = encode mapping
+      decode tJson `shouldBe` Just mapping
+      fmap encode (decode @(Map TypeID TypeID) tJson) `shouldBe` Just tJson
     describe "Valid JSON value" do
       forM_ valid \(TestData n tid (Just pref) (Just uid)) -> it n do
         case decode @TypeID (fromString $ show tid) of
@@ -365,9 +365,9 @@ v1Test = do
       tid  <- genID @TypeIDV1 "mmzk"
       tid' <- genID @TypeIDV1 "foo"
       let mapping = M.fromList [(tid, tid')]
-      let json    = encode mapping
-      decode json `shouldBe` Just mapping
-      fmap encode (decode @(Map TypeIDV1 TypeIDV1) json) `shouldBe` Just json
+      let tJson   = encode mapping
+      decode tJson `shouldBe` Just mapping
+      fmap encode (decode @(Map TypeIDV1 TypeIDV1) tJson) `shouldBe` Just tJson
     describe "Valid JSON value" do
       forM_ valid \(TestData n tid (Just pref) (Just uid)) -> it n do
         case decode @TypeIDV1 (fromString $ show tid) of
@@ -546,9 +546,9 @@ v4Test = do
       tid  <- genID @TypeIDV4 "mmzk"
       tid' <- genID @TypeIDV4 "foo"
       let mapping = M.fromList [(tid, tid')]
-      let json    = encode mapping
-      decode json `shouldBe` Just mapping
-      fmap encode (decode @(Map TypeIDV4 TypeIDV4) json) `shouldBe` Just json
+      let tJson   = encode mapping
+      decode tJson `shouldBe` Just mapping
+      fmap encode (decode @(Map TypeIDV4 TypeIDV4) tJson) `shouldBe` Just tJson
     describe "Valid JSON value" do
       forM_ valid \(TestData n tid (Just pref) (Just uid)) -> it n do
         case decode @TypeIDV4 (fromString $ show tid) of
@@ -731,9 +731,9 @@ v5Test = do
       tid  <- genID @TypeIDV5 "mmzk" uid [11, 45, 14]
       tid' <- genID @TypeIDV5 "foo" uid [11, 45, 14]
       let mapping = M.fromList [(tid, tid')]
-      let json    = encode mapping
-      decode json `shouldBe` Just mapping
-      fmap encode (decode @(Map TypeIDV5 TypeIDV5) json) `shouldBe` Just json
+      let tJson   = encode mapping
+      decode tJson `shouldBe` Just mapping
+      fmap encode (decode @(Map TypeIDV5 TypeIDV5) tJson) `shouldBe` Just tJson
     describe "Valid JSON value" do
       forM_ valid \(TestData n tid (Just pref) (Just uid)) -> it n do
         case decode @TypeIDV5 (fromString $ show tid) of
