@@ -621,13 +621,13 @@ unsafeGenTypeIDV5 prefix ns obj = TypeID' prefix (V5.generateNamed ns obj)
 
 -- | Generate a new 'Data.TypeID.V7.TypeID' from a prefix based on stateless
 -- 'UUID'v7, but without checking if the prefix is valid.
-unsafeGenTypeID' :: MonadIO m => Text -> m (TypeID' V7)
+unsafeGenTypeID' :: MonadIO m => Text -> m (TypeID' 'V7)
 unsafeGenTypeID' prefix = TypeID' prefix <$> V7.genUUID'
 {-# INLINE unsafeGenTypeID' #-}
 
 -- | Generate a new 'TypeID'' ''V4' from a prefix based on insecure 'UUID'v4,
 -- but without checking if the prefix is valid.
-unsafeGenTypeIDV4' :: MonadIO m => Text -> m (TypeID' V4)
+unsafeGenTypeIDV4' :: MonadIO m => Text -> m (TypeID' 'V4)
 unsafeGenTypeIDV4' prefix = TypeID' prefix <$> liftIO randomIO
 {-# INLINE unsafeGenTypeIDV4' #-}
 
@@ -640,7 +640,7 @@ unsafeGenTypeIDV4' prefix = TypeID' prefix <$> liftIO randomIO
 --
 -- It is guaranteed that the first 32768 'Data.TypeID.V7.TypeID's are generated
 -- at the same timestamp.
-unsafeGenTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID' V7]
+unsafeGenTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID' 'V7]
 unsafeGenTypeIDs prefix n = map (TypeID' prefix) <$> V7.genUUIDs n
 {-# INLINE unsafeGenTypeIDs #-}
 
