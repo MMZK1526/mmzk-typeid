@@ -31,6 +31,7 @@ import           Data.String
 import           Data.Text (Text)
 import qualified Data.Text as T
 import           Data.Text.Encoding
+import           Data.Tuple
 import           Data.Typeable (Typeable)
 import           Data.TypeID.Class
 import           Data.TypeID.Error
@@ -42,7 +43,6 @@ import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
 import           System.Random
 import           Foreign
-import Data.Tuple
 
 -- | This data type also supports 'Data.TypeID.V7.TypeID's with 'UUID' versions
 -- other than v7.
