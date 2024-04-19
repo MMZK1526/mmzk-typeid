@@ -201,7 +201,8 @@ toTypeID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
 toTypeID = KID.toTypeID
 {-# INLINE toTypeID #-}
 
--- | Convert a 'TypeID' to a 'KindID'.
+-- | Convert a 'TypeID' to a 'KindID'. Returns 'Nothing' if the prefix does not
+-- match.
 fromTypeID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
            => TypeID -> Maybe (KindID prefix)
 fromTypeID = KID.fromTypeID
