@@ -113,8 +113,8 @@ toByteString :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
 toByteString = KID.toByteString
 {-# INLINE toByteString #-}
 
--- | Parse a 'KindIDV4' from its 'String' representation. It is 'parseString'
--- with concrete type.
+-- | Parse a 'KindIDV4' from its 'String' representation. It is 'string2ID' with
+-- concrete type.
 parseString :: forall prefix
              . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
             => String -> Either TypeIDError (KindIDV4 prefix)
@@ -122,7 +122,7 @@ parseString = KID.parseString
 {-# INLINE parseString #-}
 
 -- | Parse a 'KindIDV4' from its string representation as a strict 'Text'. It is
--- 'parseText' with concrete type.
+-- 'text2ID' with concrete type.
 parseText :: forall prefix
            . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
           => Text -> Either TypeIDError (KindIDV4 prefix)
@@ -130,7 +130,7 @@ parseText = KID.parseText
 {-# INLINE parseText #-}
 
 -- | Parse a 'KindIDV4' from its string representation as a lazy 'ByteString'.
--- It is 'parseByteString' with concrete type.
+-- It is 'byteString2ID' with concrete type.
 parseByteString :: forall prefix
                  . (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
                 => ByteString -> Either TypeIDError (KindIDV4 prefix)
@@ -145,7 +145,7 @@ parseStringM = KID.parseStringM
 
 -- | Parse a 'KindIDV4' from its string representation as a strict 'Text',
 -- throwing an error when the parsing fails. It is 'text2IDM' with concrete
--- type. It is 'parseTextM' with concrete type.
+-- type.
 parseTextM :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
            => Text -> m (KindIDV4 prefix)
 parseTextM = KID.parseTextM
@@ -153,7 +153,7 @@ parseTextM = KID.parseTextM
 
 -- | Parse a 'KindIDV4' from its string representation as a lazy 'ByteString',
 -- throwing an error when the parsing fails. It is 'byteString2IDM' with
--- concrete type. It is 'parseByteStringM' with concrete type.
+-- concrete type.
 parseByteStringM :: ( ToPrefix prefix
                     , ValidPrefix (PrefixSymbol prefix)
                     , MonadIO m )
@@ -167,7 +167,8 @@ toTypeID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
 toTypeID = KID.toTypeID
 {-# INLINE toTypeID #-}
 
--- | Convert a 'TypeIDV4' to a 'KindIDV4'.
+-- | Convert a 'TypeIDV4' to a 'KindIDV4'. Returns 'Nothing' if the prefix does
+-- not match.
 fromTypeID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
            => TypeIDV4 -> Maybe (KindIDV4 prefix)
 fromTypeID = KID.fromTypeID
