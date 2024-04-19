@@ -1,7 +1,7 @@
 # Revision history for mmzk-typeid
 
 
-## 0.6.0.0 -- Unreleased
+## 0.6.0.0 -- 2024-04-19
 
 * Update implementation to conform with specification v0.3.0.
   * Allow `TypeID` prefix to contain underscores.
