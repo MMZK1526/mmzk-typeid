@@ -41,8 +41,8 @@ import qualified Data.UUID.V4 as V4
 import qualified Data.UUID.V5 as V5
 import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
-import           System.Random
 import           Foreign
+import           System.Random
 
 -- | This data type also supports 'Data.TypeID.V7.TypeID's with 'UUID' versions
 -- other than v7.
