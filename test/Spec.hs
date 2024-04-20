@@ -117,6 +117,14 @@ v7Test = do
       case string2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
         Left err  -> expectationFailure $ "Parse error: " ++ show err
         Right tid -> getPrefix tid `shouldBe` "mmzk"
+    it "can parse TypeID from Text" do
+      case text2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
+        Left err  -> expectationFailure $ "Parse error: " ++ show err
+        Right tid -> getPrefix tid `shouldBe` "mmzk"
+    it "can parse TypeID from ByteString" do
+      case byteString2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
+        Left err  -> expectationFailure $ "Parse error: " ++ show err
+        Right tid -> getPrefix tid `shouldBe` "mmzk"
 
   describe "Parse TypeID" do
     let invalidPrefixes = [ ("caps", "PREFIX")
@@ -321,6 +329,14 @@ v1Test = do
       case string2ID @TypeIDV1 "mmzk_5hjpeh96458fct8t49fnf9farw" of
         Left err  -> expectationFailure $ "Parse error: " ++ show err
         Right tid -> getPrefix tid `shouldBe` "mmzk"
+    it "can parse TypeIDV1 from Text" do
+      case text2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
+        Left err  -> expectationFailure $ "Parse error: " ++ show err
+        Right tid -> getPrefix tid `shouldBe` "mmzk"
+    it "can parse TypeIDV1 from ByteString" do
+      case byteString2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
+        Left err  -> expectationFailure $ "Parse error: " ++ show err
+        Right tid -> getPrefix tid `shouldBe` "mmzk"
 
   describe "Parse TypeIDV1" do
     let invalidPrefixes = [ ("caps", "PREFIX")
@@ -500,6 +516,14 @@ v4Test = do
       getPrefix tid `shouldBe` "mmzk"
     it "can parse TypeIDV4 from String" do
       case string2ID @TypeIDV4 "mmzk_5hjpeh96458fct8t49fnf9farw" of
+        Left err  -> expectationFailure $ "Parse error: " ++ show err
+        Right tid -> getPrefix tid `shouldBe` "mmzk"
+    it "can parse TypeIDV4 from Text" do
+      case text2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
+        Left err  -> expectationFailure $ "Parse error: " ++ show err
+        Right tid -> getPrefix tid `shouldBe` "mmzk"
+    it "can parse TypeIDV4 from ByteString" do
+      case byteString2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
         Left err  -> expectationFailure $ "Parse error: " ++ show err
         Right tid -> getPrefix tid `shouldBe` "mmzk"
 
@@ -683,6 +707,14 @@ v5Test = do
       getPrefix tid `shouldBe` ""
     it "can parse TypeIDV5 from String" do
       case string2ID @TypeIDV5 "mmzk_5hjpeh96458fct8t49fnf9farw" of
+        Left err  -> expectationFailure $ "Parse error: " ++ show err
+        Right tid -> getPrefix tid `shouldBe` "mmzk"
+    it "can parse TypeIDV5 from Text" do
+      case text2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
+        Left err  -> expectationFailure $ "Parse error: " ++ show err
+        Right tid -> getPrefix tid `shouldBe` "mmzk"
+    it "can parse TypeIDV5 from ByteString" do
+      case byteString2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
         Left err  -> expectationFailure $ "Parse error: " ++ show err
         Right tid -> getPrefix tid `shouldBe` "mmzk"
 
