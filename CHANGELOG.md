@@ -1,6 +1,14 @@
 # Revision history for mmzk-typeid
 
 
+## 0.6.0.1 -- Unreleased
+
+* Fix typo in the maintainer's email address.
+  * Astounded at the fact that I mismatched the local part and domain name and didn't realise it for a year.
+* More test cases on parsing.
+* Fix other typos and inconsistencies in the documentation.
+
+
 ## 0.6.0.0 -- 2024-04-19
 
 * Update implementation to conform with specification v0.3.0.
