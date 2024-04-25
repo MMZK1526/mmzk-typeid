@@ -1,7 +1,7 @@
 # Revision history for mmzk-typeid
 
 
-## 0.6.0.1 -- Unreleased
+## 0.6.0.1 -- 2024-04-26
 
 * Fix typo in the maintainer's email address.
   * Astounded at the fact that I mismatched the local part and domain name and didn't realise it for a year.
