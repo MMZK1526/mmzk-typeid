@@ -1,6 +1,7 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
+{-# OPTIONS_GHC -Wno-x-partial #-}
 
 import           Control.Monad
 import           Data.Aeson
