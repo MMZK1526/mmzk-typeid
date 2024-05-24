@@ -1,6 +1,12 @@
 # Revision history for mmzk-typeid
 
 
+## 0.6.2.0 -- Unreleased
+
+* Fix the bug where the first 32768 `TypeID`s may not of the same timestamp.
+* Test on GHC 9.8.2.
+
+
 ## 0.6.0.1 -- 2024-04-26
 
 * Fix typo in the maintainer's email address.

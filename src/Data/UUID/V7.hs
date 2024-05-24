@@ -76,38 +76,43 @@ genUUID' = do
 -- It is guaranteed that the first 32768 'UUID's are generated at the same
 -- timestamp.
 genUUIDs :: MonadIO m => Word16 -> m [UUID]
-genUUIDs 0 = pure []
-genUUIDs n = liftIO do
-  timestamp <- getEpochMilli
-  -- We set the first bit of the entropy to 0 to ensure that there's enough
-  -- room for incrementing the sequence number.
-  entropy16 <- (.&. 0x7FFF) <$> getEntropyWord16
-  -- Calculate the maximum number of slots we can use for the current timestamp
-  -- before the sequence number overflows.
-  let getMaxSlots num seqNo = if 0xFFFF - seqNo < num
-        then (0xFFFF - seqNo, 0xFFFF)
-        else (num, seqNo + num)
-  -- Get the sequence number corresponding to the current timestamp and the
-  -- number of UUIDs we can generate.
-  (n', seqNo)  <- atomicModifyIORef __state__ $ \(ts, seqNo) -> if
-    | ts < timestamp -> let (n', entropy16') = getMaxSlots n entropy16
-                        in  ((timestamp, entropy16'), (n', entropy16 + 1))
-    | ts > timestamp -> ((ts, seqNo), (0, 0))
-    | otherwise      -> let (n', entropy16') = getMaxSlots n seqNo
-                        in  ((timestamp, entropy16'), (n', seqNo + 1))
-  -- If we can't generate any UUIDs, we try again, hoping that the timestamp
-  -- has changed.
-  if n' == 0
-    then genUUIDs n
-    else do
-      uuids <- forM [0..(n' - 1)] $ \curN -> do
-        entropy64 <- getEntropyWord64
-        let bs = runPut do
-              fillTime timestamp
-              fillVerAndRandA (seqNo + curN)
-              fillVarAndRandB (seqNo + curN) entropy64
-        pure . uncurry UUID $ runGet (join (liftM2 (,)) getWord64be) bs
-      if n' == n then pure uuids else (uuids ++) <$> genUUIDs (n - n')
+genUUIDs = liftIO . go True
+  where
+    go _ 0            = pure []
+    go mustSameTime n = do
+      timestamp   <- getEpochMilli
+      -- We set the first bit of the entropy to 0 to ensure that there's enough
+      -- room for incrementing the sequence number.
+      entropy16   <- (.&. 0x7FFF) <$> getEntropyWord16
+      -- Calculate the maximum number of slots we can use for the current
+      -- timestamp before the sequence number overflows.
+      let getMaxSlots num seqNo = if 0xFFFF - seqNo < num
+            then ( if mustSameTime && num <= 32768 then 0 else 0xFFFF - seqNo
+                 , 0xFFFF )
+            else (num, seqNo + num)
+      -- Get the sequence number corresponding to the current timestamp and the
+      -- number of UUIDs we can generate.
+      (n', seqNo) <- atomicModifyIORef __state__ \(ts, seqNo) -> if
+        | ts < timestamp -> let (n', entropy16') = getMaxSlots n entropy16
+                            in  ((timestamp, entropy16'), (n', entropy16 + 1))
+        | ts > timestamp -> ((ts, seqNo), (0, 0))
+        | otherwise      -> let (n', entropy16') = getMaxSlots n seqNo
+                            in  ((timestamp, entropy16'), (n', seqNo + 1))
+      -- If we can't generate any UUIDs, we try again, hoping that the timestamp
+      -- has changed.
+      if n' == 0
+        then go mustSameTime n
+        else do
+          uuids <- forM [0..(n' - 1)] $ \curN -> do
+            entropy64 <- getEntropyWord64
+            let bs = runPut do
+                  fillTime timestamp
+                  fillVerAndRandA (seqNo + curN)
+                  fillVarAndRandB (seqNo + curN) entropy64
+            pure . uncurry UUID $ runGet (join (liftM2 (,)) getWord64be) bs
+          if n' == n
+            then pure uuids
+            else (uuids ++) <$> go False (n - n')
 
 -- | Validate the version and variant of the 'UUID'v7.
 validate :: UUID -> Bool

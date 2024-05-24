@@ -108,7 +108,7 @@ v7Test = do
       getTime tid `shouldSatisfy` \t -> t >= start
     it "can generate in batch with same timestamp and in ascending order" do
       start <- V7.getEpochMilli
-      tids  <- withChecks $ genIDs @TypeID "mmzk" 1526
+      tids  <- withChecks $ genIDs @TypeID "mmzk" 32768
       all ((== "mmzk") . getPrefix) tids `shouldBe` True
       let timestamp = getTime $ head tids
       all ((== timestamp) . getTime) tids `shouldBe` True
@@ -241,7 +241,7 @@ v7Test = do
       getTime kid `shouldSatisfy` \t -> start <= t
     it "can generate in batch with same timestamp and in ascending order" do
       start <- V7.getEpochMilli
-      kids  <- withChecks $ genIDs @(KindID "mmzk") 1526
+      kids  <- withChecks $ genIDs @(KindID "mmzk") 32768
       all ((== "mmzk") . getPrefix) kids `shouldBe` True
       let timestamp = getTime $ head kids
       all ((== timestamp) . getTime) kids `shouldBe` True
@@ -269,7 +269,7 @@ v7Test = do
         Left _    -> pure ()
         Right kid -> expectationFailure $ "Parsed KindID: " ++ show kid
     it "can generate in batch with same timestamp and in ascending order" do
-      kids <- withChecks $ genIDs @(KindID 'Comment) 1526
+      kids <- withChecks $ genIDs @(KindID 'Comment) 32768
       all ((== "comment") . getPrefix) kids `shouldBe` True
       let timestamp = getTime $ head kids
       all ((== timestamp) . getTime) kids `shouldBe` True
