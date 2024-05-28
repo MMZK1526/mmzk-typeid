@@ -2,7 +2,7 @@ cabal-version:      2.4
 name:               mmzk-typeid
 version:            0.6.2.0
 
-synopsis:           A TypeID implementation for Haskell
+synopsis:           A TypeID and UUIDv7 implementation for Haskell
 description:
   'TypeID' is a type-safe, K-sortable, globally unique identifier inspired by Stripe IDs.
   .
@@ -33,7 +33,7 @@ bug-reports:        https://github.com/MMZK1526/mmzk-typeid/issues
 license:            MIT
 author:             Yitang Chen <mmzk1526@outlook.com>
 maintainer:         Yitang Chen <mmzk1526@outlook.com>
-category:           Data, UUID, TypeID
+category:           Data, UUID, UUIDv7, TypeID
 tested-with:
     GHC == 9.2.8
     GHC == 9.6.1
