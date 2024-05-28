@@ -157,6 +157,7 @@ import           Data.TypeID
 
 main :: IO ()
 main = do
+
   -- Make a TypeID with prefix 'mmzk':
   typeID <- genID @TypeID "mmzk"
   print typeID
@@ -214,8 +215,8 @@ Now we can use `Prefix` as a prefix for `KindID`s, *e.g.*
 main :: IO ()
 main = do
   -- ...
-  userID <- genKindID @'User -- Same as genKindID @"user"
-  postID <- genKindID @'Post -- Same as genKindID @"post"
+  userID    <- genKindID @'User -- Same as genKindID @"user"
+  postID    <- genKindID @'Post -- Same as genKindID @"post"
   commentID <- genKindID @'Comment -- Same as genKindID @"comment"
   -- ...
 ```
