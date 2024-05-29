@@ -221,7 +221,7 @@ main = do
   -- ...
 ```
 
-For more information, see [Data.KindID.Class]([src/Data/KindID/Class.hs](https://hackage.haskell.org/package/mmzk-typeid/docs/Data-KindID-Class.html)).
+For more information, see [Data.KindID.Class](https://hackage.haskell.org/package/mmzk-typeid/docs/Data-KindID-Class.html).
 
 ## Note
 Functions not explicitly exported are considered internal and are subjected to changes.
