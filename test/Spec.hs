@@ -33,6 +33,7 @@ import           Data.UUID.Types (nil)
 import           Data.UUID.V4 (nextRandom)
 import           Data.UUID.V7 (UUID)
 import qualified Data.UUID.V7 as V7
+import           Data.UUID.Versions
 import           Foreign
 import           GHC.Generics (Generic)
 import           Test.Hspec
@@ -98,16 +99,19 @@ v7Test = do
       start <- V7.getEpochMilli
       tid   <- withCheck $ genID @TypeID "mmzk"
       getPrefix tid `shouldBe` "mmzk"
+      validateWithVersion (getUUID tid) V7 `shouldBe` True
       getTime tid `shouldSatisfy` \t -> t >= start
     it "can generate TypeID without prefix" do
       start <- V7.getEpochMilli
       tid   <- withCheck $ genID @TypeID ""
       getPrefix tid `shouldBe` ""
+      validateWithVersion (getUUID tid) V7 `shouldBe` True
       getTime tid `shouldSatisfy` \t -> t >= start
     it "can generate TypeID with stateless UUIDv7" do
       start <- V7.getEpochMilli
       tid   <- withCheck $ genID' @TypeID "mmzk"
       getPrefix tid `shouldBe` "mmzk"
+      validateWithVersion (getUUID tid) V7 `shouldBe` True
       getTime tid `shouldSatisfy` \t -> t >= start
     it "can generate in batch with same timestamp and in ascending order" do
       start <- V7.getEpochMilli
@@ -115,6 +119,7 @@ v7Test = do
       all ((== "mmzk") . getPrefix) tids `shouldBe` True
       let timestamp = getTime $ head tids
       all ((== timestamp) . getTime) tids `shouldBe` True
+      all (\tid -> validateWithVersion (getUUID tid) V7) tids `shouldBe` True
       all (uncurry (<)) (zip tids $ tail tids) `shouldBe` True
       timestamp `shouldSatisfy` \t -> t >= start
     it "can parse TypeID from String" do
@@ -231,16 +236,19 @@ v7Test = do
       start <- V7.getEpochMilli
       kid   <- withCheck $ genID @(KindID "mmzk")
       getPrefix kid `shouldBe` "mmzk"
+      validateWithVersion (getUUID kid) V7 `shouldBe` True
       getTime kid `shouldSatisfy` \t -> start <= t
     it "can generate KindID without prefix" do
       start <- V7.getEpochMilli
       kid   <- withCheck $ genID @(KindID "")
       getPrefix kid `shouldBe` ""
+      validateWithVersion (getUUID kid) V7 `shouldBe` True
       getTime kid `shouldSatisfy` \t -> start <= t
     it "can generate KindID with stateless UUIDv7" do
       start <- V7.getEpochMilli
       kid   <- withCheck $ genID' @(KindID "mmzk")
       getPrefix kid `shouldBe` "mmzk"
+      validateWithVersion (getUUID kid) V7 `shouldBe` True
       getTime kid `shouldSatisfy` \t -> start <= t
     it "can generate in batch with same timestamp and in ascending order" do
       start <- V7.getEpochMilli
@@ -248,6 +256,7 @@ v7Test = do
       all ((== "mmzk") . getPrefix) kids `shouldBe` True
       let timestamp = getTime $ head kids
       all ((== timestamp) . getTime) kids `shouldBe` True
+      all (\kid -> validateWithVersion (getUUID kid) V7) kids `shouldBe` True
       all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
       timestamp `shouldSatisfy` \t -> start <= t
     it "can parse KindID from String" do
@@ -326,9 +335,11 @@ v1Test = do
     it "can generate TypeIDV1 without prefix" do
       tid <- withCheck $ genID @TypeIDV1 ""
       getPrefix tid `shouldBe` ""
+      validateWithVersion (getUUID tid) V1 `shouldBe` True
     it "can generate TypeIDV1 with insecure UUIDv4" do
       tid   <- withCheck $ genID' @TypeIDV1 "mmzk"
       getPrefix tid `shouldBe` "mmzk"
+      validateWithVersion (getUUID tid) V1 `shouldBe` True
     it "can parse TypeIDV1 from String" do
       case string2ID @TypeIDV1 "mmzk_5hjpeh96458fct8t49fnf9farw" of
         Left err  -> expectationFailure $ "Parse error: " ++ show err
@@ -442,9 +453,11 @@ v1Test = do
     it "can generate KindIDV1 with prefix" do
       kid <- withCheck $ genID @(KindIDV1 "mmzk")
       getPrefix kid `shouldBe` "mmzk"
+      validateWithVersion (getUUID kid) V1 `shouldBe` True
     it "can generate KindIDV1 without prefix" do
       kid <- withCheck $ genID @(KindIDV1 "")
       getPrefix kid `shouldBe` ""
+      validateWithVersion (getUUID kid) V1 `shouldBe` True
     it "can parse KindID from String" do
       case string2ID @(KindIDV1 "mmzk") "mmzk_5hjpeh96458fct8t49fnf9farw" of
         Left err  -> expectationFailure $ "Parse error: " ++ show err
@@ -512,9 +525,11 @@ v4Test = do
     it "can generate TypeIDV4 with prefix" do
       tid <- withCheck $ genID @TypeIDV4 "mmzk"
       getPrefix tid `shouldBe` "mmzk"
+      validateWithVersion (getUUID tid) V4 `shouldBe` True
     it "can generate TypeIDV4 without prefix" do
       tid <- withCheck $ genID @TypeIDV4 ""
       getPrefix tid `shouldBe` ""
+      validateWithVersion (getUUID tid) V4 `shouldBe` True
     it "can generate TypeIDV4 with insecure UUIDv4" do
       tid   <- withCheck $ genID' @TypeIDV4 "mmzk"
       getPrefix tid `shouldBe` "mmzk"
@@ -631,9 +646,11 @@ v4Test = do
     it "can generate KindIDV4 with prefix" do
       kid <- withCheck $ genID @(KindIDV4 "mmzk")
       getPrefix kid `shouldBe` "mmzk"
+      validateWithVersion (getUUID kid) V4 `shouldBe` True
     it "can generate KindIDV4 without prefix" do
       kid <- withCheck $ genID @(KindIDV4 "")
       getPrefix kid `shouldBe` ""
+      validateWithVersion (getUUID kid) V4 `shouldBe` True
     it "can generate KindIDV4 with insecure UUIDv4" do
       kid <- withCheck $ genID' @(KindIDV4 "mmzk")
       getPrefix kid `shouldBe` "mmzk"
@@ -706,9 +723,11 @@ v5Test = do
     it "can generate TypeIDV5 with prefix" do
       tid <- withCheck $ genID @TypeIDV5 "mmzk" uid [11, 45, 14]
       getPrefix tid `shouldBe` "mmzk"
+      validateWithVersion (getUUID tid) V5 `shouldBe` True
     it "can generate TypeIDV5 without prefix" do
       tid <- withCheck $ genID @TypeIDV5 "" uid [11, 45, 14]
       getPrefix tid `shouldBe` ""
+      validateWithVersion (getUUID tid) V5 `shouldBe` True
     it "can parse TypeIDV5 from String" do
       case string2ID @TypeIDV5 "mmzk_5hjpeh96458fct8t49fnf9farw" of
         Left err  -> expectationFailure $ "Parse error: " ++ show err
@@ -825,9 +844,11 @@ v5Test = do
     it "can generate KindIDV5 with prefix" do
       kid <- withCheck $ genID @(KindIDV5 "mmzk") uid [11, 45, 14]
       getPrefix kid `shouldBe` "mmzk"
+      validateWithVersion (getUUID kid) V5 `shouldBe` True
     it "can generate KindIDV5 without prefix" do
       kid <- withCheck $ genID @(KindIDV5 "") uid [11, 45, 14]
       getPrefix kid `shouldBe` ""
+      validateWithVersion (getUUID kid) V5 `shouldBe` True
     it "can parse KindID from String" do
       case string2ID @(KindIDV5 "mmzk") "mmzk_5hjpeh96458fct8t49fnf9farw" of
         Left err  -> expectationFailure $ "Parse error: " ++ show err
