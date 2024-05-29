@@ -50,7 +50,7 @@ data TestDataUUID tid = TestDataUUID { name   :: String
                                      , uuid   :: UUID }
   deriving (Generic, FromJSON, ToJSON)
 
-data Prefix = User | Post | Comment
+data Prefix = User | Post | SuperUser
 
 instance ToPrefix 'User where
   type PrefixSymbol 'User = "user"
@@ -58,8 +58,8 @@ instance ToPrefix 'User where
 instance ToPrefix 'Post where
   type PrefixSymbol 'Post = "post"
 
-instance ToPrefix 'Comment where
-  type PrefixSymbol 'Comment = "comment"
+instance ToPrefix 'SuperUser where
+  type PrefixSymbol 'SuperUser = "super_user"
 
 anyTypeIDError :: Selector TypeIDError
 anyTypeIDError = const True
@@ -273,16 +273,16 @@ v7Test = do
         kid <- withCheck $ genID @(KindID 'Post)
         getPrefix kid `shouldBe` "post"
     it "can parse KindID from String" do
-      case string2ID @(KindID 'User) "user_00041061050r3gg28a1c60t3gf" of
+      case string2ID @(KindID 'SuperUser) "super_user_00041061050r3gg28a1c60t3gf" of
         Left err  -> expectationFailure $ "Parse error: " ++ show err
-        Right kid -> getPrefix kid `shouldBe` "user"
+        Right kid -> getPrefix kid `shouldBe` "super_user"
     it "cannot parse KindID into wrong prefix" do
-      case string2ID @(KindID 'Comment) "user_00041061050r3gg28a1c60t3gf" of
+      case string2ID @(KindID 'User) "super_user_00041061050r3gg28a1c60t3gf" of
         Left _    -> pure ()
         Right kid -> expectationFailure $ "Parsed KindID: " ++ show kid
     it "can generate in batch with same timestamp and in ascending order" do
-      kids <- withChecks $ genIDs @(KindID 'Comment) 32768
-      all ((== "comment") . getPrefix) kids `shouldBe` True
+      kids <- withChecks $ genIDs @(KindID 'User) 32768
+      all ((== "user") . getPrefix) kids `shouldBe` True
       let timestamp = getTime $ head kids
       all ((== timestamp) . getTime) kids `shouldBe` True
       all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
@@ -472,11 +472,11 @@ v1Test = do
         kid <- withCheck $ genID @(KindID 'Post)
         getPrefix kid `shouldBe` "post"
     it "can parse KindIDV1 from String" do
-      case string2ID @(KindIDV1 'User) "user_00041061050r3gg28a1c60t3gf" of
+      case string2ID @(KindIDV1 'SuperUser) "super_user_00041061050r3gg28a1c60t3gf" of
         Left err  -> expectationFailure $ "Parse error: " ++ show err
-        Right kid -> getPrefix kid `shouldBe` "user"
+        Right kid -> getPrefix kid `shouldBe` "super_user"
     it "cannot parse KindIDV1 into wrong prefix" do
-      case string2ID @(KindIDV1 'Comment) "user_00041061050r3gg28a1c60t3gf" of
+      case string2ID @(KindIDV1 'User) "post_00041061050r3gg28a1c60t3gf" of
         Left _    -> pure ()
         Right kid -> expectationFailure $ "Parsed KindIDV1: " ++ show kid
 
@@ -668,11 +668,11 @@ v4Test = do
         kid <- withCheck $ genID @(KindID 'Post)
         getPrefix kid `shouldBe` "post"
     it "can parse KindIDV4 from String" do
-      case string2ID @(KindIDV4 'User) "user_00041061050r3gg28a1c60t3gf" of
+      case string2ID @(KindIDV4 'SuperUser) "super_user_00041061050r3gg28a1c60t3gf" of
         Left err  -> expectationFailure $ "Parse error: " ++ show err
-        Right kid -> getPrefix kid `shouldBe` "user"
+        Right kid -> getPrefix kid `shouldBe` "super_user"
     it "cannot parse KindIDV4 into wrong prefix" do
-      case string2ID @(KindIDV4 'Comment) "user_00041061050r3gg28a1c60t3gf" of
+      case string2ID @(KindIDV4 'User) "post_00041061050r3gg28a1c60t3gf" of
         Left _    -> pure ()
         Right kid -> expectationFailure $ "Parsed KindIDV4: " ++ show kid
 
@@ -733,11 +733,11 @@ v5Test = do
         Left err  -> expectationFailure $ "Parse error: " ++ show err
         Right tid -> getPrefix tid `shouldBe` "mmzk"
     it "can parse TypeIDV5 from Text" do
-      case text2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
+      case text2ID @TypeIDV5 "mmzk_00041061050r3gg28a1c60t3gf" of
         Left err  -> expectationFailure $ "Parse error: " ++ show err
         Right tid -> getPrefix tid `shouldBe` "mmzk"
     it "can parse TypeIDV5 from ByteString" do
-      case byteString2ID @TypeID "mmzk_00041061050r3gg28a1c60t3gf" of
+      case byteString2ID @TypeIDV5 "mmzk_00041061050r3gg28a1c60t3gf" of
         Left err  -> expectationFailure $ "Parse error: " ++ show err
         Right tid -> getPrefix tid `shouldBe` "mmzk"
 
@@ -863,11 +863,11 @@ v5Test = do
         kid <- withCheck $ genID @(KindID 'Post)
         getPrefix kid `shouldBe` "post"
     it "can parse KindIDV5 from String" do
-      case string2ID @(KindIDV5 'User) "user_00041061050r3gg28a1c60t3gf" of
+      case string2ID @(KindIDV5 'SuperUser) "super_user_00041061050r3gg28a1c60t3gf" of
         Left err  -> expectationFailure $ "Parse error: " ++ show err
-        Right kid -> getPrefix kid `shouldBe` "user"
+        Right kid -> getPrefix kid `shouldBe` "super_user"
     it "cannot parse KindIDV5 into wrong prefix" do
-      case string2ID @(KindIDV5 'Comment) "user_00041061050r3gg28a1c60t3gf" of
+      case string2ID @(KindIDV5 'User) "post_00041061050r3gg28a1c60t3gf" of
         Left _    -> pure ()
         Right kid -> expectationFailure $ "Parsed KindIDV5: " ++ show kid
 
