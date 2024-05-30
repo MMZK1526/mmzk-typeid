@@ -543,16 +543,16 @@ parseByteStringM = byteString2IDM
 -- | Check if the given prefix is a valid 'TypeID'' prefix.
 checkPrefix :: Text -> Maybe TypeIDError
 checkPrefix prefix
-  | T.length prefix > 63 = Just $ TypeIDErrorPrefixTooLong (T.length prefix)
+  | T.length prefix > 63 = Just $ TypeIDErrorPrefixTooLong prefix
   | T.null prefix        = Nothing
-  | T.head prefix == '_' = Just TypeIDStartWithUnderscore
-  | T.last prefix == '_' = Just TypeIDEndWithUnderscore
+  | T.head prefix == '_' = Just $ TypeIDStartWithUnderscore prefix
+  | T.last prefix == '_' = Just $ TypeIDEndWithUnderscore prefix
   | otherwise
       = case T.uncons ( T.dropWhile ( liftM2 (||) (== '_')
                                     $ liftM2 (&&) isLower isAscii)
                         prefix) of
         Nothing     -> Nothing
-        Just (c, _) -> Just $ TypeIDErrorPrefixInvalidChar c
+        Just (c, _) -> Just $ TypeIDErrorPrefixInvalidChar prefix c
 {-# INLINE checkPrefix #-}
 
 -- | Check if the prefix is valid and the suffix 'UUID' has the correct v7

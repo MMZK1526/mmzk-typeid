@@ -75,18 +75,22 @@ type ValidPrefix prefix = ( KnownSymbol prefix
 
 -- | Contains a custom error message if the prefix 'Symbol' is too long.
 type family LengthLT64C (prefix :: Symbol) :: Constraint where
-  LengthLT64C s =
-    If (Compare (LengthSymbol s) 64 == 'LT) (() :: Constraint)
-       ( TypeError ( Text "Prefix with "
+  LengthLT64C s
+    = If (Compare (LengthSymbol s) 64 == 'LT) (() :: Constraint)
+       ( TypeError ( Text "The prefix "
+               :<>: ShowType s
+               :<>: Text " with "
                :<>: ShowType (LengthSymbol s)
                :<>: Text " characters is too long!" ) )
 
 -- | Contains a custom error message if the prefix 'Symbol' is not lowercase +
 -- underscore or it starts or ends with underscores.
 type family IsLUSymbolC (prefix :: Symbol) :: Constraint where
-  IsLUSymbolC s =
-    If (IsLUSymbol s) (() :: Constraint)
-       (TypeError (Text "Prefix is not valid!"))
+  IsLUSymbolC s
+    = If (IsLUSymbol s) (() :: Constraint)
+         ( TypeError ( Text "The prefix "
+                  :<>: ShowType s
+                  :<>: Text " is not valid!" ) )
 
 -- | The length of a 'Symbol' as a 'Nat'.
 type family LengthSymbol (prefix :: Symbol) :: Nat where
@@ -122,6 +126,7 @@ type family ILUSUH2 (uncons :: Maybe (Char, Symbol)) :: Bool where
   ILUSUH2 ('Just '( c, "" )) = IsLowerChar c
   ILUSUH2 ('Just '( c, s ))  = (IsLowerChar c || IsUnderscore c)
                             && ILUSUH2 (UnconsSymbol s)
+
 
 --------------------------------------------------------------------------------
 -- Deprecated

@@ -14,19 +14,20 @@ module Data.TypeID.Error
 
 import           Control.Exception
 import           Data.Text (Text)
+import qualified Data.Text as T
 
 -- | Errors from parsing TypeIDs.
 data TypeIDError
-  = -- | The prefix longer than 63 characters.
-    TypeIDErrorPrefixTooLong Int
+  = -- | The prefix is longer than 63 characters.
+    TypeIDErrorPrefixTooLong Text
     -- | The ID contains an extra underscore separator.
   | TypeIDExtraSeparator
     -- | The ID starts with an underscore separator.
-  | TypeIDStartWithUnderscore
+  | TypeIDStartWithUnderscore Text
     -- | The ID ends with an underscore separator.
-  | TypeIDEndWithUnderscore
+  | TypeIDEndWithUnderscore Text
     -- | The prefix contains an invalid character, namely not lowercase Latin.
-  | TypeIDErrorPrefixInvalidChar Char
+  | TypeIDErrorPrefixInvalidChar Text Char
     -- | From a `Data.KindID.KindID` conversion. The prefix doesn't match with
     -- the expected.
   | TypeIDErrorPrefixMismatch Text Text
@@ -36,16 +37,18 @@ data TypeIDError
 
 instance Show TypeIDError where
   show :: TypeIDError -> String
-  show (TypeIDErrorPrefixTooLong n)
-    = concat ["Prefix with ", show n, " characters is too long!"]
+  show (TypeIDErrorPrefixTooLong txt)
+    = concat [ "The prefix ", show txt
+             , " with ", show (T.length txt), " characters is too long!" ]
   show TypeIDExtraSeparator
     = "The underscore separator should not be present if the prefix is empty!"
-  show TypeIDStartWithUnderscore
-    = "The prefix should not start with an underscore!"
-  show TypeIDEndWithUnderscore
-    = "The prefix should not end with an underscore!"
-  show (TypeIDErrorPrefixInvalidChar c)
-    = concat ["Prefix contains invalid character ", show c, "!"]
+  show (TypeIDStartWithUnderscore txt)
+    = concat ["The prefix ", show txt, " should not start with an underscore!"]
+  show (TypeIDEndWithUnderscore txt)
+    = concat ["The prefix ", show txt, " should not end with an underscore!"]
+  show (TypeIDErrorPrefixInvalidChar txt c)
+    = concat [ "The prefix ", show txt
+             , " contains invalid character ", show c, "!"]
   show (TypeIDErrorPrefixMismatch expPrefix actPrefix)
     = concat [ "Expected prefix ", show expPrefix, " but got "
              , show actPrefix, "!" ]
