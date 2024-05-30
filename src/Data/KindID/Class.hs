@@ -15,6 +15,8 @@ module Data.KindID.Class
     ValidPrefix
   , ToPrefix(..)
   -- * Helpers
+  , LengthLT64C
+  , IsLUSymbolC
   , LengthSymbol
   , IsLowerChar
   , IsUnderscore
@@ -27,6 +29,7 @@ module Data.KindID.Class
   , ILSUH
   ) where
 
+import           Data.Kind
 import           Data.Type.Bool
 import           Data.Type.Equality
 import           Data.Type.Ord
@@ -62,14 +65,28 @@ class ToPrefix a where
   type PrefixSymbol a :: Symbol
 
 -- | The 'PrefixSymbol' of a 'Symbol' is the 'Symbol' itself.
-instance ToPrefix (a :: Symbol) where
-  type PrefixSymbol a = a
-
+instance ToPrefix (s :: Symbol) where
+  type PrefixSymbol s = s
 
 -- | A constraint for valid prefix 'Symbol's.
 type ValidPrefix prefix = ( KnownSymbol prefix
-                          , LengthSymbol prefix < 64
-                          , IsLUSymbol prefix ~ 'True )
+                          , LengthLT64C prefix
+                          , IsLUSymbolC prefix )
+
+-- | Contains a custom error message if the prefix 'Symbol' is too long.
+type family LengthLT64C (prefix :: Symbol) :: Constraint where
+  LengthLT64C s =
+    If (Compare (LengthSymbol s) 64 == 'LT) (() :: Constraint)
+       ( TypeError ( Text "Prefix with "
+               :<>: ShowType (LengthSymbol s)
+               :<>: Text " characters is too long!" ) )
+
+-- | Contains a custom error message if the prefix 'Symbol' is not lowercase +
+-- underscore or it starts or ends with underscores.
+type family IsLUSymbolC (prefix :: Symbol) :: Constraint where
+  IsLUSymbolC s =
+    If (IsLUSymbol s) (() :: Constraint)
+       (TypeError (Text "Prefix is not valid!"))
 
 -- | The length of a 'Symbol' as a 'Nat'.
 type family LengthSymbol (prefix :: Symbol) :: Nat where

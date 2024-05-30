@@ -5,6 +5,8 @@
 
 * Update implementation so that the prefix for `KindID` now conforms with specification v0.3.0.
 
+* More useful compile-time errors for invalid `KindID` prefixes.
+
 * More tests.
 
 * Fix documentation typos.
