@@ -1,9 +1,19 @@
 # Revision history for mmzk-typeid
 
 
+## 0.6.3.0 -- Unreleased
+
+* Update implementation so that the prefix for `KindID` now conforms with specification v0.3.0.
+
+* More tests.
+
+* Fix documentation typos.
+
+
 ## 0.6.2.0 -- 2024-05-28
 
 * Fix the bug where the first 32768 `TypeID`s may not of the same timestamp.
+
 * Test on GHC 9.8.2.
 
 
@@ -11,7 +21,9 @@
 
 * Fix typo in the maintainer's email address.
   * Astounded at the fact that I mismatched the local part and domain name and didn't realise it for a year.
+
 * More test cases on parsing.
+
 * Fix other typos and inconsistencies in the documentation.
 
 
@@ -21,6 +33,7 @@
   * Allow `TypeID` prefix to contain underscores.
   * Update parsing logic as well as `Binary` and `Storable` instances to reflect the changes.
   * Add tests.
+
 * Have a breaking change in `TypeIDError` to better reflect the error cases for the update in the specification.
 
 
