@@ -17,6 +17,9 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 
 -- | Errors from parsing TypeIDs.
+--
+-- Should NOT rely on \"grepping\" the output produced by 'show' since the
+-- exact output format may differ across library versions.
 data TypeIDError
   = -- | The prefix is longer than 63 characters.
     TypeIDErrorPrefixTooLong Text
@@ -28,7 +31,7 @@ data TypeIDError
   | TypeIDEndWithUnderscore Text
     -- | The prefix contains an invalid character, namely not lowercase Latin.
   | TypeIDErrorPrefixInvalidChar Text Char
-    -- | From a `Data.KindID.KindID` conversion. The prefix doesn't match with
+    -- | From a 'Data.KindID.V7KindID' conversion. The prefix doesn't match with
     -- the expected.
   | TypeIDErrorPrefixMismatch Text Text
     -- | The 'Data.UUID.Types.Internal.UUID' suffix has errors.

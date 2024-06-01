@@ -42,7 +42,7 @@ import           GHC.TypeLits
 -- For example, suppose we have the following data structure that represents the
 -- prefixes we are going to use:
 --
--- > data Prefix = User | Post | Comment
+-- > data Prefix = User | Post | Comment | SuperUser
 --
 -- Then we can make it an instance of 'ToPrefix' like this:
 --
@@ -54,13 +54,17 @@ import           GHC.TypeLits
 -- >
 -- > instance ToPrefix 'Comment where
 -- >   type PrefixSymbol 'Comment = "comment"
+-- >
+-- > instance ToPrefix 'SuperUser where
+-- >   type PrefixSymbol 'SuperUser = "super_user"
 --
 -- Now we can use Prefix as a prefix for 'Data.KindID.KindID's, e.g.
 --
 -- > do
--- >   userID <- genKindID @'User -- Same as genKindID @"user"
--- >   postID <- genKindID @'Post -- Same as genKindID @"post"
--- >   commentID <- genKindID @'Comment -- Same as genKindID @"comment"
+-- >   userID    <- genKindID @'User      -- Same as genKindID @"user"
+-- >   postID    <- genKindID @'Post      -- Same as genKindID @"post"
+-- >   commentID <- genKindID @'Comment   -- Same as genKindID @"comment"
+-- >   suID      <- genKindID @'SuperUser -- Same as genKindID @"super_user"
 class ToPrefix a where
   type PrefixSymbol a :: Symbol
 
@@ -77,11 +81,11 @@ type ValidPrefix prefix = ( KnownSymbol prefix
 type family LengthLT64C (prefix :: Symbol) :: Constraint where
   LengthLT64C s
     = If (Compare (LengthSymbol s) 64 == 'LT) (() :: Constraint)
-       ( TypeError ( Text "The prefix "
-               :<>: ShowType s
-               :<>: Text " with "
-               :<>: ShowType (LengthSymbol s)
-               :<>: Text " characters is too long!" ) )
+         ( TypeError ( Text "The prefix "
+                  :<>: ShowType s
+                  :<>: Text " with "
+                  :<>: ShowType (LengthSymbol s)
+                  :<>: Text " characters is too long!" ) )
 
 -- | Contains a custom error message if the prefix 'Symbol' is not lowercase +
 -- underscore or it starts or ends with underscores.
@@ -135,10 +139,10 @@ type family ILUSUH2 (uncons :: Maybe (Char, Symbol)) :: Bool where
 -- | Is a 'Symbol' lowercase?
 type family IsLowerSymbol (prefix :: Symbol) :: Bool where
   IsLowerSymbol prefix = ILSUH (UnconsSymbol prefix)
-{-# DEPRECATED IsLowerSymbol "No longer used; will be removed in the next major version" #-}
+{-# DEPRECATED IsLowerSymbol "No longer used; to be removed in version 0.7" #-}
 
 -- | Is LowerSymbol Uncons Helper.
 type family ILSUH (uncons :: Maybe (Char, Symbol)) :: Bool where
   ILSUH 'Nothing          = 'True
   ILSUH ('Just '( c, s )) = IsLowerChar c && IsLowerSymbol s
-{-# DEPRECATED ILSUH "No longer used; will be removed in the next major version" #-}
+{-# DEPRECATED ILSUH "No longer used; to be removed in the version 0.7" #-}

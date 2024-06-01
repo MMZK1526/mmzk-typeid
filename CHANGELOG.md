@@ -1,15 +1,17 @@
 # Revision history for mmzk-typeid
 
 
-## 0.6.3.0 -- Unreleased
+## 0.6.3.0 -- 2024-06-01
 
 * Update implementation so that the prefix for `KindID` now conforms with specification v0.3.0.
 
 * More useful compile-time errors for invalid `KindID` prefixes.
 
+* `TypeIDError` now includes the contextual prefix when necessary to produce better error messages.
+
 * More tests.
 
-* Fix documentation typos.
+* Fix known documentation typos.
 
 
 ## 0.6.2.0 -- 2024-05-28
@@ -151,6 +153,8 @@
 * Remove dependency on 'transformers'.
 
 * Fix typos in the documentation.
+
+* Update README examples.
 
 * More tests.
 

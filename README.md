@@ -21,7 +21,7 @@ If you notice any issues or have any suggestions, please feel free to open an is
 In addition to the features provided by [TypeID](https://github.com/jetpack-io/typeid), this implementation also supports:
 
 1. Generating TypeIDs in a batch. They are guaranteed to have the same timestamp (up to the first 32768 ids) and of ascending order;
-2. Encoding the prefix in the [type level](https://hackage.haskell.org/package/mmzk-typeid/docs/Data-KindID.html), so that if you accidentally pass in a wrong prefix, the code won't compile, avoiding the need for runtime checks;
+2. Encoding the prefix in the [type level](https://hackage.haskell.org/package/mmzk-typeid/docs/Data-KindID.html), so that if you accidentally pass in an invalid prefix, the code won't compile, avoiding the need for runtime checks;
 3. Support TypeID with other UUID versions. Currently v7 (default), v1,  v4, and v5 are supported.
 
 ## Quick start
@@ -174,6 +174,11 @@ main = do
   -- Parse a KindID from string:
   case string2ID "mmzk_01h455vb4pex5vsknk084sn02q" :: Maybe (KindID "mmzk") of
     Left err     -> throwIO err
+    Right kindID -> print kindID
+
+  -- Parse a KindID from string (wrong prefix):
+  case string2ID "mmzk_01h455vb4pex5vsknk084sn02q" :: Maybe (KindID "foo") of
+    Left err     -> throwIO err -- Will throw here as the prefix matches not
     Right kindID -> print kindID
 ```
 
