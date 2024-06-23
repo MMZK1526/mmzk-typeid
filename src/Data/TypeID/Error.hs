@@ -13,8 +13,6 @@ module Data.TypeID.Error
  ) where
 
 import           Control.Exception
-import           Data.Text (Text)
-import qualified Data.Text as T
 
 -- | Errors from parsing TypeIDs.
 --
@@ -22,18 +20,18 @@ import qualified Data.Text as T
 -- exact output format may differ across library versions.
 data TypeIDError
   = -- | The prefix is longer than 63 characters.
-    TypeIDErrorPrefixTooLong Text
+    TypeIDErrorPrefixTooLong String
     -- | The ID contains an extra underscore separator.
   | TypeIDExtraSeparator
     -- | The ID starts with an underscore separator.
-  | TypeIDStartWithUnderscore Text
+  | TypeIDStartWithUnderscore String
     -- | The ID ends with an underscore separator.
-  | TypeIDEndWithUnderscore Text
+  | TypeIDEndWithUnderscore String
     -- | The prefix contains an invalid character, namely not lowercase Latin.
-  | TypeIDErrorPrefixInvalidChar Text Char
+  | TypeIDErrorPrefixInvalidChar String Char
     -- | From a 'Data.KindID.V7KindID' conversion. The prefix doesn't match with
     -- the expected.
-  | TypeIDErrorPrefixMismatch Text Text
+  | TypeIDErrorPrefixMismatch String String
     -- | The 'Data.UUID.Types.Internal.UUID' suffix has errors.
   | TypeIDErrorUUIDError
   deriving (Eq, Ord)
@@ -42,7 +40,7 @@ instance Show TypeIDError where
   show :: TypeIDError -> String
   show (TypeIDErrorPrefixTooLong txt)
     = concat [ "The prefix ", show txt
-             , " with ", show (T.length txt), " characters is too long!" ]
+             , " with ", show (length txt), " characters is too long!" ]
   show TypeIDExtraSeparator
     = "The underscore separator should not be present if the prefix is empty!"
   show (TypeIDStartWithUnderscore txt)

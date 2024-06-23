@@ -458,8 +458,8 @@ parseString str = do
   tid <- TID.parseString str
   case fromTypeID tid of
     Nothing  -> Left $ TypeIDErrorPrefixMismatch
-                       (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))))
-                       (getPrefix tid)
+                       (symbolVal (Proxy @(PrefixSymbol prefix)))
+                       (T.unpack $ getPrefix tid)
     Just kid -> pure kid
 {-# INLINE parseString #-}
 
@@ -472,8 +472,8 @@ parseText str = do
   tid <- TID.parseText str
   case fromTypeID tid of
     Nothing  -> Left $ TypeIDErrorPrefixMismatch
-                       (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))))
-                       (getPrefix tid)
+                       (symbolVal (Proxy @(PrefixSymbol prefix)))
+                       (T.unpack $ getPrefix tid)
     Just kid -> pure kid
 {-# INLINE parseText #-}
 
@@ -486,8 +486,8 @@ parseByteString str = do
   tid <- TID.parseByteString str
   case fromTypeID tid of
     Nothing  -> Left $ TypeIDErrorPrefixMismatch
-                       (T.pack (symbolVal (Proxy @(PrefixSymbol prefix))))
-                       (getPrefix tid)
+                       (symbolVal (Proxy @(PrefixSymbol prefix)))
+                       (T.unpack $ getPrefix tid)
     Just kid -> pure kid
 {-# INLINE parseByteString #-}
 
