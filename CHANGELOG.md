@@ -1,6 +1,17 @@
 # Revision history for mmzk-typeid
 
 
+## 0.7.0.0 -- Unreleased
+
+* Use `String`s instead of `Text`s inside the constructors of `TypeIDError` so that it is eaiser to use the promoted constructors.
+
+
+## 0.6.3.1 -- 2024-06-23
+
+* Relax the version constraint on `bytestring` dependency.
+  * Kindly contributed by @jflanglois.
+
+
 ## 0.6.3.0 -- 2024-06-01
 
 * Update implementation so that the prefix for `KindID` now conforms with specification v0.3.0.
