@@ -74,6 +74,7 @@ library
         Data.UUID.V7,
         Data.UUID.Versions
     other-modules:
+        Data.KindID.Error,
         Data.KindID.Internal,
         Data.TypeID.Internal
     default-extensions:
@@ -119,6 +120,7 @@ test-suite test
     other-modules:
         Data.KindID,
         Data.KindID.Class,
+        Data.KindID.Error,
         Data.KindID.Internal,
         Data.KindID.Unsafe,
         Data.KindID.V1,
