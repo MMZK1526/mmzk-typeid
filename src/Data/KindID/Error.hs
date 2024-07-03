@@ -12,11 +12,15 @@ import           Data.Type.Equality
 import           Data.Type.Ord
 import           GHC.TypeLits
 
+-- | A class that covnerts a poly-kind into an "ErrorMessage".
+--
+-- Used for converting type-level "TypeIDError"s into custom compile-time error
+-- messages.
 class ToErrorMessageC (e :: k) where
   type ToErrorMessage e :: ErrorMessage
 
 instance ToErrorMessageC (TypeIDErrorPrefixTooLong t) where
-  type ToErrorMessage (TypeIDErrorPrefixTooLong t) = 
+  type ToErrorMessage (TypeIDErrorPrefixTooLong t) =
         Text "The prefix "
    :<>: ShowType (Str2Sym t)
    :<>: Text " with "
@@ -26,6 +30,26 @@ instance ToErrorMessageC (TypeIDErrorPrefixTooLong t) where
 instance ToErrorMessageC TypeIDExtraSeparator where
   type ToErrorMessage TypeIDExtraSeparator = Text
     "The underscore separator should not be present if the prefix is empty!"
+
+instance ToErrorMessageC (TypeIDStartWithUnderscore t) where
+  type ToErrorMessage (TypeIDStartWithUnderscore t) =
+        Text "The prefix "
+   :<>: ShowType (Str2Sym t)
+   :<>: Text " should not start with an underscore!"
+
+instance ToErrorMessageC (TypeIDEndWithUnderscore t) where
+  type ToErrorMessage (TypeIDEndWithUnderscore t) =
+        Text "The prefix "
+   :<>: ShowType (Str2Sym t)
+   :<>: Text " should not end with an underscore!"
+
+instance ToErrorMessageC (TypeIDErrorPrefixInvalidChar t c) where
+  type ToErrorMessage (TypeIDErrorPrefixInvalidChar t c) =
+        Text "The prefix "
+   :<>: ShowType (Str2Sym t)
+   :<>: Text " contains invalid character "
+   :<>: ShowType c
+   :<>: Text "!"
 
 type family Str2Sym (str :: String) :: Symbol where
   Str2Sym '[]       = ""

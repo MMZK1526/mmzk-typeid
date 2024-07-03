@@ -58,20 +58,21 @@ import           GHC.TypeLits
 -- >   commentID <- genKindID @'Comment   -- Same as genKindID @"comment"
 -- >   suID      <- genKindID @'SuperUser -- Same as genKindID @"super_user"
 class ToPrefix a where
+  -- | The associated type family that converts @a@ into a 'Symbol'.
   type PrefixSymbol a :: Symbol
 
 -- | The 'PrefixSymbol' of a 'Symbol' is the 'Symbol' itself.
 instance ToPrefix (s :: Symbol) where
   type PrefixSymbol s = s
 
+-- | A constraint for valid prefix 'Symbol's.
+--
 #ifndef __HADDOCK_VERSION__
 type ValidPrefix prefix = ( KnownSymbol prefix
                           , LengthLT64C prefix
                           , IsLUSymbolC prefix )
 #else
--- | A constraint for valid prefix 'Symbol's.
---
--- Note that this is __NOT__ the actual definition! It's true definition is
+-- Note that this is __NOT__ the actual definition! Its true definition is
 -- hidden here in the documentation as it uses internal type-level helpers that
 -- we do not expose and make no guarantee on their In practice, any prefix with
 -- this constraint is a valid prefix for a 'Data.KindID.KindID'.
