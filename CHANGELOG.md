@@ -1,9 +1,14 @@
 # Revision history for mmzk-typeid
 
 
-## 0.7.0.0 -- Unreleased
+## 0.7.0.0 -- 2024-07-03
 
-* Use `String`s instead of `Text`s inside the constructors of `TypeIDError` so that it is eaiser to use the promoted constructors.
+* Use `String`s instead of `Text`s inside the constructors of `TypeIDError` so that it is easier to use the promoted constructors.
+
+* More complete compile-time error messages for `KindID` errors.
+
+* Hide away internal type-level programming details from Haddock.
+  * Many of the type-level helper declarations are now internal.
 
 
 ## 0.6.3.1 -- 2024-06-23
