@@ -1,6 +1,11 @@
 # Revision history for mmzk-typeid
 
 
+## 0.7.0.1 -- Unreleased
+
+* Stop testing on GHC 9.2, replacing with tests on GHC 9.4.
+
+
 ## 0.7.0.0 -- 2024-07-03
 
 * Use `String`s instead of `Text`s inside the constructors of `TypeIDError` so that it is easier to use the promoted constructors.
