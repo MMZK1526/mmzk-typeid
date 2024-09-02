@@ -5,6 +5,8 @@
 
 * Stop testing on GHC 9.2, replacing with tests on GHC 9.4.
 
+* Update description in "Data.UUID.V7" to reflect the fact that UUIDv7 standard has been finalised.
+
 
 ## 0.7.0.0 -- 2024-07-03
 

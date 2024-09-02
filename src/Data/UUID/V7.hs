@@ -9,10 +9,6 @@
 -- UUIDv7 is not currently present in the uuid package, therefore I have to
 -- make a quick patch of my own.
 --
--- Note that since the specification for v7 is not yet finalised, this module's
--- implementation may change in the future according to the potential
--- adjustments in the specification.
---
 module Data.UUID.V7
   (
   -- * Data type
@@ -141,7 +137,7 @@ getTime (UUID w1 _) = w1 `shiftR` 16
 
 -- | The global mutable state of (timestamp, sequence number).
 --
--- The "NOINLINE" pragma is IMPORTANT! The logic would be flawed if it is
+-- The \"NOINLINE\" pragma is IMPORTANT! The logic would be flawed if it is
 -- is inlined by its definition.
 __state__ :: IORef (Word64, Word16)
 __state__ = unsafePerformIO (newIORef (0, 0))
