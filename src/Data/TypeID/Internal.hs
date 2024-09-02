@@ -41,6 +41,7 @@ import qualified Data.UUID.V4 as V4
 import qualified Data.UUID.V5 as V5
 import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
+import           GHC.Generics
 import           Foreign
 import           System.Random
 
@@ -50,7 +51,7 @@ import           System.Random
 --  The constructor is not exposed to the public API to prevent generating
 -- invalid 'TypeID''s.
 data TypeID' (version :: UUIDVersion) = TypeID' Text UUID
-  deriving (Eq, Ord, Data, Typeable)
+  deriving (Eq, Ord, Data, Typeable, Generic)
 
 instance Show (TypeID' version) where
   show :: TypeID' version -> String

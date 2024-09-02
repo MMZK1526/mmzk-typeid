@@ -32,6 +32,7 @@ import qualified Data.TypeID.V7.Unsafe as V7
 import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
 import           Foreign
+import           GHC.Generics
 import           GHC.TypeLits (symbolVal)
 
 -- | A TypeID with the prefix encoded at type level.
@@ -39,7 +40,7 @@ import           GHC.TypeLits (symbolVal)
 -- It is dubbed 'Data.KindID.V7.KindID' because the prefix here is a data kind
 -- rather than a type.
 newtype KindID' (version :: UUIDVersion) prefix = KindID' UUID
-  deriving (Eq, Ord, Data, Typeable)
+  deriving (Eq, Ord, Data, Typeable, Generic)
 
 instance (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
   => Show (KindID' version prefix) where

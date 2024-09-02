@@ -3,6 +3,8 @@
 
 ## 0.7.0.1 -- Unreleased
 
+* Add `Generic` derivation to `TypeID'`, `KindID'`, and `UUIDVersion`.
+
 * Stop testing on GHC 9.2, replacing with tests on GHC 9.4.
 
 * Update description in "Data.UUID.V7" to reflect the fact that UUIDv7 standard has been finalised.

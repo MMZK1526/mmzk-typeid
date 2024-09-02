@@ -16,11 +16,12 @@ module Data.UUID.Versions
 
 import           Data.Bits
 import           Data.UUID.Types.Internal
+import           GHC.Generics
 
 -- | The supported 'UUID' versions. These constructors are used as type-level
 -- tags for 'Data.TypeID.TypeID''.
 data UUIDVersion = V1 | V4 | V5 | V7
-  deriving (Eq, Ord, Bounded, Enum, Show)
+  deriving (Eq, Ord, Bounded, Enum, Show, Generic)
 
 toInt :: Num a => UUIDVersion -> a
 toInt V1 = 1
