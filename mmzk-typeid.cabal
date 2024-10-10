@@ -110,6 +110,7 @@ library
         uuid-types ^>=1.0,
     ghc-options:
         -Wall
+        -O2
     hs-source-dirs:   src
     default-language: Haskell2010
 
@@ -173,6 +174,7 @@ test-suite test
         containers ^>=0.6,
         entropy,
         hashable,
+        hint ^>=0.9,
         hspec ^>=2.11,
         random,
         text,

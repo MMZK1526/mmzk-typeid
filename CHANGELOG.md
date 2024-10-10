@@ -1,9 +1,11 @@
 # Revision history for mmzk-typeid
 
 
-## 0.7.0.1 -- Unreleased
+## 0.7.0.1 -- 2024-10-10
 
 * Add `Generic` derivation to `TypeID'`, `KindID'`, and `UUIDVersion`.
+
+* Test the type-level constraints of `KindID` using an external GHC interpreter.
 
 * Stop testing on GHC 9.2, replacing with tests on GHC 9.4.
 

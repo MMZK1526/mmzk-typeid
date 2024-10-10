@@ -36,6 +36,18 @@ import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
 import           Foreign
 import           GHC.Generics (Generic)
+import           Language.Haskell.Interpreter
+  ( Extension(..)
+  , OptionVal(..)
+  , GhcError(..)
+  , typeChecksWithDetails
+  , runInterpreter
+  , set
+  , languageExtensions
+  , loadModules
+  , setImports
+  , searchPath
+  , runStmt )
 import           Test.Hspec
 
 data TestData = TestData { name   :: String
@@ -64,6 +76,20 @@ instance ToPrefix 'SuperUser where
 anyTypeIDError :: Selector TypeIDError
 anyTypeIDError = const True
 
+prefixHasExpectedError :: String -> String -> IO ()
+prefixHasExpectedError str expectedErr = do
+  result <- runInterpreter do
+    set [languageExtensions := [AllowAmbiguousTypes, DataKinds, TypeFamilies], searchPath := ["./src"]]
+    loadModules ["Data.KindID.Class"]
+    setImports ["Prelude", "Data.KindID.Class"]
+    runStmt "foo <- return ()"
+    typeChecksWithDetails ("foo :: ValidPrefix " <> show str <> " => ()")
+  case result of
+    Left _           -> fail "Impossible: cannot interpret!"
+    Right (Left [e]) -> head (lines (errMsg e)) `shouldBe` expectedErr
+    Right (Left _)   -> fail "Unexpected number of type errors!"
+    _                -> fail "Unexpected success!"
+
 withCheck :: HasCallStack => (IDConv a, IDGen a) => IO a -> IO a
 withCheck action = do
   tid         <- action
@@ -84,10 +110,25 @@ withChecks action = do
 
 main :: IO ()
 main = hspec do
+  typeLevelTest
   v7Test
   v1Test
   v4Test
   v5Test
+
+typeLevelTest :: Spec
+typeLevelTest = describe "Reject malformed KindID previx at compile time" do
+  it "rejects invalid alphabet" do
+    prefixHasExpectedError "sZb" "The prefix \"sZb\" contains invalid character 'Z'!"
+  it "rejects single underscore" do
+    prefixHasExpectedError "_"  "The underscore separator should not be present if the prefix is empty!"
+  it "rejects trailing underscore" do
+    prefixHasExpectedError "a_" "The prefix \"a_\" should not end with an underscore!"
+  it "rejects starting underscore" do
+    prefixHasExpectedError "_a" "The prefix \"_a\" should not start with an underscore!"
+  it "rejects long prefix" do
+    prefixHasExpectedError "qwertyuiopasdfghjklzxcvbnm____________qwertyuiopasdfghjklzxcvbnm"
+                            "The prefix \"qwertyuiopasdfghjklzxcvbnm____________qwertyuiopasdfghjklzxcvbnm\" with 64 characters is too long!"
 
 v7Test :: Spec
 v7Test = do
