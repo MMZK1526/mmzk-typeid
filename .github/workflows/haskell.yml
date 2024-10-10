@@ -25,9 +25,9 @@ jobs:
       - name: Cache
         uses: actions/cache@v4
         env:
-          cache-name: cache-cabal
+          cache-name: cabal-cache
         with:
-          path: ~/.cabal
+          path: ./dist-newstyle/
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
