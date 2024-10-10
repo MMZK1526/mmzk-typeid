@@ -65,7 +65,7 @@ For a full list of functions on `TypeID`, see [Data.TypeID](https://hackage.hask
 
 ### TypeID with other UUID Versions
 
-We also support TypeID using some other versions of `UUID`, including v1 and v4, which loses the monoticity property. To use it, simply import `Data.TypeID.V4` instead of `Data.TypeID`. The following is an example using v4:
+We also support TypeID using some other versions of `UUID`, including v1, v4 and v5, which loses the monoticity property. To use it, simply import `Data.TypeID.V4` instead of `Data.TypeID`. The following is an example using v4:
 
 ```Haskell
 {-# LANGUAGE OverloadedStrings #-}
