@@ -41,7 +41,7 @@ import qualified Data.UUID.V4 as V4
 import qualified Data.UUID.V5 as V5
 import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
-import           GHC.Generics
+import           GHC.Generics (Generic)
 import           Foreign
 import           System.Random
 

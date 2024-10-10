@@ -35,7 +35,6 @@ import qualified Data.ByteString.Lazy as BSL
 import           Data.IORef
 import           Data.Time.Clock.POSIX
 import           Data.UUID.Types.Internal
-
 import           Data.UUID.Versions
 import           System.Entropy
 import           System.IO.Unsafe (unsafePerformIO)

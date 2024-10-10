@@ -16,7 +16,7 @@ module Data.UUID.Versions
 
 import           Data.Bits
 import           Data.UUID.Types.Internal
-import           GHC.Generics
+import           GHC.Generics (Generic)
 
 -- | The supported 'UUID' versions. These constructors are used as type-level
 -- tags for 'Data.TypeID.TypeID''.

@@ -32,7 +32,7 @@ import qualified Data.TypeID.V7.Unsafe as V7
 import qualified Data.UUID.V7 as V7
 import           Data.UUID.Versions
 import           Foreign
-import           GHC.Generics
+import           GHC.Generics (Generic)
 import           GHC.TypeLits (symbolVal)
 
 -- | A TypeID with the prefix encoded at type level.
