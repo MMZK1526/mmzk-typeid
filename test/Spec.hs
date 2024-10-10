@@ -39,8 +39,9 @@ import           GHC.Generics (Generic)
 import           Language.Haskell.Interpreter
   ( Extension(..)
   , OptionVal(..)
+  , InterpreterError(..)
   , GhcError(..)
-  , typeChecksWithDetails
+  , eval
   , runInterpreter
   , set
   , languageExtensions
@@ -82,13 +83,13 @@ prefixHasExpectedError str expectedErr = do
     set [languageExtensions := [AllowAmbiguousTypes, DataKinds, TypeFamilies], searchPath := ["./src"]]
     loadModules ["Data.KindID.Class"]
     setImports ["Prelude", "Data.KindID.Class"]
-    runStmt "foo <- return ()"
-    typeChecksWithDetails ("foo :: ValidPrefix " <> show str <> " => ()")
+    runStmt $ "foo :: ValidPrefix " <> show str <> " => () <- return ()"
+    eval "foo"
   case result of
-    Left _           -> fail "Impossible: cannot interpret!"
-    Right (Left [e]) -> head (lines (errMsg e)) `shouldBe` expectedErr
-    Right (Left _)   -> fail "Unexpected number of type errors!"
-    _                -> fail "Unexpected success!"
+    Left (WontCompile [e]) -> head (lines (errMsg e)) `shouldBe` expectedErr
+    Left (WontCompile _)   -> fail "Unexpected number of type errors!"
+    Left _                 -> fail "Impossible: cannot interpret!"
+    Right _                -> fail "Unexpected success!"
 
 withCheck :: HasCallStack => (IDConv a, IDGen a) => IO a -> IO a
 withCheck action = do
