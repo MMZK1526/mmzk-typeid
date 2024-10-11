@@ -4,7 +4,7 @@
 -- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
--- An implementation of the TypeID specification:
+-- An implementation of the 'TypeID' specification:
 -- https://github.com/jetpack-io/typeid.
 --
 -- It is a re-export of "Data.TypeID.V7".
