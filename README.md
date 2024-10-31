@@ -71,8 +71,8 @@ We also support TypeID using some other versions of `UUID`, including v1, v4 and
 {-# LANGUAGE OverloadedStrings #-}
 
 import           Control.Exception
-import           Data.TypeIDV4 (TypeIDV4)
-import qualified Data.TypeIDV4 as TID
+import           Data.TypeID.V4 (TypeIDV4)
+import qualified Data.TypeID.V4 as TID
 
 main :: IO ()
 main = do
