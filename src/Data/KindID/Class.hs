@@ -65,17 +65,19 @@ class ToPrefix a where
 instance ToPrefix (s :: Symbol) where
   type PrefixSymbol s = s
 
+#ifndef __HADDOCK_VERSION__
 -- | A constraint for valid prefix 'Symbol's.
 --
-#ifndef __HADDOCK_VERSION__
 type ValidPrefix prefix = ( KnownSymbol prefix
                           , LengthLT64C prefix
                           , IsLUSymbolC prefix )
 #else
+-- | A constraint for valid prefix 'Symbol's.
+--
 -- Note that this is __NOT__ the actual definition! Its true definition is
 -- hidden here in the documentation as it uses internal type-level helpers that
--- we do not expose and make no guarantee on their In practice, any prefix with
--- this constraint is a valid prefix for a 'Data.KindID.KindID'.
+-- we do not expose and make no guarantee on their stability. In practice, any
+-- prefix with this constraint is a valid prefix for a 'Data.KindID.KindID'.
 type ValidPrefix prefix = KnownSymbol prefix
 #endif
 
