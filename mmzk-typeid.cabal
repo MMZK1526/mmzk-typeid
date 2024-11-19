@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               mmzk-typeid
-version:            0.7.0.1
+version:            0.7.0.2
 
 synopsis:           A TypeID and UUIDv7 implementation for Haskell
 description:

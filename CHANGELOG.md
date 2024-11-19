@@ -1,6 +1,11 @@
 # Revision history for mmzk-typeid
 
 
+## 0.7.0.2 -- Unreleased
+
+* Fix a Haddock error on `ValidPrefix` related to conditional compilation.
+
+
 ## 0.7.0.1 -- 2024-10-10
 
 * Add `Generic` derivation to `TypeID'`, `KindID'`, and `UUIDVersion`.
