@@ -436,7 +436,7 @@ genTypeIDV4' prefix = case checkPrefix prefix of
 genTypeIDV5 :: MonadIO m => Text -> UUID -> [Word8] -> m (TypeID' 'V5)
 genTypeIDV5 prefix ns obj = case checkPrefix prefix of
   Nothing  -> pure $ unsafeGenTypeIDV5 prefix ns obj
-  Just err -> throw err
+  Just err -> liftIO $ throwIO err
 {-# INLINE genTypeIDV5 #-}
 
 -- | Obtain a 'TypeID'' from a prefix and a 'UUID'.
