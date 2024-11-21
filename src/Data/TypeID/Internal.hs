@@ -675,6 +675,13 @@ unsafeParseByteString bs = case second BSL.uncons $ BSL.span (/= 95) bs of
                               . unsafeDecodeUUID $ suffix
 {-# INLINE unsafeParseByteString #-}
 
+-- | A helper for generating 'UUID'v1.
+nextUUID :: IO UUID
+nextUUID = V1.nextUUID >>= maybe nextUUID pure
+{-# INLINE nextUUID #-}
+
+-- Helpers
+
 concat5BitInts :: [Word8] -> [Word8]
 concat5BitInts
   = reverse . toBytes
@@ -692,11 +699,6 @@ separate5BitInts
     toBytes 0 = []
     toBytes x = fromIntegral (x .&. 0x1F) : toBytes (x `shiftR` 5)
 {-# INLINE separate5BitInts #-}
-
--- | A helper for generating 'UUID'v1.
-nextUUID :: IO UUID
-nextUUID = V1.nextUUID >>= maybe nextUUID pure
-{-# INLINE nextUUID #-}
 
 spanEnd :: (a -> Bool) -> [a] -> ([a], [a])
 spanEnd p = bimap reverse reverse . span p . reverse
