@@ -1,9 +1,13 @@
 # Revision history for mmzk-typeid
 
 
-## 0.7.0.2 -- Unreleased
+## 0.7.0.2 -- 2025-04-22
 
 * Fix a Haddock error on `ValidPrefix` related to conditional compilation.
+
+* Add more tests.
+
+* CI test on the latest GHC version.
 
 
 ## 0.7.0.1 -- 2024-10-10
