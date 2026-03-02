@@ -1,6 +1,18 @@
 # Revision history for mmzk-typeid
 
 
+## 0.7.1.0 -- UNRELEASED
+
+* Add custom timestamp support for V7 UUID/TypeID/KindID generation.
+  * New functions `genUUIDWithTime`, `genUUIDWithTime'`, and `genUUIDsWithTime` in `Data.UUID.V7`.
+  * New functions `genTypeIDWithTime`, `genTypeIDWithTime'`, and `genTypeIDsWithTime` in `Data.TypeID.V7` (and re-exported from `Data.TypeID`).
+  * New unsafe variants `unsafeGenTypeIDWithTime`, `unsafeGenTypeIDWithTime'`, and `unsafeGenTypeIDsWithTime` in `Data.TypeID.V7.Unsafe` (and re-exported from `Data.TypeID.Unsafe`).
+  * New functions `genKindIDWithTime`, `genKindIDWithTime'`, and `genKindIDsWithTime` in `Data.KindID.V7` (and re-exported from `Data.KindID`).
+  * These functions accept a `Word64` timestamp (milliseconds since Unix epoch) and do not interact with the global monotonic state.
+
+* More tests.
+
+
 ## 0.7.0.2 -- 2025-04-22
 
 * Fix a Haddock error on `ValidPrefix` related to conditional compilation.
