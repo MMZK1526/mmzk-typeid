@@ -358,6 +358,45 @@ genKindIDs n = fmap (unsafeFromTypeID <$>) . flip V7.unsafeGenTypeIDs n . T.pack
              $ symbolVal @(PrefixSymbol prefix) Proxy
 {-# INLINE genKindIDs #-}
 
+-- | Generate a new 'Data.KindID.V7.KindID' from a prefix with a custom
+-- timestamp (milliseconds since Unix epoch).
+genKindIDWithTime :: forall prefix m
+                   . ( ToPrefix prefix
+                     , ValidPrefix (PrefixSymbol prefix)
+                     , MonadIO m )
+                  => Word64 -> m (KindID' 'V7 prefix)
+genKindIDWithTime ts = unsafeFromTypeID
+  <$> V7.unsafeGenTypeIDWithTime (T.pack $ symbolVal @(PrefixSymbol prefix) Proxy) ts
+{-# INLINE genKindIDWithTime #-}
+
+-- | Generate a new 'Data.KindID.V7.KindID' from a prefix with a custom
+-- timestamp based on stateless 'UUID'v7.
+genKindIDWithTime' :: forall prefix m
+                    . ( ToPrefix prefix
+                      , ValidPrefix (PrefixSymbol prefix)
+                      , MonadIO m )
+                   => Word64 -> m (KindID' 'V7 prefix)
+genKindIDWithTime' ts = fmap unsafeFromTypeID
+  . flip V7.unsafeGenTypeIDWithTime' ts . T.pack
+  $ symbolVal @(PrefixSymbol prefix) Proxy
+{-# INLINE genKindIDWithTime' #-}
+
+-- | Generate a list of 'Data.KindID.V7.KindID's from a prefix with a custom
+-- timestamp (milliseconds since Unix epoch).
+--
+-- The first 32768 'Data.KindID.V7.KindID's are guaranteed to be monotonically
+-- increasing.
+genKindIDsWithTime :: forall prefix m
+                    . ( ToPrefix prefix
+                      , ValidPrefix (PrefixSymbol prefix)
+                      , MonadIO m )
+                   => Word64 -> Word16 -> m [KindID' 'V7 prefix]
+genKindIDsWithTime ts n
+  = fmap (unsafeFromTypeID <$>)
+  . (\p -> V7.unsafeGenTypeIDsWithTime p ts n) . T.pack
+  $ symbolVal @(PrefixSymbol prefix) Proxy
+{-# INLINE genKindIDsWithTime #-}
+
 -- | Generate a new 'KindID'' ''V1' from a prefix.
 --
 -- It throws a 'TypeIDError' if the prefix does not match the specification,

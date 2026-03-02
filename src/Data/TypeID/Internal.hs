@@ -647,6 +647,63 @@ unsafeGenTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID' 'V7]
 unsafeGenTypeIDs prefix n = map (TypeID' prefix) <$> V7.genUUIDs n
 {-# INLINE unsafeGenTypeIDs #-}
 
+-- | Generate a new 'Data.TypeID.V7.TypeID' from a prefix with a custom
+-- timestamp (milliseconds since Unix epoch).
+--
+-- It throws a 'TypeIDError' if the prefix does not match the specification,
+-- namely if it's longer than 63 characters or if it contains characters other
+-- than lowercase latin letters.
+genTypeIDWithTime :: MonadIO m => Text -> Word64 -> m (TypeID' 'V7)
+genTypeIDWithTime prefix ts = case checkPrefix prefix of
+  Nothing  -> unsafeGenTypeIDWithTime prefix ts
+  Just err -> liftIO $ throwIO err
+{-# INLINE genTypeIDWithTime #-}
+
+-- | Generate a new 'Data.TypeID.V7.TypeID' from a prefix with a custom
+-- timestamp based on stateless 'UUID'v7.
+--
+-- See the documentation of 'V7.genUUIDWithTime'' for more information.
+genTypeIDWithTime' :: MonadIO m => Text -> Word64 -> m (TypeID' 'V7)
+genTypeIDWithTime' prefix ts = case checkPrefix prefix of
+  Nothing  -> unsafeGenTypeIDWithTime' prefix ts
+  Just err -> liftIO $ throwIO err
+{-# INLINE genTypeIDWithTime' #-}
+
+-- | Generate a list of 'Data.TypeID.V7.TypeID's from a prefix with a custom
+-- timestamp (milliseconds since Unix epoch).
+--
+-- The first 32768 'Data.TypeID.V7.TypeID's are guaranteed to be monotonically
+-- increasing.
+genTypeIDsWithTime :: MonadIO m => Text -> Word64 -> Word16 -> m [TypeID' 'V7]
+genTypeIDsWithTime prefix ts n = case checkPrefix prefix of
+  Nothing  -> unsafeGenTypeIDsWithTime prefix ts n
+  Just err -> liftIO $ throwIO err
+{-# INLINE genTypeIDsWithTime #-}
+
+-- | Generate a new 'Data.TypeID.V7.TypeID' from a prefix with a custom
+-- timestamp, but without checking if the prefix is valid.
+unsafeGenTypeIDWithTime :: MonadIO m => Text -> Word64 -> m (TypeID' 'V7)
+unsafeGenTypeIDWithTime prefix ts = TypeID' prefix <$> V7.genUUIDWithTime ts
+{-# INLINE unsafeGenTypeIDWithTime #-}
+
+-- | Generate a new 'Data.TypeID.V7.TypeID' from a prefix with a custom
+-- timestamp based on stateless 'UUID'v7, but without checking if the prefix
+-- is valid.
+unsafeGenTypeIDWithTime' :: MonadIO m => Text -> Word64 -> m (TypeID' 'V7)
+unsafeGenTypeIDWithTime' prefix ts = TypeID' prefix <$> V7.genUUIDWithTime' ts
+{-# INLINE unsafeGenTypeIDWithTime' #-}
+
+-- | Generate n 'Data.TypeID.V7.TypeID's from a prefix with a custom timestamp,
+-- but without checking if the prefix is valid.
+--
+-- The first 32768 'Data.TypeID.V7.TypeID's are guaranteed to be monotonically
+-- increasing.
+unsafeGenTypeIDsWithTime :: MonadIO m
+                         => Text -> Word64 -> Word16 -> m [TypeID' 'V7]
+unsafeGenTypeIDsWithTime prefix ts n
+  = map (TypeID' prefix) <$> V7.genUUIDsWithTime ts n
+{-# INLINE unsafeGenTypeIDsWithTime #-}
+
 -- | Parse a 'TypeID'' from its 'String' representation, but crashes when
 -- parsing fails.
 unsafeParseString :: String -> TypeID' version

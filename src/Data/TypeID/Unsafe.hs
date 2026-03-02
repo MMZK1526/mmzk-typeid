@@ -14,6 +14,10 @@ module Data.TypeID.Unsafe
     unsafeGenTypeID
   , unsafeGenTypeID'
   , unsafeGenTypeIDs
+  -- * Unsafe 'Data.TypeID.V7.TypeID' generation with custom timestamp
+  , unsafeGenTypeIDWithTime
+  , unsafeGenTypeIDWithTime'
+  , unsafeGenTypeIDsWithTime
   -- * Unsafe decoding ('Data.TypeID.V7.TypeID'-specific)
   , unsafeParseString
   , unsafeParseText

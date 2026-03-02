@@ -17,6 +17,10 @@ module Data.UUID.V7
   , genUUID
   , genUUID'
   , genUUIDs
+  -- * 'UUID'v7 generation with custom timestamp
+  , genUUIDWithTime
+  , genUUIDWithTime'
+  , genUUIDsWithTime
   -- * Validation
   , validate
   , validateWithTime
@@ -52,15 +56,7 @@ genUUID = head <$> genUUIDs 1
 -- In use cases where the ordering is not important, this function is could be
 -- preferred.
 genUUID' :: MonadIO m => m UUID
-genUUID' = do
-  timestamp <- getEpochMilli
-  entropy16 <- getEntropyWord16
-  entropy64 <- getEntropyWord64
-  let bs = runPut do
-        fillTime timestamp
-        fillVerAndRandA entropy16
-        fillVarAndRandB entropy16 entropy64
-  pure . uncurry UUID $ runGet (join (liftM2 (,)) getWord64be) bs
+genUUID' = getEpochMilli >>= genUUIDWithTime'
 {-# INLINE genUUID' #-}
 
 -- | Generate a list of 'UUID'v7s.
@@ -108,6 +104,58 @@ genUUIDs = liftIO . go True
           if n' == n
             then pure uuids
             else (uuids ++) <$> go False (n - n')
+
+-- | Generate a 'UUID'v7 with a custom timestamp (milliseconds since Unix
+-- epoch).
+--
+-- It does not interact with the global state, so it is safe to interleave
+-- with 'genUUID'.
+genUUIDWithTime :: MonadIO m => Word64 -> m UUID
+genUUIDWithTime ts = head <$> genUUIDsWithTime ts 1
+{-# INLINE genUUIDWithTime #-}
+
+-- | Generate a stateless 'UUID'v7 with a custom timestamp (milliseconds since
+-- Unix epoch).
+--
+-- It is faster than 'genUUIDWithTime' but it is not guaranteed to be
+-- monotonically increasing if multiple 'UUID's are generated with the same
+-- timestamp.
+genUUIDWithTime' :: MonadIO m => Word64 -> m UUID
+genUUIDWithTime' timestamp = do
+  entropy16 <- getEntropyWord16
+  entropy64 <- getEntropyWord64
+  let bs = runPut do
+        fillTime timestamp
+        fillVerAndRandA entropy16
+        fillVarAndRandB entropy16 entropy64
+  pure . uncurry UUID $ runGet (join (liftM2 (,)) getWord64be) bs
+{-# INLINE genUUIDWithTime' #-}
+
+-- | Generate a list of 'UUID'v7s with a custom timestamp (milliseconds since
+-- Unix epoch).
+--
+-- The first 32768 'UUID's are guaranteed to be monotonically increasing.
+--
+-- It does not interact with the global state, so it is safe to interleave
+-- with 'genUUIDs'.
+genUUIDsWithTime :: MonadIO m => Word64 -> Word16 -> m [UUID]
+genUUIDsWithTime timestamp = liftIO . go
+  where
+    go 0 = pure []
+    go n = do
+      entropy16 <- (.&. 0x7FFF) <$> getEntropyWord16
+      let slots = min n (0xFFFF - entropy16)
+      uuids <- forM [0..(slots - 1)] \curN -> do
+        entropy64 <- getEntropyWord64
+        let seqNo = entropy16 + curN
+            bs = runPut do
+              fillTime timestamp
+              fillVerAndRandA seqNo
+              fillVarAndRandB seqNo entropy64
+        pure . uncurry UUID $ runGet (join (liftM2 (,)) getWord64be) bs
+      if slots == n
+        then pure uuids
+        else (uuids ++) <$> go (n - slots)
 
 -- | Validate the version and variant of the 'UUID'v7.
 validate :: UUID -> Bool

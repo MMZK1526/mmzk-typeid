@@ -19,6 +19,9 @@ module Data.TypeID.V7
   , genTypeID
   , genTypeID'
   , genTypeIDs
+  , genTypeIDWithTime
+  , genTypeIDWithTime'
+  , genTypeIDsWithTime
   , decorateTypeID
   -- * 'TypeID' generation (class methods)
   , genID
@@ -96,6 +99,32 @@ genTypeID' = TID.genTypeID'
 genTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID]
 genTypeIDs = TID.genTypeIDs
 {-# INLINE genTypeIDs #-}
+
+-- | Generate a new 'TypeID' from a prefix with a custom timestamp
+-- (milliseconds since Unix epoch).
+--
+-- It throws a 'TypeIDError' if the prefix does not match the specification,
+-- namely if it's longer than 63 characters or if it contains characters other
+-- than lowercase latin letters.
+genTypeIDWithTime :: MonadIO m => Text -> Word64 -> m TypeID
+genTypeIDWithTime = TID.genTypeIDWithTime
+{-# INLINE genTypeIDWithTime #-}
+
+-- | Generate a new 'TypeID' from a prefix with a custom timestamp based on
+-- stateless 'UUID'v7.
+--
+-- See the documentation of 'V7.genUUIDWithTime'' for more information.
+genTypeIDWithTime' :: MonadIO m => Text -> Word64 -> m TypeID
+genTypeIDWithTime' = TID.genTypeIDWithTime'
+{-# INLINE genTypeIDWithTime' #-}
+
+-- | Generate a list of 'TypeID's from a prefix with a custom timestamp
+-- (milliseconds since Unix epoch).
+--
+-- The first 32768 'TypeID's are guaranteed to be monotonically increasing.
+genTypeIDsWithTime :: MonadIO m => Text -> Word64 -> Word16 -> m [TypeID]
+genTypeIDsWithTime = TID.genTypeIDsWithTime
+{-# INLINE genTypeIDsWithTime #-}
 
 -- | Obtain a 'TypeID' from a prefix and a 'UUID'.
 decorateTypeID :: Text -> UUID -> Either TypeIDError TypeID
