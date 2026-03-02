@@ -49,6 +49,9 @@ module Data.KindID
   , genKindID
   , genKindID'
   , genKindIDs
+  , genKindIDWithTime
+  , genKindIDWithTime'
+  , genKindIDsWithTime
   , decorateKindID
   -- * 'KindID' generation (class methods)
   , genID

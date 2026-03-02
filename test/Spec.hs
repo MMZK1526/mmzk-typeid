@@ -113,6 +113,7 @@ main :: IO ()
 main = hspec do
   typeLevelTest
   v7Test
+  v7WithTimeTest
   v1Test
   v4Test
   v5Test
@@ -364,6 +365,73 @@ v7Test = do
         kid'' <- peek ptr
         kid'' `shouldBe` kid'
         free ptr
+
+v7WithTimeTest :: Spec
+v7WithTimeTest = do
+  let testTimestamp = 1234567890123 :: Word64
+  describe "Generate TypeID with custom timestamp" do
+    it "can generate TypeID with correct prefix and timestamp" do
+      tid <- genTypeIDWithTime "mmzk" testTimestamp
+      getPrefix tid `shouldBe` "mmzk"
+      getTime tid `shouldBe` testTimestamp
+      validateWithVersion (getUUID tid) V7 `shouldBe` True
+    it "can generate TypeID with stateless UUIDv7 and custom timestamp" do
+      tid <- genTypeIDWithTime' "mmzk" testTimestamp
+      getPrefix tid `shouldBe` "mmzk"
+      getTime tid `shouldBe` testTimestamp
+      validateWithVersion (getUUID tid) V7 `shouldBe` True
+    it "can generate batch with same custom timestamp and ascending order" do
+      tids <- genTypeIDsWithTime "mmzk" testTimestamp 100
+      all ((== "mmzk") . getPrefix) tids `shouldBe` True
+      all ((== testTimestamp) . getTime) tids `shouldBe` True
+      all (\tid -> validateWithVersion (getUUID tid) V7) tids `shouldBe` True
+      all (uncurry (<)) (zip tids $ tail tids) `shouldBe` True
+    it "rejects invalid prefix" do
+      genTypeIDWithTime "INVALID" testTimestamp `shouldThrow` anyTypeIDError
+    it "works with timestamp 0" do
+      tid <- genTypeIDWithTime "mmzk" 0
+      getPrefix tid `shouldBe` "mmzk"
+      getTime tid `shouldBe` 0
+      validateWithVersion (getUUID tid) V7 `shouldBe` True
+  describe "Generate KindID with custom timestamp" do
+    it "can generate KindID with correct prefix and timestamp" do
+      kid <- genKindIDWithTime @"mmzk" testTimestamp
+      getPrefix kid `shouldBe` "mmzk"
+      getTime kid `shouldBe` testTimestamp
+      validateWithVersion (getUUID kid) V7 `shouldBe` True
+    it "can generate KindID with stateless UUIDv7 and custom timestamp" do
+      kid <- genKindIDWithTime' @"mmzk" testTimestamp
+      getPrefix kid `shouldBe` "mmzk"
+      getTime kid `shouldBe` testTimestamp
+      validateWithVersion (getUUID kid) V7 `shouldBe` True
+    it "can generate KindID batch with same custom timestamp and ascending order" do
+      kids <- genKindIDsWithTime @"mmzk" testTimestamp 100
+      all ((== "mmzk") . getPrefix) kids `shouldBe` True
+      all ((== testTimestamp) . getTime) kids `shouldBe` True
+      all (\kid -> validateWithVersion (getUUID kid) V7) kids `shouldBe` True
+      all (uncurry (<)) (zip kids $ tail kids) `shouldBe` True
+  describe "Generate UUID with custom timestamp" do
+    it "can generate UUID with correct timestamp" do
+      uuid <- V7.genUUIDWithTime testTimestamp
+      V7.getTime uuid `shouldBe` testTimestamp
+      V7.validate uuid `shouldBe` True
+    it "can generate stateless UUID with correct timestamp" do
+      uuid <- V7.genUUIDWithTime' testTimestamp
+      V7.getTime uuid `shouldBe` testTimestamp
+      V7.validate uuid `shouldBe` True
+    it "can generate UUID batch with same timestamp and ascending order" do
+      uuids <- V7.genUUIDsWithTime testTimestamp 100
+      all ((== testTimestamp) . V7.getTime) uuids `shouldBe` True
+      all V7.validate uuids `shouldBe` True
+      all (uncurry (<)) (zip uuids $ tail uuids) `shouldBe` True
+  describe "Custom timestamp does not affect global state" do
+    it "does not interfere with normal generation" do
+      tid1 <- genID @TypeID "test"
+      let ts1 = getTime tid1
+      _    <- genTypeIDWithTime "test" 0
+      tid2 <- genID @TypeID "test"
+      let ts2 = getTime tid2
+      ts2 `shouldSatisfy` (>= ts1)
 
 v1Test :: Spec
 v1Test = do

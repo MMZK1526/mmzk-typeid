@@ -21,6 +21,9 @@ module Data.TypeID
   , genTypeID
   , genTypeID'
   , genTypeIDs
+  , genTypeIDWithTime
+  , genTypeIDWithTime'
+  , genTypeIDsWithTime
   , decorateTypeID
   -- * 'TypeID' generation (class methods)
   , genID

@@ -12,6 +12,10 @@ module Data.TypeID.V7.Unsafe
     unsafeGenTypeID
   , unsafeGenTypeID'
   , unsafeGenTypeIDs
+  -- * Unsafe 'TypeID' generation with custom timestamp
+  , unsafeGenTypeIDWithTime
+  , unsafeGenTypeIDWithTime'
+  , unsafeGenTypeIDsWithTime
   -- * Unsafe decoding ('TypeID'-specific)
   , unsafeParseString
   , unsafeParseText
@@ -55,6 +59,28 @@ unsafeGenTypeID' = TID.unsafeGenTypeID'
 unsafeGenTypeIDs :: MonadIO m => Text -> Word16 -> m [TypeID]
 unsafeGenTypeIDs = TID.unsafeGenTypeIDs
 {-# INLINE unsafeGenTypeIDs #-}
+
+-- | Generate a new 'TypeID' from a prefix with a custom timestamp
+-- (milliseconds since Unix epoch), but without checking if the prefix is
+-- valid.
+unsafeGenTypeIDWithTime :: MonadIO m => Text -> Word64 -> m TypeID
+unsafeGenTypeIDWithTime = TID.unsafeGenTypeIDWithTime
+{-# INLINE unsafeGenTypeIDWithTime #-}
+
+-- | Generate a new 'TypeID' from a prefix with a custom timestamp based on
+-- stateless 'Data.UUID.Types.Internal.UUID'v7, but without checking if the
+-- prefix is valid.
+unsafeGenTypeIDWithTime' :: MonadIO m => Text -> Word64 -> m TypeID
+unsafeGenTypeIDWithTime' = TID.unsafeGenTypeIDWithTime'
+{-# INLINE unsafeGenTypeIDWithTime' #-}
+
+-- | Generate n 'TypeID's from a prefix with a custom timestamp, but without
+-- checking if the prefix is valid.
+--
+-- The first 32768 'TypeID's are guaranteed to be monotonically increasing.
+unsafeGenTypeIDsWithTime :: MonadIO m => Text -> Word64 -> Word16 -> m [TypeID]
+unsafeGenTypeIDsWithTime = TID.unsafeGenTypeIDsWithTime
+{-# INLINE unsafeGenTypeIDsWithTime #-}
 
 -- | Parse a 'TypeID' from its 'String' representation, but crashes when
 -- parsing fails.

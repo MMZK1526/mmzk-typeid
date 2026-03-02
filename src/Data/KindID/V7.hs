@@ -19,6 +19,9 @@ module Data.KindID.V7
   , genKindID
   , genKindID'
   , genKindIDs
+  , genKindIDWithTime
+  , genKindIDWithTime'
+  , genKindIDsWithTime
   , decorateKindID
   -- * 'KindID' generation (class methods)
   , genID
@@ -104,6 +107,29 @@ genKindIDs :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
            => Word16 -> m [KindID prefix]
 genKindIDs = KID.genKindIDs
 {-# INLINE genKindIDs #-}
+
+-- | Generate a new 'KindID' from a prefix with a custom timestamp
+-- (milliseconds since Unix epoch).
+genKindIDWithTime :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+                  => Word64 -> m (KindID prefix)
+genKindIDWithTime = KID.genKindIDWithTime
+{-# INLINE genKindIDWithTime #-}
+
+-- | Generate a new 'KindID' from a prefix with a custom timestamp based on
+-- stateless 'UUID'v7.
+genKindIDWithTime' :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+                   => Word64 -> m (KindID prefix)
+genKindIDWithTime' = KID.genKindIDWithTime'
+{-# INLINE genKindIDWithTime' #-}
+
+-- | Generate a list of 'KindID's from a prefix with a custom timestamp
+-- (milliseconds since Unix epoch).
+--
+-- The first 32768 'KindID's are guaranteed to be monotonically increasing.
+genKindIDsWithTime :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
+                   => Word64 -> Word16 -> m [KindID prefix]
+genKindIDsWithTime = KID.genKindIDsWithTime
+{-# INLINE genKindIDsWithTime #-}
 
 -- | Obtain a 'KindID' from a prefix and a 'UUID'.
 decorateKindID :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix))
