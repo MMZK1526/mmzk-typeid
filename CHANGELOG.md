@@ -12,6 +12,8 @@
 
 * More tests.
 
+* Kindly contributed by @johnhampton.
+
 
 ## 0.7.0.2 -- 2025-04-22
 
