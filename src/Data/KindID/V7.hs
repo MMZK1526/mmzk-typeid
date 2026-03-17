@@ -110,6 +110,9 @@ genKindIDs = KID.genKindIDs
 
 -- | Generate a new 'KindID' from a prefix with a custom timestamp
 -- (milliseconds since Unix epoch).
+--
+-- Note: a future timestamp will produce a valid 'KindID' that nonetheless
+-- fails 'checkKindIDWithEnv'.
 genKindIDWithTime :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
                   => Word64 -> m (KindID prefix)
 genKindIDWithTime = KID.genKindIDWithTime
@@ -117,6 +120,9 @@ genKindIDWithTime = KID.genKindIDWithTime
 
 -- | Generate a new 'KindID' from a prefix with a custom timestamp based on
 -- stateless 'UUID'v7.
+--
+-- Note: a future timestamp will produce a valid 'KindID' that nonetheless
+-- fails 'checkKindIDWithEnv'.
 genKindIDWithTime' :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
                    => Word64 -> m (KindID prefix)
 genKindIDWithTime' = KID.genKindIDWithTime'
@@ -126,6 +132,9 @@ genKindIDWithTime' = KID.genKindIDWithTime'
 -- (milliseconds since Unix epoch).
 --
 -- The first 32768 'KindID's are guaranteed to be monotonically increasing.
+--
+-- Note: a future timestamp will produce valid 'KindID's that nonetheless
+-- fail 'checkKindIDWithEnv'.
 genKindIDsWithTime :: (ToPrefix prefix, ValidPrefix (PrefixSymbol prefix), MonadIO m)
                    => Word64 -> Word16 -> m [KindID prefix]
 genKindIDsWithTime = KID.genKindIDsWithTime

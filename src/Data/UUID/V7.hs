@@ -110,6 +110,9 @@ genUUIDs = liftIO . go True
 --
 -- It does not interact with the global state, so it is safe to interleave
 -- with 'genUUID'.
+--
+-- Note: a future timestamp will produce a valid 'UUID' that nonetheless
+-- fails 'validateWithTime'.
 genUUIDWithTime :: MonadIO m => Word64 -> m UUID
 genUUIDWithTime ts = head <$> genUUIDsWithTime ts 1
 {-# INLINE genUUIDWithTime #-}
@@ -120,6 +123,9 @@ genUUIDWithTime ts = head <$> genUUIDsWithTime ts 1
 -- It is faster than 'genUUIDWithTime' but it is not guaranteed to be
 -- monotonically increasing if multiple 'UUID's are generated with the same
 -- timestamp.
+--
+-- Note: a future timestamp will produce a valid 'UUID' that nonetheless
+-- fails 'validateWithTime'.
 genUUIDWithTime' :: MonadIO m => Word64 -> m UUID
 genUUIDWithTime' timestamp = do
   entropy16 <- getEntropyWord16
@@ -144,6 +150,9 @@ genUUIDWithTime' timestamp = do
 --
 -- It does not interact with the global state, so it is safe to interleave
 -- with 'genUUIDs'.
+--
+-- Note: a future timestamp will produce valid 'UUID's that nonetheless
+-- fail 'validateWithTime'.
 genUUIDsWithTime :: MonadIO m => Word64 -> Word16 -> m [UUID]
 genUUIDsWithTime timestamp = liftIO . go
   where

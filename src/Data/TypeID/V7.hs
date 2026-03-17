@@ -106,6 +106,9 @@ genTypeIDs = TID.genTypeIDs
 -- It throws a 'TypeIDError' if the prefix does not match the specification,
 -- namely if it's longer than 63 characters or if it contains characters other
 -- than lowercase latin letters.
+--
+-- Note: a future timestamp will produce a valid 'TypeID' that nonetheless
+-- fails 'checkTypeIDWithEnv'.
 genTypeIDWithTime :: MonadIO m => Text -> Word64 -> m TypeID
 genTypeIDWithTime = TID.genTypeIDWithTime
 {-# INLINE genTypeIDWithTime #-}
@@ -114,6 +117,9 @@ genTypeIDWithTime = TID.genTypeIDWithTime
 -- stateless 'UUID'v7.
 --
 -- See the documentation of 'V7.genUUIDWithTime'' for more information.
+--
+-- Note: a future timestamp will produce a valid 'TypeID' that nonetheless
+-- fails 'checkTypeIDWithEnv'.
 genTypeIDWithTime' :: MonadIO m => Text -> Word64 -> m TypeID
 genTypeIDWithTime' = TID.genTypeIDWithTime'
 {-# INLINE genTypeIDWithTime' #-}
@@ -122,6 +128,9 @@ genTypeIDWithTime' = TID.genTypeIDWithTime'
 -- (milliseconds since Unix epoch).
 --
 -- The first 32768 'TypeID's are guaranteed to be monotonically increasing.
+--
+-- Note: a future timestamp will produce valid 'TypeID's that nonetheless
+-- fail 'checkTypeIDWithEnv'.
 genTypeIDsWithTime :: MonadIO m => Text -> Word64 -> Word16 -> m [TypeID]
 genTypeIDsWithTime = TID.genTypeIDsWithTime
 {-# INLINE genTypeIDsWithTime #-}
