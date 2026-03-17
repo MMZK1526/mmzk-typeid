@@ -135,6 +135,12 @@ genUUIDWithTime' timestamp = do
 -- Unix epoch).
 --
 -- The first 32768 'UUID's are guaranteed to be monotonically increasing.
+-- Beyond that, if the sequence number space is exhausted, a new random
+-- starting sequence number is drawn for the remaining 'UUID's. That new
+-- starting point may be lower than where the previous batch ended, so
+-- later 'UUID's in the list can sort before earlier ones, or even share
+-- the same sequence number (though a full 'UUID' collision remains
+-- astronomically unlikely due to the independent 58-bit rand_b entropy).
 --
 -- It does not interact with the global state, so it is safe to interleave
 -- with 'genUUIDs'.
@@ -169,7 +175,7 @@ validateWithTime uuid = do
   curTime <- getEpochMilli
   pure $ validate uuid && (getTime uuid <= curTime)
 {-# INLINE validateWithTime #-}
-  
+
 -- | Get the current time in milliseconds since the Unix epoch.
 getEpochMilli :: MonadIO m => m Word64
 getEpochMilli = liftIO do
