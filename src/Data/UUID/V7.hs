@@ -53,7 +53,7 @@ genUUID = head <$> genUUIDs 1
 -- It is faster than 'genUUID' but it is not guaranteed to be monotonically
 -- increasing if multiple 'UUID's are generated at the same timestamp.
 --
--- In use cases where the ordering is not important, this function is could be
+-- In use cases where the ordering is not important, this function may be
 -- preferred.
 genUUID' :: MonadIO m => m UUID
 genUUID' = getEpochMilli >>= genUUIDWithTime'
