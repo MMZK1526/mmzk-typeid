@@ -1,7 +1,7 @@
 # Revision history for mmzk-typeid
 
 
-## 0.7.1.0 -- UNRELEASED
+## 0.7.1.0 -- 2026-03-18
 
 * Add custom timestamp support for V7 UUID/TypeID/KindID generation.
   * New functions `genUUIDWithTime`, `genUUIDWithTime'`, and `genUUIDsWithTime` in `Data.UUID.V7`.
