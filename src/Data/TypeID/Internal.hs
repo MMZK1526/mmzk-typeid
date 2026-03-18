@@ -32,7 +32,6 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 import           Data.Text.Encoding
 import           Data.Tuple
-import           Data.Typeable (Typeable)
 import           Data.TypeID.Class
 import           Data.TypeID.Error
 import           Data.UUID.Types.Internal (UUID(..))
@@ -51,7 +50,7 @@ import           System.Random
 --  The constructor is not exposed to the public API to prevent generating
 -- invalid 'TypeID''s.
 data TypeID' (version :: UUIDVersion) = TypeID' Text UUID
-  deriving (Eq, Ord, Data, Typeable, Generic)
+  deriving (Eq, Ord, Data, Generic)
 
 instance Show (TypeID' version) where
   show :: TypeID' version -> String

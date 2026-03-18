@@ -10,6 +10,8 @@
   * New functions `genKindIDWithTime`, `genKindIDWithTime'`, and `genKindIDsWithTime` in `Data.KindID.V7` (and re-exported from `Data.KindID`).
   * These functions accept a `Word64` timestamp (milliseconds since Unix epoch) and do not interact with the global monotonic state.
 
+* Drop redundant `Typeable` derivation.
+
 * More tests.
 
 * Kindly contributed by @johnhampton.
