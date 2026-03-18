@@ -13,11 +13,11 @@ module Data.UUID.V7
   (
   -- * Data type
     UUID
-  -- * 'UUID'v7 generation
+  -- * t'UUID'v7 generation
   , genUUID
   , genUUID'
   , genUUIDs
-  -- * 'UUID'v7 generation with custom timestamp
+  -- * t'UUID'v7 generation with custom timestamp
   , genUUIDWithTime
   , genUUIDWithTime'
   , genUUIDsWithTime
@@ -43,15 +43,15 @@ import           Data.UUID.Versions
 import           System.Entropy
 import           System.IO.Unsafe (unsafePerformIO)
 
--- | Generate a 'UUID'v7.
+-- | Generate a t'UUID'v7.
 genUUID :: MonadIO m => m UUID
 genUUID = head <$> genUUIDs 1
 {-# INLINE genUUID #-}
 
--- | Generate a stateless 'UUID'v7.
+-- | Generate a stateless t'UUID'v7.
 --
 -- It is faster than 'genUUID' but it is not guaranteed to be monotonically
--- increasing if multiple 'UUID's are generated at the same timestamp.
+-- increasing if multiple t'UUID's are generated at the same timestamp.
 --
 -- In use cases where the ordering is not important, this function may be
 -- preferred.
@@ -59,12 +59,12 @@ genUUID' :: MonadIO m => m UUID
 genUUID' = getEpochMilli >>= genUUIDWithTime'
 {-# INLINE genUUID' #-}
 
--- | Generate a list of 'UUID'v7s.
+-- | Generate a list of t'UUID'v7s.
 --
--- It tries its best to generate 'UUID's at the same timestamp, but it may not
--- be possible if we are asking too many 'UUID's at the same time.
+-- It tries its best to generate t'UUID's at the same timestamp, but it may not
+-- be possible if we are asking too many t'UUID's at the same time.
 --
--- It is guaranteed that the first 32768 'UUID's are generated at the same
+-- It is guaranteed that the first 32768 t'UUID's are generated at the same
 -- timestamp.
 genUUIDs :: MonadIO m => Word16 -> m [UUID]
 genUUIDs = liftIO . go True
@@ -105,26 +105,26 @@ genUUIDs = liftIO . go True
             then pure uuids
             else (uuids ++) <$> go False (n - n')
 
--- | Generate a 'UUID'v7 with a custom timestamp (milliseconds since Unix
+-- | Generate a t'UUID'v7 with a custom timestamp (milliseconds since Unix
 -- epoch).
 --
 -- It does not interact with the global state, so it is safe to interleave
 -- with 'genUUID'.
 --
--- Note: a future timestamp will produce a valid 'UUID' that nonetheless
+-- Note: a future timestamp will produce a valid t'UUID' that nonetheless
 -- fails 'validateWithTime'.
 genUUIDWithTime :: MonadIO m => Word64 -> m UUID
 genUUIDWithTime ts = head <$> genUUIDsWithTime ts 1
 {-# INLINE genUUIDWithTime #-}
 
--- | Generate a stateless 'UUID'v7 with a custom timestamp (milliseconds since
+-- | Generate a stateless t'UUID'v7 with a custom timestamp (milliseconds since
 -- Unix epoch).
 --
 -- It is faster than 'genUUIDWithTime' but it is not guaranteed to be
--- monotonically increasing if multiple 'UUID's are generated with the same
+-- monotonically increasing if multiple t'UUID's are generated with the same
 -- timestamp.
 --
--- Note: a future timestamp will produce a valid 'UUID' that nonetheless
+-- Note: a future timestamp will produce a valid t'UUID' that nonetheless
 -- fails 'validateWithTime'.
 genUUIDWithTime' :: MonadIO m => Word64 -> m UUID
 genUUIDWithTime' timestamp = do
@@ -137,21 +137,21 @@ genUUIDWithTime' timestamp = do
   pure . uncurry UUID $ runGet (join (liftM2 (,)) getWord64be) bs
 {-# INLINE genUUIDWithTime' #-}
 
--- | Generate a list of 'UUID'v7s with a custom timestamp (milliseconds since
+-- | Generate a list of t'UUID'v7s with a custom timestamp (milliseconds since
 -- Unix epoch).
 --
--- The first 32768 'UUID's are guaranteed to be monotonically increasing.
+-- The first 32768 t'UUID's are guaranteed to be monotonically increasing.
 -- Beyond that, if the sequence number space is exhausted, a new random
--- starting sequence number is drawn for the remaining 'UUID's. That new
+-- starting sequence number is drawn for the remaining t'UUID's. That new
 -- starting point may be lower than where the previous batch ended, so
--- later 'UUID's in the list can sort before earlier ones, or even share
--- the same sequence number (though a full 'UUID' collision remains
+-- later t'UUID's in the list can sort before earlier ones, or even share
+-- the same sequence number (though a full t'UUID' collision remains
 -- astronomically unlikely due to the independent 58-bit rand_b entropy).
 --
 -- It does not interact with the global state, so it is safe to interleave
 -- with 'genUUIDs'.
 --
--- Note: a future timestamp will produce valid 'UUID's that nonetheless
+-- Note: a future timestamp will produce valid t'UUID's that nonetheless
 -- fail 'validateWithTime'.
 genUUIDsWithTime :: MonadIO m => Word64 -> Word16 -> m [UUID]
 genUUIDsWithTime timestamp = liftIO . go
@@ -172,12 +172,12 @@ genUUIDsWithTime timestamp = liftIO . go
         then pure uuids
         else (uuids ++) <$> go (n - slots)
 
--- | Validate the version and variant of the 'UUID'v7.
+-- | Validate the version and variant of the t'UUID'v7.
 validate :: UUID -> Bool
 validate = flip validateWithVersion V7
 {-# INLINE validate #-}
 
--- | Validate the version and variant of the 'UUID'v7 as well as its timestamp
+-- | Validate the version and variant of the t'UUID'v7 as well as its timestamp
 -- is no greater than the current time.
 validateWithTime :: MonadIO m => UUID -> m Bool
 validateWithTime uuid = do
@@ -192,7 +192,7 @@ getEpochMilli = liftIO do
   pure . round $ t * 1000
 {-# INLINE getEpochMilli #-}
 
--- | Get the time field (unix_ts_ms) of a 'UUID'v7.
+-- | Get the time field (unix_ts_ms) of a t'UUID'v7.
 getTime :: UUID -> Word64
 getTime (UUID w1 _) = w1 `shiftR` 16
 {-# INLINE getTime #-}
@@ -205,7 +205,7 @@ __state__ :: IORef (Word64, Word16)
 __state__ = unsafePerformIO (newIORef (0, 0))
 {-# NOINLINE __state__ #-}
 
--- | Fill in the 48-bit time field (unix_ts_ms) of a 'UUID'v7 with the given
+-- | Fill in the 48-bit time field (unix_ts_ms) of a t'UUID'v7 with the given
 -- time.
 fillTime :: Word64 -> Put
 fillTime timestamp = do
@@ -213,7 +213,7 @@ fillTime timestamp = do
   mapM_ putWord16be [p2, p1, p0]
 {-# INLINE fillTime #-}
 
--- | Fill in the version and rand_a part of a 'UUID'v7 with the given sequence
+-- | Fill in the version and rand_a part of a t'UUID'v7 with the given sequence
 -- number.
 --
 -- The sequence number is a 16-bit integer, of which the first 12 bits are used
@@ -225,7 +225,7 @@ fillVerAndRandA seqNo = do
   putWord16be randAWithVer
 {-# INLINE fillVerAndRandA #-}
 
--- | Fill in the variant and rand_b part of a 'UUID'v7 with the given sequence
+-- | Fill in the variant and rand_b part of a t'UUID'v7 with the given sequence
 -- number and random number. The variant is 2.
 --
 -- The sequence number is a 16-bit integer, of which the last 4 bits are used

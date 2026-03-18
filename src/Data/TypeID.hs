@@ -13,7 +13,7 @@ module Data.TypeID
   (
   -- * Data types
     TypeID
-  , TypeID'
+  , TypeID'()
   , getPrefix
   , getUUID
   , getTime

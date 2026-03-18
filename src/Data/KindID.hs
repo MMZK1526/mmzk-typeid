@@ -41,7 +41,7 @@ module Data.KindID
   (
   -- * Data types
     KindID
-  , KindID'
+  , KindID'()
   , getPrefix
   , getUUID
   , getTime
