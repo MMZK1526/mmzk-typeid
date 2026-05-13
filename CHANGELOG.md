@@ -1,6 +1,15 @@
 # Revision history for mmzk-typeid
 
 
+## 0.7.1.1 -- 2026-05-13
+
+* Support `random` 1.3.
+
+* Tested with GHC 9.14.1.
+
+* Kindly contributed by @ysangkok.
+
+
 ## 0.7.1.0 -- 2026-03-18
 
 * Add custom timestamp support for V7 UUID/TypeID/KindID generation.
