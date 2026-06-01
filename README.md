@@ -14,7 +14,7 @@ For more information, please check out [specification v0.3.0](https://github.com
 
 It also serves as a (temporary) UUIDv7 implementation in Haskell, since there are no official ones yet.
 
-If you notice any issues or have any suggestions, please feel free to open an issue or contact me via email.
+If you notice any issues or have any suggestions, please feel free to open an issue.
 
 ## Highlights
 
