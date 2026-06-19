@@ -1,7 +1,6 @@
 -- |
 -- Module      : Data.KindID.V1
 -- License     : MIT
--- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
 -- 'Data.KindID.V7.KindID' with 'UUID'v1.

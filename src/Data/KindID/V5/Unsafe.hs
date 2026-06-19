@@ -1,7 +1,6 @@
 -- |
 -- Module      : Data.KindID.V5.Unsafe
 -- License     : MIT
--- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
 -- Unsafe 'KindIDV5' functions.

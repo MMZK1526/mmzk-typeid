@@ -1,7 +1,6 @@
 -- |
 -- Module      : Data.TypeID.V1.Unsafe
 -- License     : MIT
--- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
 -- Unsafe 'TypeIDV1' functions.

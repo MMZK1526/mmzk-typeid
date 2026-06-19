@@ -1,7 +1,6 @@
 -- |
 -- Module      : Data.UUID.Versions
 -- License     : MIT
--- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
 -- Supported t'UUID' versions for 'Data.TypeID.TypeID''.

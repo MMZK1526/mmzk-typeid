@@ -1,7 +1,6 @@
 -- |
 -- Module      : Data.UUID.V7
 -- License     : MIT
--- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
 -- UUIDv7 implementation.

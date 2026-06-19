@@ -3,7 +3,6 @@
 -- |
 -- Module      : Data.TypeID.Class
 -- License     : MIT
--- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
 -- A module with the APIs for any 'Data.TypeID.V7.TypeID'-ish identifier type.

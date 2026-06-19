@@ -3,7 +3,6 @@
 -- |
 -- Module      : Data.KindID.Internal
 -- License     : MIT
--- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
 module Data.KindID.Internal where

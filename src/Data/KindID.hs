@@ -1,7 +1,6 @@
 -- |
 -- Module      : Data.KindID
 -- License     : MIT
--- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
 -- Similar to "Data.TypeID", but the type is statically determined in the type

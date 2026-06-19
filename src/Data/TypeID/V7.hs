@@ -1,7 +1,6 @@
 -- |
 -- Module      : Data.TypeID.V7
 -- License     : MIT
--- Maintainer  : mmzk1526@outlook.com
 -- Portability : GHC
 --
 -- An implementation of the 'TypeID' specification:

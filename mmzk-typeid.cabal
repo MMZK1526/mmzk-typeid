@@ -31,8 +31,8 @@ description:
 homepage:           https://github.com/MMZK1526/mmzk-typeid
 bug-reports:        https://github.com/MMZK1526/mmzk-typeid/issues
 license:            MIT
-author:             Yitang Chen <mmzk1526@outlook.com>
-maintainer:         Yitang Chen <mmzk1526@outlook.com>
+author:             MMZK1526
+maintainer:         MMZK1526
 category:           Data, UUID, UUIDv7, TypeID
 tested-with:
     GHC == 9.4.8
