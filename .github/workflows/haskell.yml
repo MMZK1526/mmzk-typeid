@@ -19,51 +19,10 @@ jobs:
         ghc: [9.4.8, 9.6.7, 9.8.4, 9.12.4, 9.14.1]
     steps:
       - uses: actions/checkout@v4
-      - name: Detect GHCup home
-        id: ghcup-home
-        shell: bash
-        run: |
-          if [[ "${{ runner.os }}" == "Linux" ]]; then
-            echo "path=/usr/local/.ghcup" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ runner.os }}" == "macOS" ]]; then
-            echo "path=$HOME/.ghcup" >> "$GITHUB_OUTPUT"
-          else
-            echo "path=C:/ghcup" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Restore GHCup cache
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ${{ steps.ghcup-home.outputs.path }}/ghc
-            ${{ steps.ghcup-home.outputs.path }}/cabal
-            ${{ steps.ghcup-home.outputs.path }}/bin
-          key: ${{ runner.os }}-ghcup-${{ matrix.ghc }}-v1
-
-      - name: Check GHCup cache hit
-        id: ghcup-hit
-        shell: bash
-        run: |
-          if [ -d "${{ steps.ghcup-home.outputs.path }}/ghc/${{ matrix.ghc }}" ]; then
-            echo "hit=true" >> $GITHUB_OUTPUT
-          else
-            echo "hit=false" >> $GITHUB_OUTPUT
-          fi
-
       - uses: haskell-actions/setup@v2
         with:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: latest
-
-      - name: Save GHCup cache
-        if: steps.ghcup-hit.outputs.hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            ${{ steps.ghcup-home.outputs.path }}/ghc
-            ${{ steps.ghcup-home.outputs.path }}/cabal
-            ${{ steps.ghcup-home.outputs.path }}/bin
-          key: ${{ runner.os }}-ghcup-${{ matrix.ghc }}-v1
       - name: Cache
         uses: actions/cache@v4
         env:
