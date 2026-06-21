@@ -23,17 +23,6 @@ jobs:
         uses: MMZK1526/haskell-ci@main
         with:
           ghc-version: ${{ matrix.ghc }}
-      - name: Cache
-        uses: actions/cache@v4
-        env:
-          cache-name: cabal-cache
-        with:
-          path: |
-            ~/.cabal/store
-            ./dist-newstyle
-          key: ${{ runner.os }}-${{ matrix.ghc }}--${{ hashFiles('cabal.project.freeze') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.ghc }}-
       - name: Install dependencies
         run: |
           cabal update
